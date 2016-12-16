@@ -1,7 +1,8 @@
 <p id="notice"><%= notice %></p>
 <%= render 'top' %>
 
-<h2>Step Detail for Step: <%= @step %></h2>
+<% steprec = @results.find {|r| r.step == @step} %>
+<h2>Step Detail for Step: <%= @step %> @ <%= steprec.timestamp %> hours</h2>
 
 <table>
   <thead>

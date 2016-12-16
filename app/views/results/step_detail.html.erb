@@ -30,7 +30,7 @@
 	<% prev_step = 0 %>
 	<% @results.each do | i | %>
 	  <% if i.step != prev_step %>
-		<tr><td>Step <%= i.step %>  @ <%= '%8.4f'% i.timestamp %> Hours</td></tr>
+		<tr><td colspan="18"><strong>Step <%= i.step %>  @ <%= '%8.4f'% i.timestamp %> Hours</strong></td></tr>
 		<% prev_step = i.step %>
 	  <% end %>
       <tr>

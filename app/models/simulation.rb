@@ -125,7 +125,6 @@ class Simulation < ActiveRecord::Base
         $maxsteps = $step - 1
 #       Save step results in database table for user viewing
         save_results
-        @summary_results = summary_results_calc(@statar, @stepar)
 #      rescue => e
 #        logger.fatal e.message + "\n"
 #        self.errors.add(:base, e.message)
@@ -866,17 +865,19 @@ class Simulation < ActiveRecord::Base
   end
 
 
-  def summary_results_calc(statar, stepar)
-#   Get the list of stations from the saved step results
-    stations = @results.map do |s| {station_id: s.station_id_id, name: s.stat}
+  def summary_results_calc(results)
+#   Get the list of stations from the saved step results.  @results is the only data available at this point.
+#    logger.info "summary_results_calc: #{@results.inspect}"
+    stations = results.map {|s| [s.station_id_id, s.kmp, s.stat]}.uniq
+    stations.sort_by! {|s| s[1]}
 #   Find the bottleneck points for each step on the line
     bottlenecks = Array[$maxsteps]
     step_ix = 0
     while step_ix <= $maxsteps-1
       max_viol = -9e9
       bottleneck_station = "  "
-      stepar.select {|s| s.step - 1 == step_ix}.each do |r|
-        if (r.stat != statar.last.name) and (r.min_pressure_violation > max_viol) then
+      results.select {|s| s.step - 1 == step_ix}.each do |r|
+        if (r.stat != stations.last[2]) and (r.min_pressure_violation > max_viol) then
           bottleneck_station = r.stat
           max_viol = r.min_pressure_violation
         end
@@ -887,8 +888,9 @@ class Simulation < ActiveRecord::Base
     summary_results = Array.new    
 #   Calculate the totals and averages for each station across all steps
     stations[0...-1].each do |i|
-      stat = i.name
-      station_id = i.station_id
+      station_id = i[0]
+      kmp = i[1]
+      stat = i[2]
       total_time = 0
       accum_volume = 0
       accum_hold = 0
@@ -896,39 +898,37 @@ class Simulation < ActiveRecord::Base
       accum_head = 0
       accum_casep = 0
       accum_disc = 0
-      kwh = 0
+      total_kwh = 0
       bottleneck_time = 0
-      station_step_results = stepar.select {|s| s.stat == stat}
-      step_ix = 1
-      while step_ix <= station_step_results.size - 1
-        steptime = station_step_results[step_ix].timestamp - station_step_results[step_ix - 1].timestamp
-        s = station_step_results[step_ix - 1]
+      station_step_results = results.select {|s| s.stat == stat}
+      station_step_results[0...-1].each do |s|
+        step = s.step
+        steptime = s.step_time
         accum_volume = accum_volume + s.flow*steptime
         accum_hold = accum_hold + s.hold*steptime
         accum_suct = accum_suct + s.suct*steptime
         accum_head = accum_head + s.head*steptime
         accum_casep = accum_casep + s.casep*steptime
         accum_disc = accum_disc + s.disc*steptime
-        kwh = s.hhp * steptime
-        if bottlenecks[step_ix - 1] == stat then
+        total_kwh = total_kwh + s.hhp * steptime
+        if bottlenecks[step - 1] == stat then
           bottleneck_time = bottleneck_time + steptime
         end
         total_time = total_time + steptime
-        step_ix = step_ix + 1
       end
       bottleneck_pct = 100.0 * bottleneck_time / total_time
-      total_pumped = accum_volume
+      total_pumped = accum_volume.round(0)
       avg_flow = total_pumped / total_time
       avg_hold =  accum_hold / total_time
       avg_suct = accum_suct / total_time
       avg_head = accum_head / total_time
       avg_casep = accum_casep / total_time
       avg_disc = accum_disc / total_time
-      summary_results << Sumresultrec.new(stat, station_id, avg_flow, total_pumped, avg_hold, avg_suct, avg_head, avg_casep, avg_disc, bottleneck_pct, kwh)
+      summary_results << Sumresultrec.new(stat, station_id, avg_flow, total_pumped, avg_hold, avg_suct, avg_head, avg_casep, avg_disc, bottleneck_pct, total_kwh)
     end
     return summary_results
   end
-
+        
   def save_results
     @stepar.each do |s|
         result = Result.new

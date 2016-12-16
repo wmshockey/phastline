@@ -1,0 +1,50 @@
+<p id="notice"><%= notice %></p>
+<%= render 'shared/error_messages', :object => @simulation %>
+
+<%= render 'simulations/show' %>
+<%= render 'simulations/sim_result_links' %>
+
+<% @pipeline = Pipeline.find {|s| s.name == @simulation.pipeline_name} %>
+<% @nomination = Nomination.find {|s| s.name == @simulation.nomination_name} %>
+
+<h2>Simulation Average Summary Results - total simulation time: <%= $timestamp.round(2).to_s %> hours</h2>
+<table style="width:1200px" %>
+	<thead>
+		<tr>
+			<th>Station</th>
+			<th>Kmp</th>
+			<th>Flowrate</th>
+			<th>Pumped<br>Volume</th>
+			<th>Holding</th>
+			<th>Suction</th>
+			<th>Head</th>
+			<th>Case</th>
+			<th>Discharge</th>
+			<th>Bottleneck<br>Percent</th>
+			<th>Energy<br>(KwH)</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+		<% @summary_results.each do |s| %>
+		    <% station_id = s.station_id %>
+		    <% station = Station.find {|i| i.id == station_id} %>
+			<tr>
+				<td><%= link_to s.stat, station_detail_result_path(s.station_id) %></td>
+				<td><%= '%8.2f'% station.kmp %></td>
+				<td><%= '%8.1f'% s.flow %></td>
+				<td><%= '%10.0f'% s.pumped_volume %></td>
+				<td><%= '%.1f'% s.hold %></td>
+				<td><%= '%.1f'% s.suct %></td>
+				<td><%= '%.1f'% s.head %></td>
+				<td><%= '%.1f'% s.casep %></td>
+				<td><%= '%.1f'% s.disc %></td>
+				<td><%= '%-8.1f'% s.bottleneck_pct.round(2) %></td>
+				<td><%= '%9.0f'% s.kwh %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>
+
+<% session.delete :return_to %>
+<% session[:return_to] ||= request.path %>

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   resources :results do
     member do
+      get 'summary'
       get 'step_detail'
       get 'station_detail'
       get 'station_step_detail'

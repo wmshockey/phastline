@@ -1,5 +1,5 @@
 <p>
-<%= link_to 'Back to Summary Results', session[:return_to] %> | 
+<%= link_to 'Summary Results', summary_result_path(@simulation.id) %> | 
 <%= link_to "Step Details", step_detail_result_path %> | 
 <%= link_to "Station Curves", station_curves_result_path %> |
 <%= link_to "Step Flowrates", step_flowrates_result_path %> |

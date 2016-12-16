@@ -11,11 +11,10 @@
 				 <% (1..6).each do |row| %>
 					<% row_units = station_units.select {|su| su.unit_row == row} %>
 					<% if row_units.size > 0 then %>
-						<% row_unit_string = " " %>
+						<br><%= "row #{row}: " %>
 						<% row_units.each do |ru| %>
-							<% row_unit_string = row_unit_string + " -> " + ru.pump_id %>
+							<%= " -> " %><%= link_to ru.pump_id, Pump.find {|p| p.pump_id == ru.pump_id} %>
 						<% end %>
-						<%= "row #{row}: " + row_unit_string %><br>
 					<% end %>
 				<% end %>
 			</tr></td>
