@@ -1,0 +1,19 @@
+<h2>Stations</h2>
+<table  class="fixed", style="width: 500px;">
+  <thead>
+   <tr>
+	  <th>Distance (kmp)</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @pipeline.stations.order(kmp: :asc).each do |station| %>
+      <tr>
+		<td><%= link_to station.kmp, pipeline_station_path(station.pipeline_id, station.id) %></td>
+        <td><%= link_to station.name, pipeline_station_path(station.pipeline_id, station.id) %></td>
+      </tr>
+	<% end %>
+	<tr><td colspan="2"><%= link_to 'Add Station', new_pipeline_station_path(@pipeline) %></td></tr>
+  </tbody>
+</table>

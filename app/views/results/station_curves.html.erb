@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+<%= render 'top' %>
+
+<h2>Station Curves</h2>
+<table style="width:800px">
+	<tbody>
+		<% @results.each do |r| %>
+			<% station_name = r.stat %>
+			<tr><td colspan="2"><strong>Station: <%= station_name %></strong><br>
+				 <% station_units = Unit.select {|u| u.station_id == r.station_id_id} %>
+				 <% (1..6).each do |row| %>
+					<% row_units = station_units.select {|su| su.unit_row == row} %>
+					<% if row_units.size > 0 then %>
+						<% row_unit_string = " " %>
+						<% row_units.each do |ru| %>
+							<% row_unit_string = row_unit_string + " -> " + ru.pump_id %>
+						<% end %>
+						<%= "row #{row}: " + row_unit_string %><br>
+					<% end %>
+				<% end %>
+			</tr></td>
+			<td>Flowrate (m3/hr)</td>
+			<td>Head (meters)</td>
+			<% station_curve = r.station_curve_data %>
+			<% station_curve.each do |c| %>
+				  <tr>
+			      <td><%= '%6.1f' % c.flow %></td>
+				  <td><%= '%6.1f' % c.head %></td>
+				  </tr>
+			<% end %>
+		<% end %>
+	</tbody>
+</table>

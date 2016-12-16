@@ -1,0 +1,72 @@
+<p id="notice"><%= notice %></p>
+<%= render 'header' %>
+
+<h1>Listing Results</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Simulation</th>
+      <th>Simulation name</th>
+      <th>Step</th>
+      <th>Timestamp</th>
+      <th>Kmp</th>
+      <th>Station</th>
+      <th>Stat</th>
+      <th>Flow</th>
+      <th>Pumped volume</th>
+      <th>Upstream batch</th>
+      <th>Downstream batch</th>
+      <th>Hold</th>
+      <th>Suct</th>
+      <th>Head</th>
+      <th>Casep</th>
+      <th>Disc</th>
+      <th>Max disc pressure</th>
+      <th>Min pressure violation</th>
+      <th>Min pressure point</th>
+      <th>Max pressure violation</th>
+      <th>Max pressure point</th>
+      <th>Total static loss</th>
+      <th>Total dynamic loss</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @results.each do |result| %>
+      <tr>
+        <td><%= result.simulation_id_id %></td>
+        <td><%= result.simulation_name %></td>
+        <td><%= result.step %></td>
+        <td><%= result.timestamp %></td>
+        <td><%= result.kmp %></td>
+        <td><%= result.station_id_id %></td>
+        <td><%= result.stat %></td>
+        <td><%= result.flow %></td>
+        <td><%= result.pumped_volume %></td>
+        <td><%= result.upstream_batch %></td>
+        <td><%= result.downstream_batch %></td>
+        <td><%= result.hold %></td>
+        <td><%= result.suct %></td>
+        <td><%= result.head %></td>
+        <td><%= result.casep %></td>
+        <td><%= result.disc %></td>
+        <td><%= result.max_disc_pressure %></td>
+        <td><%= result.min_pressure_violation %></td>
+        <td><%= result.min_pressure_point %></td>
+        <td><%= result.max_pressure_violation %></td>
+        <td><%= result.max_pressure_point %></td>
+        <td><%= result.total_static_loss %></td>
+        <td><%= result.total_dynamic_loss %></td>
+        <td><%= link_to 'Show', result %></td>
+        <td><%= link_to 'Edit', edit_result_path(result) %></td>
+        <td><%= link_to 'Destroy', result, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Result', new_result_path %>

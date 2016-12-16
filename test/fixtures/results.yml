@@ -1,0 +1,51 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  simulation_id: 
+  simulation_name: MyString
+  step: 1
+  timestamp: 1.5
+  kmp: 1.5
+  station_id: 
+  stat: MyString
+  flow: 1.5
+  pumped_volume: 1.5
+  upstream_batch: MyString
+  downstream_batch: MyString
+  hold: 1.5
+  suct: 1.5
+  head: 1.5
+  casep: 1.5
+  disc: 1.5
+  max_disc_pressure: 1.5
+  min_pressure_violation: 1.5
+  min_pressure_point: 1.5
+  max_pressure_violation: 1.5
+  max_pressure_point: 1.5
+  total_static_loss: 1.5
+  total_dynamic_loss: 1.5
+
+two:
+  simulation_id: 
+  simulation_name: MyString
+  step: 1
+  timestamp: 1.5
+  kmp: 1.5
+  station_id: 
+  stat: MyString
+  flow: 1.5
+  pumped_volume: 1.5
+  upstream_batch: MyString
+  downstream_batch: MyString
+  hold: 1.5
+  suct: 1.5
+  head: 1.5
+  casep: 1.5
+  disc: 1.5
+  max_disc_pressure: 1.5
+  min_pressure_violation: 1.5
+  min_pressure_point: 1.5
+  max_pressure_violation: 1.5
+  max_pressure_point: 1.5
+  total_static_loss: 1.5
+  total_dynamic_loss: 1.5

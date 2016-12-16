@@ -1,0 +1,33 @@
+<h2>Commodities</h2>
+<table class="fixed", style="width: 1200px;">
+  <thead>
+   <tr>
+	  <th>ID</th>
+      <th>Name</th>
+	  <th>Temperature point 1 (deg C)</th>
+      <th>Viscosity point 1 (cst)</th>
+	  <th>Temperature point 2 (deg C)</th>
+	  <th>Viscosity point 2 (cst)</th>
+	  <th>Density (kg/m3)</th>
+	  <th>Density Temp Conv Factor</th>
+	  <th>Vapor Pressure</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @commodities.order(commodity_id: :asc).each do |commodity| %>
+      <tr>
+		<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
+        <td><%= commodity.commodity_name %></td>
+        <td><%= commodity.temp1 %></td>
+        <td><%= commodity.visc1 %></td>
+        <td><%= commodity.temp2 %></td>
+        <td><%= commodity.visc2 %></td>
+        <td><%= commodity.density %></td>
+        <td><%= commodity.density_cf %></td>
+        <td><%= commodity.vapor %></td>
+      </tr>
+	<% end %>
+	<td colspan="9"><%= link_to 'Add Commodity', new_commodity_path %></td>
+  </tbody>
+</table>

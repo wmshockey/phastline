@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  kmp: 1.5
+  temperature: 1.5
+  pipeline_id: 
+
+two:
+  kmp: 1.5
+  temperature: 1.5
+  pipeline_id: 

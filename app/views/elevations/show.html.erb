@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<%= render 'pipelines/show_one' %>
+<br>
+<%= render 'stations/index' %>
+<%= render 'segments/index' %>
+<%= render 'index' %>
+
+<h2>Elevation</h2>
+<table class="fixed", style="width: 500px;">
+  <thead>
+    <tr>
+	  <th>Distance (kmp)</th>
+      <th>Elevation (meters)</th>
+	  <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+		<td><%= @elevation.kmp %></td>
+        <td><%= @elevation.elevation %></td>
+		<td></td>
+      </tr>
+  </tbody>
+</table>
+
+<%= link_to 'Edit Elevation', edit_pipeline_elevation_path(@elevation.pipeline_id, @elevation.id) %> |
+<%= link_to 'Delete', pipeline_elevation_path(@elevation.pipeline_id, @elevation.id), method: :delete, data: { confirm: 'Are you sure you want to delete this elevation?' } %> |
+<%= link_to 'Back', pipeline_path(@pipeline) %>

@@ -1,0 +1,9 @@
+<p id="notice"><%= notice %></p>
+
+<%= render 'show_one' %>
+
+<%= link_to 'Edit Nomination', edit_nomination_path(@nomination) %> | 
+<%= link_to 'Delete', nomination_path(@nomination.id), method: :delete, data: { confirm: 'Are you sure you want to delete this nomination?' } %> |
+<%= link_to 'Back', :back %>
+
+<%= render 'shipments/index' %>

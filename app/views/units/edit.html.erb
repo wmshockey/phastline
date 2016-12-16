@@ -1,0 +1,8 @@
+<%= render 'pipelines/show_one' %>
+<br>
+<%= render 'stations/index' %>
+<%= render 'stations/show_one' %>
+<%= render 'form' %>
+
+<%= link_to 'Show', pipeline_station_unit_path(@pipeline, @station, @unit) %> |
+<%= link_to 'Back', pipeline_station_path(@pipeline, @station) %>

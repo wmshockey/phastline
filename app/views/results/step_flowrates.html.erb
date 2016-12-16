@@ -1,0 +1,32 @@
+<p id="notice"><%= notice %></p>
+<%= render 'top' %>
+
+<h2>Flow Rates</h2>
+<table>
+  <tbody>
+	  <% stn_ix = 0 %>
+	  <% num_stations = @stations.count %>
+	  <% num_steprecs = @results.count %>
+	  <tr>
+	    <td>Step</td>
+	    <% while stn_ix <= num_stations - 1 %>
+	      <td> <%= @stations[stn_ix] %> </td>
+		  <% stn_ix = stn_ix + 1 %>
+		<% end %>
+	  </tr>
+	  <% steprec = 0 %>
+	  <% while steprec <= num_steprecs - 1 %>
+	    <% stn_ix = 0 %>
+		<tr>
+		  <% step = @results[steprec].step %>
+		  <% step_string = "#{step} @ #{@results[steprec].timestamp} hrs" %>
+		  <td><%= link_to step_string, station_step_detail_result_path(step) %></td>
+	      <% while stn_ix < num_stations %>
+		    <td><%= '%8.2f'% @results[steprec].flow %></td>
+		    <% stn_ix = stn_ix + 1 %>
+			<% steprec = steprec + 1 %>
+	      <% end %>
+	    </tr>
+      <% end %>
+  </tbody>
+</table>

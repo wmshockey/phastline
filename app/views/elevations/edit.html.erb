@@ -1,0 +1,9 @@
+<%= render 'pipelines/show_one' %>
+<br>
+<%= render 'stations/index' %>
+<%= render 'segments/index' %>
+<%= render 'index' %>
+<%= render 'form' %>
+
+<%= link_to 'Show', pipeline_elevation_path(@elevation.pipeline_id, @elevation.id) %> | 
+<%= link_to 'Back', pipeline_path(@pipeline) %>

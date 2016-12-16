@@ -1,0 +1,62 @@
+
+<br>
+Temperatures Profile is: <br>
+<% @pipeline.temperatures.each do |i| %>
+  <%= '%8.2f' % i.kmp %> <%= '%6.2f' % i.temperature %><br>
+<% end %>
+<br>
+Volumes Profile is: <br>
+<% @simulation.volmar.each do |i| %>
+  <%= '%8.2f' % i.kmp %> <%= '%8.2f' % i.val %><br>
+<% end %>
+<br>
+Viscosity Profile is: <br>
+<% @simulation.viscar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.4f' % i.val %> | <%= @simulation.get_record(@simulation.lfill, i.kmp).commodity_id %><br>
+<% end %>
+<br>
+Density Profile is: <br>
+<% @simulation.densar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %> | <%= @simulation.get_record(@simulation.lfill, i.kmp).commodity_id %><br>
+<% end %>
+<br>
+Elevations Profile is: <br>
+<% @simulation.elevar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Static Loss is: <br>
+<% @simulation.slossar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Minimum pressures are: <br>
+<% @simulation.minpressar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Maximum pressures are: <br>
+<% @simulation.maxpressar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Flowrates are: <br>
+<% @simulation.flowar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Dynamic Loss is: <br>
+<% @simulation.dlossar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Head is: <br>
+<% @simulation.headar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Suction is: <br>
+<% @simulation.suctar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>

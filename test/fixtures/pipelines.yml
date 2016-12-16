@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyText
+  length: 9.99
+  flowrate: 9.99
+  diameter: 9.99
+  roughness: 9.99
+  viscosity: 9.99
+  density: 9.99
+  lineloss: 9.99
+  total_loss: 9.99
+
+two:
+  name: MyString
+  description: MyText
+  length: 9.99
+  flowrate: 9.99
+  diameter: 9.99
+  roughness: 9.99
+  viscosity: 9.99
+  density: 9.99
+  lineloss: 9.99
+  total_loss: 9.99

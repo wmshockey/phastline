@@ -1,0 +1,12 @@
+<%= render 'form' %>
+
+<%= link_to 'Show', pipeline_path(@pipeline.id) %> | 
+<%= link_to 'Back', pipelines_path %>
+
+<%= render 'stations/index' %>
+<br>
+<%= render 'segments/index' %>
+<br>
+<%= render 'elevations/index' %>
+<br>
+<%= render 'temperatures/index' %>

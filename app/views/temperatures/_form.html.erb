@@ -1,0 +1,35 @@
+<h2>Temperature</h2>
+<%= form_for([@pipeline, @temperature]) do |f| %>
+  <p>
+  <% if @temperature.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@temperature.errors.count, "error") %> prohibited this temperature from being saved:</h2>
+
+      <ul>
+      <% @temperature.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  </p>
+
+<table class="fixed", style="width: 500px;">
+  <thead>
+    <tr>
+	  <th>Distance (kmp)</th>
+      <th>Temperature (deg C)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+		<td><%= f.number_field :kmp,  :step => "any" %></td>
+        <td><%= f.number_field :temperature, :step => "any" %></td>
+      </tr>
+  </tbody>
+</table>
+<div class="actions">
+   <%= f.submit %>
+</div>
+<% end %>

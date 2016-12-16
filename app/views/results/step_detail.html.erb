@@ -1,0 +1,57 @@
+<p id="notice"><%= notice %></p>
+<%= render 'top' %>
+
+<h2>Step Details</h2>
+<table>
+  <thead>
+   <tr>
+      <th>Station</th>
+	  <th>Kmp</th>
+	  <th>Flowrate</th>
+	  <th>Pumped<br>Volume</th>
+	  <th>Upstream<br>Batch</th>
+	  <th>Downstream<br> Batch</th>
+	  <th>Holding</th>
+	  <th>Suction</th>
+	  <th>Head</th>
+	  <th>Case</th>
+	  <th>Discharge</th>
+	  <th>Static<br>Loss</th>
+	  <th>Dynamic<br>Loss</th>
+	  <th>Min Press<br>Violation</th>
+	  <th>Max Press<br>Violation</th>
+	  <th>Min Pres<br>Point</th>
+	  <th>Max Pres<br>Point</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% prev_step = 0 %>
+	<% @results.each do | i | %>
+	  <% if i.step != prev_step %>
+		<tr><td>Step <%= i.step %>  @ <%= '%8.4f'% i.timestamp %> Hours</td></tr>
+		<% prev_step = i.step %>
+	  <% end %>
+      <tr>
+		<td><%= i.stat %></td>
+        <td><%= '%.2f'% i.kmp %></td>
+		<td><%= '%8.2f'% i.flow %></td>
+		<td><%= '%10.2f'% i.pumped_volume %></td>
+		<td><%= i.upstream_batch %></td>
+		<td><%= i.downstream_batch %></td>
+		<td><%= '%.2f'% i.hold %>
+		<td><%= '%.2f'% i.suct %>
+        <td><%= '%.2f'% i.head %></td>
+        <td><%= '%.2f'% i.casep %></td>
+        <td><%= '%.2f'% i.disc %></td>
+		<td><%= '%.2f'% i.total_static_loss %></td>
+		<td><%= '%.2f'% i.total_dynamic_loss %></td>
+		<td><%= '%.2f'% i.min_pressure_violation%></td>
+		<td><%= '%.2f'% i.max_pressure_violation%></td>
+		<td><%= '%.2f'% i.min_pressure_point%></td>
+		<td><%= '%.2f'% i.max_pressure_point%></td>
+      </tr>
+	<% end %>
+  </tbody>
+</table>
+<br>

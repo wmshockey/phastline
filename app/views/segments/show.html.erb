@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+<%= render 'pipelines/show_one' %>
+<br>
+<%= render 'stations/index' %>
+<%= render 'index' %>
+
+<h2>Segment</h2>
+<table class="fixed", style="width: 860px;">
+  <thead>
+    <tr>
+	  <th>Distance (kmp)</th>
+      <th>Diameter (meters)</th>
+	  <th>Thickness (meters)</th>
+      <th>Roughness (meters)</th>
+	  <th>MAWP (kpa)</th>
+	  <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+		<td style="width: 120px;"><%= '%8.2f' % @segment.kmp %></td>
+        <td style="width: 160px;"><%= @segment.diameter %></td>
+        <td style="width: 160px;"><%= @segment.thickness  %></td>
+        <td style="width: 160px;"><%= '%12.10f' % @segment.roughness  %></td>
+        <td style="width: 160px;"><%= @segment.mawp %></td>
+		<td style="width: 60px;" %></td>
+      </tr>
+  </tbody>
+</table>
+
+<%= link_to 'Edit', edit_pipeline_segment_path(@segment.pipeline_id, @segment.id) %> |
+<%= link_to 'Delete', pipeline_segment_path(@segment.pipeline_id, @segment.id), method: :delete, data: { confirm: 'Are you sure you want to delete this segment?' } %> |
+<%= link_to 'Back', pipeline_path(@pipeline) %>

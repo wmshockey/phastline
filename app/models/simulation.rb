@@ -1,0 +1,1269 @@
+class Simulation < ActiveRecord::Base
+    attr_accessor :lfill
+    attr_accessor :viscar
+    attr_accessor :tempar
+    attr_accessor :densar
+    attr_accessor :slossar
+    attr_accessor :minpressar
+    attr_accessor :maxpressar
+    attr_accessor :dlossar
+    attr_accessor :flowar
+    attr_accessor :suctar
+    attr_accessor :headar
+    attr_accessor :stepar
+    attr_accessor :elevar
+    attr_accessor :volmar
+    attr_accessor :statar
+    attr_accessor :btsqar
+    attr_accessor :ratear
+    attr_accessor :flowar
+    attr_accessor :stepar
+    attr_accessor :statcv
+    attr_accessor :summary_results
+    has_many :results, dependent: :destroy
+    validates :name, :presence => true
+    validates :pipeline_name, :presence => true
+    validates :nomination_name, :presence => true
+    validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 10000}
+    validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
+
+# Constants and conversion factors
+    Gconstant = 0.00980652       # Gravitational constant (km/sec2)
+
+# US to metric
+    $M3dy_m3hr = 0.04166666       #conversion from m3/dy to m3/hr
+    $Blhr_m3hr = 0.15898251       #conversion from bl/hr to m3/hr
+    $Bldy_m3hr = 0.00662427       #conversion from bl/dy to m3/hr
+    $Gpm_m3hr  = 0.2271253        #conversion from gpm   to m3/hr
+    $Bl_m3     = 0.15898251       #conversion from bl to m3
+    $Psig_kpa  = 6.8944           #conversion from psig to kpa
+    $Miles_km  = 1.60934          #conversion from miles to km
+    $In_m      = 0.0254           #conversion from in to m
+    $Ft_m      = 0.3048           #conversion from ft to m
+
+# Metric to US
+    $M3hr_m3dy   = 24.0           #conversion from m3/hr to m3/dy
+    $M3hr_blhr   = 6.29           #conversion from m3/hr to bl/hr
+    $M3hr_bldy   = 150.960030     #conversion from m3/hr to bl/dy
+    $M3hr_gpm    = 4.40285604     #conversion from m3/hr to gpm
+    $M3_bl       = 6.29           #conversion from m3 to bl
+    $Kpa_psig    = 0.14504525     #conversion from kpa to psig
+    $Km_miles    = 0.62137274     #conversion from km to miles
+    $M_in        = 39.3700787     #conversion from m to in
+    $M_ft        = 3.28083989     #conversion from m to ft
+
+
+# Mainline driver code
+    def run
+      begin
+        @pipelines = Pipeline.all
+        @nominations = Nomination.all
+        Result.delete_all
+        @pipeline = @pipelines.detect{ |p| p.name == pipeline_name }
+        @nomination = @nominations.detect{ |n| n.name == nomination_name }
+        @commodities = Commodity.all
+        @shipments = @nomination.shipments
+        @stations = @pipeline.stations
+        @pumpar = Pump.all
+        @segmar = @pipeline.segments.sort_by { |a| a.kmp}
+        @volmar = @pipeline.get_volumes
+        @tempar = @pipeline.get_all_temps
+        @maxpressar = @pipeline.get_all_maxpress
+        @elevar = @pipeline.get_all_elevations
+        @statar = @pipeline.get_all_stations(@volmar)
+        @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
+  #     Get the batch sequence for the simulation 
+        @btsqar = batch_sequence(@shipments, @statar)      
+  #     Set initial positioning of batches in the line (linefill)
+        initial_batch_positioning(@statar, @btsqar, @volmar)
+        $step = 1; stepdone = false; $timestamp = 0.0
+        @stepar = Array.new
+  #     Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
+        while not stepdone
+          @lfill = linefill(@statar, @btsqar, @volmar)
+          @viscar = visc_profile(@lfill, @tempar)
+          @densar = dens_profile(@lfill, @tempar)
+          @slossar = static_loss(@densar, @elevar)
+          @minpressar = min_press(@lfill)
+          @suctar = suct_calc(@lfill)
+          @ratear = calc_rate_ratios(@statar, @btsqar)
+          iter = 1; iterdone = false; flow = max_flowrate; new_flow = max_flowrate
+          viol = -9.0e9
+          while not iterdone
+            prev_flow = flow
+            prev_viol = viol
+            flow = new_flow
+            @flowar = calc_flowrates(flow, ratear)
+            @headar = head_calc(@statar, @statcv, @flowar, @densar)
+            @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
+            steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
+            new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
+            if flow == max_flowrate and viol <= 0 then
+              iterdone = true
+            end
+            if flow <= 0.0 and viol > 0 then
+              iterdone = true
+              raise "Error - flowrate iterations cannot converge in step #{$step}"
+            end
+            if not iterdone then
+              iter = iter + 1
+            end
+          end
+  #       Save step results and then shift batches into position for the next step
+          @stepar = @stepar + steprecs
+          stepdone = step_shift_volumes(@statar, @btsqar, @flowar)
+          $step = $step + 1
+          if $step > 1000 then
+            raise "Error - exceeded maximum number of steps 1000 - simulation stopped"
+          end
+        end
+        $maxsteps = $step - 1
+#       Save step results in database table for user viewing
+        save_results
+        @summary_results = summary_results_calc(@statar, @stepar)
+#      rescue => e
+#        logger.fatal e.message + "\n"
+#        self.errors.add(:base, e.message)
+#        stepdone = true
+#        printf("Simulation had to be rescued after step #{$step} \n")
+      end
+    end
+
+    def cole_loss(flow, visc, dens, diam, thick, ruff)
+#   Calculate the dynamic (flowing) pressure loss of a pipe segment using the Colebrook White equation.
+      error = 2.5e-5
+      kreyn = 353.677499
+      kdarc = 6.25439455e-8
+      diam = diam - 2*thick
+      reynl = kreyn*flow/(diam*visc)
+      if reynl>40000.0 then
+        tcons = ruff/diam/3.7
+        estim = 1/(-2*Math.log10(tcons + 5.74/(reynl**0.9)))
+        diff = 10000.0
+        while diff > error do
+          temp = 1/(-2*Math.log10(tcons + 2.51/reynl/estim))
+          diff = (estim-temp).abs
+          estim = temp
+        end
+        frict = temp**2
+      elsif reynl>2500.0 then frict = 0.364/(reynl**0.265)
+      elsif (reynl>2000) and (reynl<=2500) then frict = (reynl**1.596)/5700000.0
+      elsif (reynl>0.01) and (reynl<=2000) then frict = 64.0/reynl
+      elsif (reynl<=0.01) then frict = 10000.0
+      end
+      return kdarc*dens*frict*flow**2/(diam**5)
+    end
+
+
+    def batch_sequence(shipments, statar)
+#     Break up shipments into batches
+      batches = Array.new
+      number_of_shipments = shipments.count
+      total_volume_of_shipments = shipments.sum("volume")
+      total_number_of_batches = total_volume_of_shipments / max_batchsize
+      shipments.each_with_index do |s, ix|
+        number_of_batches_in_shipment = s.volume / max_batchsize
+        spacing_of_batches = (total_number_of_batches / number_of_batches_in_shipment).round
+        vol = s.volume
+        batch_number_within_shipment = 0
+        while vol > max_batchsize
+          batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
+          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, s.shipper, ix+1)
+          vol = vol - max_batchsize
+          batch_number_within_shipment = batch_number_within_shipment + 1
+        end
+        if vol > 0.0 then
+          batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
+          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, s.shipper, ix+1)
+        end
+      end
+#     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
+      batches.sort! { |a, b| a.batch_number <=> b.batch_number }
+      batches.each_with_index do |b, bix|
+        b.batch_number = bix + 1
+        b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
+      end
+#     Create the two-dimensional batch sequence array
+      max_batches = batches.count
+      bs = Array.new(statar.count-1){Array.new(max_batches)}
+      batches.each_with_index do |b, btix|
+        start_loc = b.start_location
+        station_rec = statar.detect {|s| s.name == start_loc}
+        start_kmp = station_rec.kmp
+        end_loc = b.end_location
+        station_rec = statar.detect {|s| s.name == end_loc}
+        end_kmp = station_rec.kmp
+        statar[0...-1].each_with_index do |s, stix|
+          stat = s.name
+          kmp = s.kmp
+          if start_kmp <= kmp and end_kmp > kmp then
+            bs[stix][btix] = batches[btix].dup
+          else
+            bs[stix][btix] = batches[btix].dup
+            bs[stix][btix].volume = 0.0
+          end
+          s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
+        end
+      end
+      logger.info "btsqar = #{bs.inspect}"
+      return bs
+    end
+          
+    def initial_batch_positioning(statar, btsqar, volmar)
+#     Calculate the linefill.  Fill the line between stations with commodities using the batch sequence array.
+      lf = Array.new
+      stn_ix = 0
+      kmp = statar[stn_ix].kmp
+      stat = statar[stn_ix].name
+      max_batch = btsqar[0].size - 1
+#     Specify initial split across first station
+      batch = 1
+      batch_vol = 1000
+#     Calculate the linefill between stations.
+      while stn_ix < statar.count - 1
+        stat = statar[stn_ix].name
+        kmp = statar[stn_ix].kmp
+        vol = volmar.interpolate_y(kmp)
+        kmp_end = statar[stn_ix + 1].kmp
+        vol_end = volmar.interpolate_y(kmp_end)
+#       Determine initial volume pumped
+        initial_volume = 0
+        bix = 0
+        while bix != batch 
+          initial_volume = initial_volume + btsqar[stn_ix][bix].volume
+          if bix < max_batch then bix = bix+1 else bix = 0 end
+        end
+#       Adjust the volume of the downstream batch at this station based on volume of batch left on the upstream side.
+        if stn_ix > 0 and batch_vol > 0 then
+          fraction_left_on_upstream_batch = batch_vol / btsqar[stn_ix - 1][batch].volume
+          volume_left_on_downstream_batch = btsqar[stn_ix][batch].volume * fraction_left_on_upstream_batch
+          batch_vol = volume_left_on_downstream_batch
+        end
+        initial_volume = initial_volume + batch_vol
+        statar[stn_ix].initial_volume = initial_volume        
+#       Get batch split at downstream station
+        pipe_volume = volmar.interpolate_y(kmp_end) - volmar.interpolate_y(kmp)
+        volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume - pipe_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        batch = downstream_batch
+        batch_vol = downstream_vol
+        stn_ix = stn_ix + 1
+      end      
+    end           
+
+    def linefill(statar, btsqar, volmar)
+#     Calculate the linefill.  Fill the line between stations with commodities using the batch sequence array.
+      lf = Array.new
+      stn_ix = 0
+      kmp = statar[stn_ix].kmp
+      stat = statar[stn_ix].name
+      max_batch = btsqar[0].size - 1
+      batch = 0
+#     Calculate the linefill between stations.
+      while stn_ix < statar.count - 1
+        stat = statar[stn_ix].name
+        kmp = statar[stn_ix].kmp
+        vol = volmar.interpolate_y(kmp)
+        kmp_end = statar[stn_ix + 1].kmp
+        vol_end = volmar.interpolate_y(kmp_end)        
+#       Position initial batch out of the station after shifting the sequence by the sum of the initial_volume setting and the total pumped volume at that station
+        upstream_batch = batch
+        volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift , stn_ix)
+        batch = downstream_batch
+        commodity_id = btsqar[stn_ix][downstream_batch].commodity_id
+        batch_vol = downstream_vol
+#       Walk down the line to the next station, adding a new linefill record at each batch interface point
+        while kmp < kmp_end
+          lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+          next_vol1 = vol + batch_vol
+          if next_vol1 <= vol_end then
+            vol = next_vol1
+            kmp = volmar.interpolate_x(vol)
+            batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
+          else
+            kmp = kmp_end
+          end
+        end            
+        stn_ix = stn_ix + 1
+      end
+      return lf
+    end
+
+
+    def step_shift_volumes(statar, btsqar, flowar)
+#     Determine volume to the next batch interface out of station or coming into the next downstream station
+#     Will need to update this in the future to check for batches hitting elevation change and segment change points as well
+      stn_ix = 0
+      time_shift = 999999.0
+      while stn_ix < statar.count - 1
+        kmp = statar[stn_ix].kmp
+        stat = statar[stn_ix].name
+        flow = flowar.get_y(kmp)
+#       Get the volume to the next batch at the station
+        volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        batch1 = upstream_batch
+        vol1 = upstream_vol
+#       Get the volume to the next batch coming into the downstream station
+        volume_shift = statar[stn_ix].initial_volume - statar[stn_ix].pipe_volume + statar[stn_ix].pumped_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        batch2 = upstream_batch
+        vol2 = upstream_vol
+#       Calculate the time to next batch interface between this station and the next.
+        if flow > 0 then
+          time_step = [vol1, vol2].min / flow
+        else
+          time_step = 999999.0
+        end
+        if time_step < time_shift then
+          time_shift = time_step
+        end
+        stn_ix = stn_ix + 1
+      end
+#     Check if all done
+      all_done = true
+      stn_ix = 0
+      while stn_ix < statar.count - 1
+        if (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) > 0.001 then
+          all_done = false
+        end
+        stn_ix = stn_ix + 1
+      end
+#     Update the volumes pumped for all stations
+      if not all_done then
+#       If this is last step, set the volume shift so it doesn't exceed the total sequence volume
+        stn_ix = 0
+        while stn_ix < statar.count - 1
+          kmp = statar[stn_ix].kmp
+          flow = flowar.get_y(kmp)
+          pumped_vol_increment = flow * time_shift
+          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
+          if next_vol > statar[stn_ix].sequence_volume then
+            time_shift_adjusted = (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) / flow
+            if time_shift_adjusted < time_shift then
+              time_shift = time_shift_adjusted
+            end
+          end
+          stn_ix = stn_ix + 1
+        end
+#       Update the pumped volumes for all stations to advance to the next step
+        stn_ix = 0
+        $timestamp = $timestamp + time_shift
+        while stn_ix < statar.count - 1
+          kmp = statar[stn_ix].kmp
+          flow = flowar.get_y(kmp)
+          pumped_vol_increment = flow * time_shift
+          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
+          if next_vol > statar[stn_ix].sequence_volume then
+            next_vol = statar[stn_ix].sequence_volume
+          end        
+          statar[stn_ix].pumped_volume = statar[stn_ix].pumped_volume + pumped_vol_increment
+          stn_ix = stn_ix + 1
+        end
+      end
+#     Ensure to update the timestamp on the last step of the run.
+      if all_done then
+        $timestamp = $timestamp + time_shift
+      end
+      return all_done
+    end        
+
+    def get_next_batch(btsqar, stn_ix, batch, direction)
+      max_batch = btsqar[0].count - 1
+      if direction == 'down' then
+        if batch > 0 then batch = batch-1 else batch = max_batch end
+        while btsqar[stn_ix][batch].volume == 0
+          if batch > 0 then batch = batch-1 else batch = max_batch end
+        end
+      elsif direction == 'up'
+        if batch < max_batch then batch = batch+1 else batch = 0 end
+        while btsqar[stn_ix][batch].volume == 0
+          if batch < max_batch then batch = batch+1 else batch = 0 end
+        end
+      end        
+      commodity_id = btsqar[stn_ix][batch].commodity_id
+      batch_vol = btsqar[stn_ix][batch].volume
+      return batch, commodity_id, batch_vol
+    end
+
+    def get_batch_split(btsqar, volume_shift, stn_ix)
+#     if volume_shift is positive we are shifting the volumes forward in time, thus the batch numbers are incremented.
+#     if volume_shift is negative we are shifting the volumes backward in time, or further downstream is other way of looking at it, thus batch numbers are decremented.
+      if volume_shift >= 0 then
+        batch = 0
+      else
+        batch = btsqar[0].count - 1
+      end
+      batch_vol = btsqar[stn_ix][batch].volume
+      commodity_id = btsqar[stn_ix][batch].commodity_id
+      vol = volume_shift.abs
+      while vol - batch_vol > 0.0
+        vol = vol - batch_vol
+        if volume_shift >= 0 then
+          batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'up')
+        else
+          batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
+        end
+      end
+#     After shifting through the batch sequence, determine upstream and downstream volumes based on amount of shifting left over.
+      if volume_shift >= 0 then
+        downstream_vol = vol
+        upstream_vol = batch_vol - vol
+      else
+        upstream_vol = vol
+        downstream_vol = batch_vol - vol
+      end      
+      upstream_batch = batch
+      downstream_batch = batch    
+#     If upstream volume is zero, loop until find a non-zero batch
+      while upstream_vol <= 0.0000001
+        if volume_shift >= 0 then
+          batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'up')
+        else
+          batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
+        end
+        upstream_batch = batch
+        upstream_vol = batch_vol
+      end      
+#     If downstream volume is zero, loop until find a non-zero batch
+      while downstream_vol <= 0.0000001
+        if volume_shift >= 0 then
+          batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'up')
+        else
+          batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
+        end
+        downstream_batch = batch
+        downstream_vol = batch_vol
+      end
+      if upstream_vol <= 0.0000001 then
+        printf("Failure of get_batch_split: %5d  %3d  %3d  %8.2f  %3d  %8.2f \n", $step, stn_ix, upstream_batch, upstream_vol, downstream_batch, downstream_vol)
+        exit
+      end
+      return upstream_batch, upstream_vol, downstream_batch, downstream_vol
+    end
+
+    def calc_rate_ratios(statar, btsqar)
+#   Calculate rate ratios for the new step
+      rr = Array.new(statar.count)
+      max_stn_ix = statar.count - 1
+      rr[0] = 1
+      rr[max_stn_ix] = 0
+#     Loop from end of line to beginning, checking for deliveries
+      stn_ix = max_stn_ix - 1
+      while stn_ix > 0
+        stat = statar[stn_ix].name
+        kmp = statar[stn_ix].kmp
+#       Delivery check:  If the total btsqar volume of the batch going into a station is zero on the other side of the station.
+        volume_shift = statar[stn_ix - 1].initial_volume + statar[stn_ix - 1].pumped_volume - statar[stn_ix - 1].pipe_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
+        batch = upstream_batch
+        volume = btsqar[stn_ix][batch].volume
+        if volume == 0 then rr[stn_ix] = 0 else rr[stn_ix] = 1 end
+        stn_ix = stn_ix - 1
+      end
+#     Loop from beginning of line to end, checking for injections
+      stn_ix = 0
+      while stn_ix < max_stn_ix - 1
+        stat = statar[stn_ix].name
+        kmp = statar[stn_ix].kmp      
+#       Injection check:  If the total btsqar volume of the batch leaving a station is zero on the upstream side of the station.
+        volume_shift = statar[stn_ix + 1].initial_volume + statar[stn_ix + 1].pumped_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix + 1)
+        batch = upstream_batch
+        volume = btsqar[stn_ix][batch].volume
+        if volume == 0 then rr[stn_ix + 1] = 100 end
+        stn_ix = stn_ix + 1
+      end
+#     Set all rate ratios to zero downstream of a full stream delivery
+      rr_ix = 0
+      delivery_happening = false
+      while rr_ix < rr.count
+        if rr[rr_ix] == 0 then delivery_happening = true end
+        if delivery_happening then rr[rr_ix] = 0.0 end
+        rr_ix = rr_ix + 1
+      end
+#     Set all rate ratios to zero upstream of a full stream injection
+      rr_ix = rr.count - 1
+      injection_happening = false
+      while rr_ix >= 0
+        if injection_happening then rr[rr_ix] = 0.0 end
+        if rr[rr_ix] == 100 then
+          injection_happening = true
+          rr[rr_ix] = 1
+        end
+        rr_ix = rr_ix - 1
+      end
+#     Form the array of rate ratio records to return
+      rr_rec_array = Array.new
+      stn_ix = 0
+      while stn_ix < max_stn_ix
+        kmp = statar[stn_ix].kmp
+        stat = statar[stn_ix].name
+        rr_rec_array << Raterec.new(kmp, stat, rr[stn_ix])
+        stn_ix = stn_ix + 1
+      end      
+      return rr_rec_array
+    end
+                    
+    def calc_flowrates(maxflow, ratear)
+      flowar = Profile.new
+      stn_ix = 0
+      while stn_ix < statar.count - 1
+        stat = statar[stn_ix].name
+        kmp = statar[stn_ix].kmp
+        flow = maxflow * ratear[stn_ix].rate_ratio
+        flowar.add_point(kmp, flow)
+        stn_ix = stn_ix + 1
+      end
+      return flowar
+    end     
+
+    def adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
+#   Find the max minimum pressure violation on current iteration (the worst violation of minimum pressure)
+      stn_ix = 0
+      max_viol = -9.0e9
+      while stn_ix < steprecs.count - 1
+        if steprecs[stn_ix].min_pressure_violation > max_viol then
+          max_viol = steprecs[stn_ix].min_pressure_violation
+        end
+        stn_ix = stn_ix + 1
+      end
+#     Check if we need to change the flowrate
+      if max_viol.abs < 10.0 then
+        new_flow = flow
+        iterdone = true
+      else
+#       Adjust the flowrate up or down depending on the pressure violation amount
+        if iter == 1 then
+          if max_viol < 0 then
+            new_flow = flow * 1.10
+          else
+            new_flow = flow * 0.90
+          end
+        else
+          x1 = prev_flow
+          y1 = prev_viol
+          x2 = flow
+          y2 = max_viol
+          if (x1==x2) or (y1==y2) then
+            new_flow = x2
+          else
+            m = (y2-y1)/(x2-x1)
+            b = y1 - m*x1
+            new_flow = -b/m
+          end
+        end
+        if new_flow < 0 then
+          new_flow = 0
+        end
+        if iter > 20 then
+          raise "flowrate iterations stopped at 20.  Cannot converge on a flowrate"
+          iterdone = true
+        else
+          iterdone = false
+        end
+      end
+      return new_flow, max_viol, iterdone
+    end
+
+      
+    def visc_profile(lfill, tempar)
+#   Purpose is to compute the viscosity profile adjusted for temperature of the commodity in the line.
+      vp = Profile.new
+      kmp = lfill.first.kmp     
+      while kmp != nil
+        commodity_id = get_record(lfill, kmp).commodity_id
+        @commodity = @commodities.detect{ |c| c.commodity_id == commodity_id }
+        acoef = @commodity.acoef
+        bcoef = @commodity.bcoef
+        temp = tempar.get_y(kmp)
+        visc = visc_corr(acoef, bcoef, temp)
+        vp.add_point(kmp, visc)
+        kmp = [next_record(lfill, kmp), tempar.next_x(kmp)].compact.min
+      end
+      return vp
+    end
+    
+    def xval(e)
+      xval = -1.47 - 1.84*e - 0.51*e**2
+    end
+    
+    def visc_corr(acoef, bcoef, temp)
+#   Purpose is to adjust the viscosity of an oil for tempeature using the ASTM method.
+      err = 2.5e-5
+      orest = visc_est(acoef, bcoef, temp)
+      diff = 10000
+      if xval(orest) < -38.0 then
+        return orest
+      else
+        diff = 10000
+        estim = orest
+        while diff > err
+          tvisc = orest - Math::E**xval(estim)
+          diff = (estim - tvisc).abs
+          estim = tvisc
+        end
+        return tvisc
+      end
+    end
+
+    def visc_est(acoef, bcoef, temp)
+#   Purpose is to evalute the initial estimate to viscosity at a specified temperature
+      return 10**(10**(acoef - bcoef * Math.log10(temp+273.15))) - 0.7
+    end
+        
+  def dens_profile(lfill, tempar)
+#   Calculate the density profile from the densities of the commodities in the line adjusted for temperature in the line.
+    dp = Profile.new
+    kmp = lfill.first.kmp
+    while kmp != nil
+      commodity_id = get_record(lfill, kmp).commodity_id
+      @commodity = @commodities.detect{ |c| c.commodity_id == commodity_id }
+      dn15 = @commodity.density
+      dncf = @commodity.density_cf
+      temp = tempar.get_y(kmp)
+      dens = dn15 * dncf**(temp-15.0)
+      dp.add_point(kmp, dens)
+      kmp = [next_record(lfill, kmp), tempar.next_x(kmp)].compact.min
+     end
+    return dp
+  end
+       
+  def static_loss(densar, elevar)
+#   Calculate the static pressure profile (pressure loss/gain due to elevation changes)
+    sl = Profile.new
+    kmp = densar.first.kmp
+    while kmp != nil
+      dens = densar.get_y(kmp)
+      elev = elevar.interpolate_y(kmp)
+      next_kmp = [densar.next_x(kmp), elevar.next_x(kmp)].compact.min
+      if next_kmp != nil then
+        dist = next_kmp - kmp
+        next_elev = elevar.interpolate_y(next_kmp)
+        slope = (next_elev - elev)/dist
+      else
+        slope = 0
+      end
+      sloss = dens * Gconstant * slope
+      sl.add_point(kmp,sloss)
+      kmp = next_kmp
+    end
+    return sl
+  end
+
+  def dynamic_loss(flowar, segmar, viscar, densar)
+# Calculate the dynamic pressure loss profile (profile of pressure loss due to flowrate friction in pipe)
+    dl = Profile.new
+    kmp = flowar.first.kmp
+    while kmp != nil
+      flow = flowar.get_y(kmp)
+      segm = get_record(@segmar, kmp)
+      diam = segm.diameter
+      thick = segm.thickness
+      ruff = segm.roughness
+      visc = viscar.get_y(kmp)
+      dens = densar.get_y(kmp)
+      dloss = cole_loss(flow, visc, dens, diam, thick, ruff)
+      dl.add_point(kmp,dloss)
+      kmp = [flowar.next_x(kmp), next_record(@segmar,kmp), viscar.next_x(kmp), densar.next_x(kmp)].compact.min
+    end
+    return dl
+  end
+
+  def min_press(lfill)
+#  Calculate the minimum pressure profile (determine by vapor pressure of commodity in the line)
+    mp = Profile.new
+    lfill.each do |i|
+      kmp = i.kmp
+      commodity_id = get_record(lfill, kmp).commodity_id
+      @commodity = @commodities.detect{ |c| c.commodity_id == commodity_id }
+      vapor_pres = @commodity.vapor
+      mp.add_point(kmp, vapor_pres)
+    end
+    return mp
+  end
+
+  def head_calc(statar, statcv, flowar, densar)
+    hd = Profile.new
+#  Calculate the head generated at each station.
+    statar[0...-1].each do |i|
+      kmp = i.kmp
+      station_flow = flowar.get_y(kmp)
+      dens = densar.get_y(kmp)
+      station_curve = Profile.new
+      statcv.each do |s|
+        if i.station_id == s.station_id then
+          station_curve << Profile_point.new(s.flow, s.head)
+        end
+      end
+      station_curve.sort_by! {|a| a.flow}
+#     Check if any station pumps at this station and set head to zero.
+      if station_curve.size > 0 then
+  #     Get the head at this station for the current flowrate through it
+        if station_flow < station_curve.first.flow then
+          pres = Gconstant * dens * station_curve.first.head
+        elsif station_flow > station_curve.last.flow then
+          pres = 0.0
+        else
+          pres = Gconstant * dens * station_curve.interpolate_y(station_flow)
+        end
+        hd << Profile_point.new(kmp, pres)
+      else
+        hd << Profile_point.new(kmp, 0.0)
+      end
+    end
+    return hd
+  end
+   
+  
+  def suct_calc(lfill)
+#   Calculate the suction pressure profile.  This is set to the vapor pressure of the commodity at stations
+#   where there is a full stream injection occurring (start of line and at break out stations)
+    sc = Profile.new
+    lfill.each do |i|
+      kmp = i.kmp
+      commodity_id = get_record(lfill, kmp).commodity_id
+      @commodity = @commodities.detect{ |c| c.commodity_id == commodity_id }
+      vapor_press = @commodity.vapor
+      sc.add_point(kmp, vapor_press)
+    end
+    return sc
+  end
+
+  def loss_calc(station, disp, statar, slossar, dlossar, maxpressar, minpressar)
+#   Purpose of this method is to compute the total static and dynamic pressure losses between two stations.
+#   It also computes the maximum and minimum pressure points on the line between the two stations.
+    station_rec = statar.detect { |s| s.name == station}
+    kmp = station_rec.kmp
+    next_stn_kmp = next_record(statar, kmp)
+    telos = 0; tdlos = 0; viol = 0
+    maxp_at_station = maxpressar.get_y(kmp)
+    pres = disp
+    maxp = maxp_at_station
+    minp = minpressar.get_y(kmp)
+    mxpt = kmp
+    mnpt = kmp
+    mxvl = pres - maxp
+    mnvl = minp - pres
+    if station == statar.last.name then
+      mxdp=0; mnvl=0; mnpt=kmp; mxvl=0; mxpt=kmp; telos=0; tdlos=0
+    else
+      while kmp < next_stn_kmp
+        sloss = slossar.get_y(kmp)
+        dloss = dlossar.get_y(kmp)
+        maxp = maxpressar.get_y(kmp)
+        minp = minpressar.get_y(kmp)
+        prev_kmp = kmp
+        kmp = [next_record(statar,kmp), slossar.next_x(kmp), dlossar.next_x(kmp), maxpressar.next_x(kmp), minpressar.next_x(kmp)].compact.min
+        dist = kmp - prev_kmp
+        pres = pres - dist*(sloss + dloss)
+        telos = telos + sloss*dist
+        tdlos = tdlos + dloss*dist
+        mxdf = pres - maxp
+        mndf = minp - pres
+        if mxdf >= mxvl then 
+          mxpt = kmp
+          mxvl = mxdf
+        end
+        if mndf > mnvl then
+          mnpt = kmp
+          mnvl = mndf
+        end
+      end
+    end
+    mxdp = disp - mxvl
+    return mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos
+  end
+
+  def step_calc(statar, flowar, btsqar, suctar, headar, slossar, dlossar, maxpressar, minpressar)
+    kmp = statar[0].kmp
+    pres = suctar.get_y(kmp)
+    steprecs = Array.new
+    statar.each_with_index do |i, stn_ix|
+      stat = i.name
+      station_id = i.station_id
+      kmp = i.kmp
+      hold = pres
+      flow = flowar.get_y(kmp)
+      suct=0; head=0; casep=0; disc=0; telos=0; tdlos=0; mxpt=0; mnpt=0; mxvl=0; mnvl=0; viol=0
+      if stn_ix > 0 then up_stn_ix = stn_ix - 1 else up_stn_ix = stn_ix end
+      if kmp != statar.last.kmp then
+#       Get batch coming into station on upstream side
+        if stn_ix > 0 then          
+          volume_shift = statar[stn_ix - 1].initial_volume - statar[stn_ix - 1].pipe_volume + statar[stn_ix - 1].pumped_volume
+          upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
+          if upstream_vol < 0.0000001 then
+            raise "step_calc error: upstream volume < 0.0000001  step:#{$step}  stn:#{stn_ix}  upstream_vol:#{upstream_vol}"
+          end
+          upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
+          upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
+        else
+          volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
+          upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+          upstream_batch_id = btsqar[stn_ix][upstream_batch].batch_id
+          upstream_batch_str = " "   #no upstream batch for first station in the line
+        end         
+#       Get batch leaving station on downstream side
+        volume_shift = i.initial_volume + i.pumped_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
+        downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(2).to_s  
+#       Calculate the pressures for this station
+        suct = hold
+        head = headar.get_y(kmp)
+        pres = pres + head
+#       If the line is shut down downstream of this station then set the head to zero and the case to same as the holding pressure.
+#       If line is shut down, set the discharge to be what the pumps would have otherwise be putting out as line is still pressurized.
+#       When line is shut down, the pumps at the station are not running but the line downstream is still pressurized from the previous steps.
+        if flow == 0 then
+          casep = hold
+          disp = pres
+          head = 0
+        else          
+          casep = pres
+          disp = casep
+        end
+#       Calculate values for:
+#       mxdp = max discharge pressure
+#       mnvl = minimum pressure violation (amount going below minimum suction or vapor pressure at some point between the two stations)
+#       mnpt = point of minimum pressure between the two stations
+#       mxvl = maximum pressure violation (going over the max allowed working pressure of the pipe at some point between the two stations)
+#       mxpt = point of maximum pressure between the two stations
+#       telos = total static pressure loss (pressure loss due to elevation change)
+#       tdlos = total dynamic pressure loss (pressure loss due to internal pipe friction)
+        mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos = loss_calc(stat, disp, statar, slossar, dlossar, maxpressar, minpressar)
+#       If the discharge pressure has to be reduced due to max pressure violation, then any minimum pressure violation must increase accordingly and the max violation is reset to 0.
+        if pres > mxdp then 
+          mnvl = mnvl + (pres - mxdp)
+          mxvl = 0
+          pres = mxdp
+        end
+        disc = pres
+        pres = pres - telos - tdlos
+      else
+#       Get upstream batch information for batch coming into last station on the line.
+        volume_shift = statar[stn_ix - 1].initial_volume - statar[stn_ix - 1].pipe_volume + statar[stn_ix - 1].pumped_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
+        upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
+        upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
+      end
+#     Save step result record
+      steprecs << Steprec.new($step, $timestamp, kmp, stat, station_id, flow, i.pumped_volume, upstream_batch_str, downstream_batch_str, hold, suct, head, casep, disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos)
+    end
+    return steprecs
+  end
+
+
+  def summary_results_calc(statar, stepar)
+#   Find the bottleneck points for each step on the line
+    bottlenecks = Array[$maxsteps]
+    step_ix = 0
+    while step_ix <= $maxsteps-1
+      max_viol = -9e9
+      bottleneck_station = "  "
+      stepar.select {|s| s.step - 1 == step_ix}.each do |r|
+        if (r.stat != statar.last.name) and (r.min_pressure_violation > max_viol) then
+          bottleneck_station = r.stat
+          max_viol = r.min_pressure_violation
+        end
+      end
+      bottlenecks[step_ix] = bottleneck_station
+      step_ix = step_ix + 1
+    end
+    summary_results = Array.new    
+    statar[0...-1].each do |i|
+      stat = i.name
+      station_id = i.station_id
+      total_time = 0
+      accum_volume = 0
+      accum_hold = 0
+      accum_suct = 0
+      accum_head = 0
+      accum_casep = 0
+      accum_disc = 0
+      bottleneck_time = 0
+      station_step_results = stepar.select {|s| s.stat == stat}
+      step_ix = 1
+      while step_ix <= station_step_results.size - 1
+        steptime = station_step_results[step_ix].timestamp - station_step_results[step_ix - 1].timestamp
+        s = station_step_results[step_ix - 1]
+        accum_volume = accum_volume + s.flow*steptime
+        accum_hold = accum_hold + s.hold*steptime
+        accum_suct = accum_suct + s.suct*steptime
+        accum_head = accum_head + s.head*steptime
+        accum_casep = accum_casep + s.casep*steptime
+        accum_disc = accum_disc + s.disc*steptime
+        if bottlenecks[step_ix - 1] == stat then
+          bottleneck_time = bottleneck_time + steptime
+        end
+        total_time = total_time + steptime
+        step_ix = step_ix + 1
+      end
+      bottleneck_pct = 100.0 * bottleneck_time / total_time
+      total_pumped = accum_volume
+      avg_flow = total_pumped / total_time
+      avg_hold =  accum_hold / total_time
+      avg_suct = accum_suct / total_time
+      avg_head = accum_head / total_time
+      avg_casep = accum_casep / total_time
+      avg_disc = accum_disc / total_time
+      summary_results << Sumresultrec.new(stat, station_id, avg_flow, total_pumped, avg_hold, avg_suct, avg_head, avg_casep, avg_disc, bottleneck_pct)
+    end
+    return summary_results
+  end
+
+  def save_results
+    @stepar.each do |s|
+        result = Result.new
+        station = @pipeline.stations.find{|i| i.name == s.stat}        
+        result.simulation_id_id = self.id
+        result.simulation_name = self.name
+        result.step = s.step
+        result.timestamp = s.timestamp
+        result.kmp = s.kmp
+        result.station_id_id = station.id
+        result.stat = s.stat
+        result.flow = s.flow
+        result.pumped_volume = s.pumped_volume
+        result.upstream_batch = s.upstream_batch
+        result.downstream_batch = s.downstream_batch
+        result.hold = s.hold
+        result.suct = s.suct
+        result.head = s.head
+        result.casep = s.casep
+        result.disc = s.disc
+        result.max_disc_pressure = s.max_disc_pressure
+        result.min_pressure_violation = s.min_pressure_violation
+        result.min_pressure_point = s.min_pressure_point
+        result.max_pressure_violation = s.max_pressure_violation
+        result.max_pressure_point = s.max_pressure_point
+        result.total_static_loss = s.total_static_loss
+        result.total_dynamic_loss = s.total_dynamic_loss
+#       The station curves only need to be stored once as they don't change from step to step
+#       The batch squence also only needs to be stored once as it doesn't change from step to step
+        if s.step == 1 then
+          station_curve = statcv.select {|c| c.station_id == s.station_id}
+          result.station_curve_data = station_curve
+          stn_ix = @statar.index {|i| i.name == s.stat}
+#         Save batch sequence for this station, but there is no batch sequence for the last station on the line
+          if stn_ix < @statar.count - 1 then
+            batch_seq = btsqar[stn_ix]
+            result.batch_sequence_data = batch_seq
+          end
+        end
+        result.save
+    end    
+  end
+
+
+  def get_record(record_array, kmp)
+# Get the record for a specified kmp
+    i = 0
+    until i == record_array.count - 1
+      if record_array[i].kmp > kmp then break end
+      i = i + 1
+    end
+    i = i - 1
+    return record_array[i]
+  end
+
+  def next_record (record_array, kmp)
+# Find the next point in a record array
+    np = nil
+    record_array.each do |i|
+      if i.kmp > kmp then
+        np = i.kmp
+        break
+      end
+    end
+    return np
+  end   
+  
+end
+
+class Profile < Array
+
+  def add_point (x, y)
+# Add a profile point to a profile array
+    self << Profile_point.new(x,y)
+  end
+
+  def next_x (x)
+# Find the x point of the next in line profile point
+    np = nil
+    self.each do |i|
+      if i.x > x then
+        np = i.x
+        break
+      end
+    end
+    return np
+  end
+  
+  def get_y (x)
+# Get the y value of a profile array at a specified x point.
+    y = nil
+    self.each do |i|
+      if i.x <= x then
+        y = i.y
+      else
+        break
+      end
+    end
+    return y
+  end  
+
+  def get_x (y)
+# Get the x of a profile array for a specified y value (e.g. station array)
+    x = nil
+    self.each do |i|
+      if i.y == y
+        x = i.x
+        break
+      end
+    end
+    return x
+  end 
+
+  def interpolate_y (x)
+# Use linear interpolation to get the value of a x point within a profile array (e.g. elevations)
+    i = 0
+    while i < self.count
+      x1 = self[i].x
+      if i < self.count-1
+        x2 = self[i+1].x
+        if x>=x1 and x<x2 then
+          y1 = self[i].y
+          y2 = self[i+1].y
+          deltax = x1 - x2
+          deltay = y1 - y2
+          y = y1  + (x - x1)*deltay/deltax
+          break
+        end
+      elsif i >= self.count-1
+        y = self[i].y
+        break
+      end
+      i = i + 1
+    end
+    return y
+  end
+
+  def interpolate_x (y)
+    if y < self.map {|t| t.y}.min or y > self.map {|t| t.y}.max then
+      x = 0.0
+    else
+      match = false
+      self[0...-1].each_with_index do |i, ix|
+        y1 = self[ix].y
+        y2 = self[ix+1].y
+        if (y >= y1 and y <= y2) or (y <= y1 and y >= y2) then
+          x1 = self[ix].x
+          x2 = self[ix+1].x
+          deltax = x1 - x2
+          deltay = y1 - y2
+          x = x1 + (y - y1)*deltax/deltay
+          match = true
+        end
+      end
+    end
+    if not match then
+      raise "Could not interpolate value in interpolate_x method"
+    end
+    return x
+  end      
+    
+end
+
+
+class Profile_point
+  attr_accessor :x
+  attr_accessor :y
+  alias :kmp :x
+  alias :val :y
+  alias :flow :x
+  alias :head :y
+  def initialize (x, y)
+    @x = x
+    @y = y
+  end
+end  
+
+class Statrec
+  attr_accessor :station_id
+  attr_accessor :kmp
+  attr_accessor :name
+  attr_accessor :pipe_volume
+  attr_accessor :sequence_volume
+  attr_accessor :initial_volume
+  attr_accessor :pumped_volume
+  def initialize(station_id, kmp, name, pipe_volume, sequence_volume, initial_volume, pumped_volume)
+    @station_id = station_id
+    @kmp = kmp
+    @name = name
+    @pipe_volume = pipe_volume
+    @sequence_volume = sequence_volume
+    @initial_volume = initial_volume
+    @pumped_volume = pumped_volume
+  end
+end
+
+
+class Steprec
+  attr_accessor :step
+  attr_accessor :timestamp
+  attr_accessor :kmp
+  attr_accessor :stat
+  attr_accessor :station_id
+  attr_accessor :flow
+  attr_accessor :pumped_volume
+  attr_accessor :upstream_batch
+  attr_accessor :downstream_batch
+  attr_accessor :hold
+  attr_accessor :suct
+  attr_accessor :head
+  attr_accessor :casep
+  attr_accessor :disc
+  attr_accessor :max_disc_pressure
+  attr_accessor :min_pressure_violation
+  attr_accessor :min_pressure_point
+  attr_accessor :max_pressure_violation
+  attr_accessor :max_pressure_point
+  attr_accessor :total_static_loss
+  attr_accessor :total_dynamic_loss
+  def initialize (step, timestamp, kmp, stat, station_id, flow, pumped_volume, upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss)
+    @step = step
+    @timestamp = timestamp
+    @kmp = kmp
+    @stat = stat
+    @station_id = station_id
+    @flow = flow
+    @pumped_volume = pumped_volume
+    @upstream_batch = upstream_batch
+    @downstream_batch = downstream_batch
+    @hold = hold
+    @suct = suct
+    @head = head
+    @casep = casep
+    @disc = disc
+    @max_disc_pressure = max_disc_pressure
+    @min_pressure_violation = min_pressure_violation
+    @min_pressure_point = min_pressure_point
+    @max_pressure_violation = max_pressure_violation
+    @max_pressure_point = max_pressure_point
+    @total_static_loss = total_static_loss
+    @total_dynamic_loss = total_dynamic_loss
+  end
+end
+
+
+class Sumresultrec
+  attr_accessor :stat
+  attr_accessor :station_id
+  attr_accessor :flow
+  attr_accessor :pumped_volume
+  attr_accessor :hold
+  attr_accessor :suct
+  attr_accessor :head
+  attr_accessor :casep
+  attr_accessor :disc
+  attr_accessor :bottleneck_pct
+  def initialize(stat, station_id, flow, pumped_volume, hold, suct, head, casep, disc, bottleneck_pct)
+    @stat = stat
+    @station_id = station_id
+    @flow = flow
+    @pumped_volume = pumped_volume
+    @hold = hold
+    @suct = suct
+    @head = head
+    @casep = casep
+    @disc = disc
+    @bottleneck_pct = bottleneck_pct
+  end
+end
+
+class Linefillrec
+  attr_accessor :kmp
+  attr_accessor :stat
+  attr_accessor :batch
+  attr_accessor :commodity_id
+  attr_accessor :batch_vol
+  attr_accessor :upstream_batch
+  def initialize(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+    @kmp = kmp
+    @stat = stat
+    @batch = batch
+    @commodity_id = commodity_id
+    @batch_vol = batch_vol
+    @upstream_batch = upstream_batch
+  end
+end
+
+class Raterec
+  attr_accessor :kmp
+  attr_accessor :stat
+  attr_accessor :rate_ratio
+  def initialize (kmp, stat, rate_ratio)
+    @kmp = kmp
+    @stat = stat
+    @rate_ratio = rate_ratio
+  end
+end
+  
+class Batchrec
+  attr_accessor :batch_id
+  attr_accessor :batch_number
+  attr_accessor :commodity_id
+  attr_accessor :volume
+  attr_accessor :start_location
+  attr_accessor :end_location
+  attr_accessor :shipper
+  attr_accessor :shipment_number
+  def initialize (batch_number, commodity_id, volume, start_location, end_location, shipper, shipment_number)
+    @batch_number = batch_number
+    @commodity_id = commodity_id
+    @volume = volume
+    @start_location = start_location
+    @end_location = end_location
+    @shipper = shipper
+    @shipment_number = shipment_number
+  end
+end
+
+class Commodityrec
+  attr_accessor :commodity_id
+  attr_accessor :temp1
+  attr_accessor :visc1
+  attr_accessor :temp2
+  attr_accessor :visc2
+  attr_accessor :density
+  attr_accessor :density_cf
+  attr_accessor :vapor
+  def initialize (commodity_id, temp1, visc1, temp2, visc2, density, density_cf, vapor)
+    @commodity_id = commodity_id
+    @temp1 = temp1
+    @visc1 = visc1
+    @temp2 = temp2
+    @visc2 = visc2
+    @density = density
+    @density_cf = density_cf
+    @vapor = vapor
+  end
+end
+
+class Stationcurverec
+  attr_accessor :station_id
+  attr_accessor :station_name
+  attr_accessor :flow
+  attr_accessor :head
+  def initialize (station_id, station_name, flow, head)
+    @station_id = station_id
+    @station_name = station_name
+    @flow = flow
+    @head = head
+  end
+end
+
+
+

@@ -1,0 +1,21 @@
+<h2>Pipelines</h2>
+<table class="fixed", style="width: 860px;">
+  <thead>
+   <tr>
+     <th>Name</th>
+	 <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @pipelines.order(name: :asc).each do |pipeline| %>
+      <tr>
+        <td><%= link_to pipeline.name, pipeline_path(pipeline) %></td>
+        <td><%= pipeline.description %></td>
+      </tr>
+	<% end %>
+	<td colspan="2"><%= link_to 'Add Pipeline', new_pipeline_path %></td>
+  </tbody>
+</table>
+
+

@@ -1,0 +1,55 @@
+<h2>Pump</h2>
+<%= form_for(@pump) do |f| %>
+  <p>
+  <% if @pump.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pump.errors.count, "error") %> prohibited this pump from being saved:</h2>
+
+      <ul>
+      <% @pump.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  </p>
+
+	<table>
+		<thead>
+	    <tr>
+	      <th>Pump</th>
+	      <th>Description</th>
+	      <th>Flow<br>units</th>
+	      <th>Head<br>units</th>
+	      <th>Pressure<br>units</th>
+	      <th>Minimum<br>suction</th>
+	      <th>Stages</th>
+	      <th>Impeller<br>diameter</th>
+		  <th>Efficiency<br>Correction<br>Factor</th>
+		  <th>Capacity<br>Correction<br>Factor</th>
+		  <th>Head<br>Correction<br>Factor</th>
+	    </tr>
+	  </thead>
+		
+		
+		
+	  <tbody>
+		<tr>
+			<td><%= f.text_field :pump_id, :autofocus => true %></td>
+	        <td><%= f.text_field :description %>
+		    <td><%= f.select :flow_units, ["gallons/min", "m3/hr", "m3/day", "barrels/hr", "barrels/day"] %></td>
+			<td><%= f.select :head_units, ["meters", "feet"] %></td>
+			<td><%= f.select :pressure_units, ["kpa", "psi"] %></td>
+			<td><%= f.text_field :minimum_suction %></td>
+			<td><%= f.number_field :stages %></td>
+			<td><%= f.number_field :impeller_diameter,  :step => "any"  %></td>
+			<td><%= f.number_field :efficiency_correction_factor ,  :step => "any" %></td>
+			<td> <%= f.number_field :capacity_correction_factor,  :step => "any"  %></td>
+			<td><%= f.number_field :head_correction_factor,  :step => "any"  %></td>
+		</tr>
+	  </tbody>
+	</table>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

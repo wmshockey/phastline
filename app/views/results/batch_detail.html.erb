@@ -1,0 +1,38 @@
+<p id="notice"><%= notice %></p>
+<%= render 'top' %>
+
+<table>
+	<thead>
+		<tr>
+			<th>Station</th>
+			<th>Batch ID</th>
+			<th>Commodity ID</th>
+			<th>Volume</th>
+			<th>Start<br>Location</th>
+			<th>End<br>Location</th>
+			<th>Shipper</th>
+			<th>Shipment<br>Number</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+		<% @results.take_while{|i| i.step == 1 and i.batch_sequence_data != nil}.each do |r| %>
+			<% station = r.stat %>
+			<% station_batches = r.batch_sequence_data %>
+			<% station_batches.each do |b| %>
+				<% if b.batch_id == @batch %>
+					<tr>
+						<td><%= station %>
+						<td><%= b.batch_id %></td>
+						<td><%= b.commodity_id %></td>
+						<td><%= b.volume %></td>
+						<td><%= b.start_location %></td>
+						<td><%= b.end_location %></td>
+						<td><%= b.shipper %></td>
+						<td><%= b.shipment_number %></td>
+					</tr>
+				<% end %>
+			<% end %>
+		<% end %>
+	</tbody>
+</table>

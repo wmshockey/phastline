@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  station_id: 1
+  pump_id: MyString
+  unit_row: 1
+  unit_column: 1
+
+two:
+  station_id: 1
+  pump_id: MyString
+  unit_row: 1
+  unit_column: 1

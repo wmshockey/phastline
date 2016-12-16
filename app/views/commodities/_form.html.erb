@@ -1,0 +1,34 @@
+<h2>Commodity</h2>
+<%= form_for(@commodity) do |f| %>
+  <p>
+  <% if @commodity.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@commodity.errors.count, "error") %> prohibited this commodity from being saved:</h2>
+
+      <ul>
+      <% @commodity.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  </p>
+
+	<table   class="fixed", style="width: 360px;">
+	  <tbody>
+			<tr><td><%= f.label "Commodity ID" %></td><td><%= f.text_field :commodity_id %></td></tr>
+	        <tr><td><%= f.label "Commodity Name" %></td><td><%= f.text_field :commodity_name %></td></tr>
+		    <tr><td><%= f.label "Temperature point 1 (Deg C)" %></td><td><%= f.number_field :temp1,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Viscosity point 1 (cst)" %></td><td><%= f.number_field :visc1,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Temperature point 2 (Deg C)" %></td><td><%= f.number_field :temp2,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Viscosity point 2 (cst)" %></td><td><%= f.number_field :visc2,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Density (kg/m3)" %></td><td><%= f.number_field :density,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Density conversion factor" %></td><td><%= f.number_field :density_cf,   :step => "any" %></td></tr>
+			<tr><td><%= f.label "Vapour pressure (kpa)" %></td><td><%= f.number_field :vapor,  :step => "any"  %></td></tr>
+	  </tbody>
+	</table>
+	<div class="actions">
+	  <%= f.submit %>
+	</div>
+
+<% end %>

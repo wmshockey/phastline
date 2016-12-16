@@ -1,0 +1,40 @@
+<h2>Segment</h2>
+<%= form_for([@pipeline, @segment]) do |f| %>
+<p>
+<% if @segment.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@segment.errors.count, "error") %> prohibited this segment from being saved:</h2>
+    <ul>
+    <% @segment.errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+</p>
+
+<table class="fixed", style="width: 860px;">
+  <thead>
+    <tr>
+	  <th>Distance (kmp)</th>
+      <th>Diameter (meters)</th>
+	  <th>Thickness (meters)</th>
+      <th>Roughness (meters)</th>
+	  <th>MAWP (kpa)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+		<td style="width: 120px;"><%= f.number_field :kmp,  :step => "any"  %></td>
+        <td style="width: 160px;"><%= f.number_field :diameter,  :step => "any"   %></td>
+        <td style="width: 160px;"><%= f.number_field :thickness,  :step => "any"   %></td>
+        <td style="width: 160px;"><%= f.number_field :roughness,  :step => "any"  %></td>
+        <td style="width: 160px;"><%= f.number_field :mawp,  :step => "any"   %></td>
+      </tr>
+  </tbody>
+</table>
+<div class="actions">
+  <%= f.submit %>
+</div>
+<% end %>

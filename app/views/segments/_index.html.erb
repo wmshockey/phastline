@@ -1,0 +1,25 @@
+<h2>Segments</h2>
+<table class="fixed", style="width: 860px;">
+  <thead>
+   <tr>
+	  <th>Distance (kmp)</th>
+      <th>Diameter (meters)</th>
+	  <th>Thickness (meters)</th>
+      <th>Roughness (meters)</th>
+	  <th>MAWP (kpa)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @pipeline.segments.order(kmp: :asc).each do |segment| %>
+      <tr>
+		<td><%= link_to segment.kmp, pipeline_segment_path(segment.pipeline_id, segment.id) %></td>
+        <td><%= segment.diameter %></td>
+        <td><%= segment.thickness %></td>
+        <td><%= '%12.10f' % segment.roughness %></td>
+        <td><%= segment.mawp %></td>
+      </tr>
+	<% end %>
+	<td colspan="5"><%= link_to 'Add Segment', new_pipeline_segment_path(@pipeline) %></td>
+  </tbody>
+</table>

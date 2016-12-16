@@ -1,0 +1,26 @@
+<h2>Pump Units</h2>
+<table class="fixed", style="width: 860px;">
+  <thead>
+    <tr>
+      <th>ROW</th>
+      <th>COLUMN</th>
+      <th>Pump Unit</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @units.each do |unit| %>
+      <tr>
+	    <% unit_row_string = unit.unit_row.to_s.rjust(2, "0") %>
+		<% unit_col_string = unit.unit_column.to_s.rjust(2, "0") %>
+        <td><%= link_to unit_row_string, pipeline_station_unit_path(@pipeline, @station, unit) %></td>
+        <td><%= unit_col_string %></td>
+		<td><%= link_to unit.pump_id, Pump.find {|p| p.pump_id == unit.pump_id} %>
+      </tr>
+    <% end %>
+	<td colspan="3"><%= link_to 'Add Pump Unit', new_pipeline_station_unit_path(@pipeline, @station) %></td>
+  </tbody>
+</table>
+
+
+

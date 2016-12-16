@@ -1,0 +1,119 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Simulation:</strong>
+  <%= @result.simulation_id %>
+</p>
+
+<p>
+  <strong>Simulation name:</strong>
+  <%= @result.simulation_name %>
+</p>
+
+<p>
+  <strong>Step:</strong>
+  <%= @result.step %>
+</p>
+
+<p>
+  <strong>Timestamp:</strong>
+  <%= @result.timestamp %>
+</p>
+
+<p>
+  <strong>Kmp:</strong>
+  <%= @result.kmp %>
+</p>
+
+<p>
+  <strong>Station:</strong>
+  <%= @result.station_id %>
+</p>
+
+<p>
+  <strong>Stat:</strong>
+  <%= @result.stat %>
+</p>
+
+<p>
+  <strong>Flow:</strong>
+  <%= @result.flow %>
+</p>
+
+<p>
+  <strong>Pumped volume:</strong>
+  <%= @result.pumped_volume %>
+</p>
+
+<p>
+  <strong>Upstream batch:</strong>
+  <%= @result.upstream_batch %>
+</p>
+
+<p>
+  <strong>Downstream batch:</strong>
+  <%= @result.downstream_batch %>
+</p>
+
+<p>
+  <strong>Hold:</strong>
+  <%= @result.hold %>
+</p>
+
+<p>
+  <strong>Suct:</strong>
+  <%= @result.suct %>
+</p>
+
+<p>
+  <strong>Head:</strong>
+  <%= @result.head %>
+</p>
+
+<p>
+  <strong>Casep:</strong>
+  <%= @result.casep %>
+</p>
+
+<p>
+  <strong>Disc:</strong>
+  <%= @result.disc %>
+</p>
+
+<p>
+  <strong>Max disc pressure:</strong>
+  <%= @result.max_disc_pressure %>
+</p>
+
+<p>
+  <strong>Min pressure violation:</strong>
+  <%= @result.min_pressure_violation %>
+</p>
+
+<p>
+  <strong>Min pressure point:</strong>
+  <%= @result.min_pressure_point %>
+</p>
+
+<p>
+  <strong>Max pressure violation:</strong>
+  <%= @result.max_pressure_violation %>
+</p>
+
+<p>
+  <strong>Max pressure point:</strong>
+  <%= @result.max_pressure_point %>
+</p>
+
+<p>
+  <strong>Total static loss:</strong>
+  <%= @result.total_static_loss %>
+</p>
+
+<p>
+  <strong>Total dynamic loss:</strong>
+  <%= @result.total_dynamic_loss %>
+</p>
+
+<%= link_to 'Edit', edit_result_path(@result) %> |
+<%= link_to 'Back', results_path %>

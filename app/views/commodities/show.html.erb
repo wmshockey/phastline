@@ -1,0 +1,23 @@
+<p id="notice"><%= notice %></p>
+<%= render 'index' %>
+<h2>Commodity</h2>
+<table   class="fixed", style="width: 360px;">
+  <tbody>
+		<tr><td><strong>Commodity ID:</strong></td><td><%= @commodity.commodity_id %></td></tr>
+        <tr><td><strong>Commodity Name:</strong></td><td><%= @commodity.commodity_name %></td></tr>
+	    <tr><td><strong>Temperature point 1 (Dec C):</strong></td><td><%= @commodity.temp1 %></td></tr>
+		<tr><td><strong>Viscosity point 1 (cst):</strong></td><td><%= @commodity.visc1 %></td></tr>
+		<tr><td><strong>Temperature point 2 (Deg C):</strong></td><td><%= @commodity.temp2 %></td></tr>
+		<tr><td><strong>Viscosity point 2 (cst):</strong></td><td><%= @commodity.visc2 %></td></tr>
+		<tr><td><strong>Density (kg/m3):</strong></td><td><%= @commodity.density %></td></tr>
+		<tr><td><strong>Density Conversion Factor:</strong></td><td><%= @commodity.density_cf %></td></tr>
+		<tr><td><strong>Vapor Pressure (kpa):</strong></td><td><%= @commodity.vapor %></td></tr>
+  </tbody>
+</table>
+
+<%= link_to 'Edit', edit_commodity_path(@commodity) %> |
+<%= link_to 'Delete', commodity_path(@commodity.id), method: :delete, data: { confirm: 'Are you sure you want to delete this commodity?' } %> |
+<%= link_to 'Back', :back %>
+
+
+

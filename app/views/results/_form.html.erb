@@ -1,0 +1,109 @@
+<%= form_for(@result) do |f| %>
+  <% if @result.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@result.errors.count, "error") %> prohibited this result from being saved:</h2>
+
+      <ul>
+      <% @result.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :simulation_id %><br>
+    <%= f.text_field :simulation_id %>
+  </div>
+  <div class="field">
+    <%= f.label :simulation_name %><br>
+    <%= f.text_field :simulation_name %>
+  </div>
+  <div class="field">
+    <%= f.label :step %><br>
+    <%= f.number_field :step %>
+  </div>
+  <div class="field">
+    <%= f.label :timestamp %><br>
+    <%= f.text_field :timestamp %>
+  </div>
+  <div class="field">
+    <%= f.label :kmp %><br>
+    <%= f.text_field :kmp %>
+  </div>
+  <div class="field">
+    <%= f.label :station_id %><br>
+    <%= f.text_field :station_id %>
+  </div>
+  <div class="field">
+    <%= f.label :stat %><br>
+    <%= f.text_field :stat %>
+  </div>
+  <div class="field">
+    <%= f.label :flow %><br>
+    <%= f.text_field :flow %>
+  </div>
+  <div class="field">
+    <%= f.label :pumped_volume %><br>
+    <%= f.text_field :pumped_volume %>
+  </div>
+  <div class="field">
+    <%= f.label :upstream_batch %><br>
+    <%= f.text_field :upstream_batch %>
+  </div>
+  <div class="field">
+    <%= f.label :downstream_batch %><br>
+    <%= f.text_field :downstream_batch %>
+  </div>
+  <div class="field">
+    <%= f.label :hold %><br>
+    <%= f.text_field :hold %>
+  </div>
+  <div class="field">
+    <%= f.label :suct %><br>
+    <%= f.text_field :suct %>
+  </div>
+  <div class="field">
+    <%= f.label :head %><br>
+    <%= f.text_field :head %>
+  </div>
+  <div class="field">
+    <%= f.label :casep %><br>
+    <%= f.text_field :casep %>
+  </div>
+  <div class="field">
+    <%= f.label :disc %><br>
+    <%= f.text_field :disc %>
+  </div>
+  <div class="field">
+    <%= f.label :max_disc_pressure %><br>
+    <%= f.text_field :max_disc_pressure %>
+  </div>
+  <div class="field">
+    <%= f.label :min_pressure_violation %><br>
+    <%= f.text_field :min_pressure_violation %>
+  </div>
+  <div class="field">
+    <%= f.label :min_pressure_point %><br>
+    <%= f.text_field :min_pressure_point %>
+  </div>
+  <div class="field">
+    <%= f.label :max_pressure_violation %><br>
+    <%= f.text_field :max_pressure_violation %>
+  </div>
+  <div class="field">
+    <%= f.label :max_pressure_point %><br>
+    <%= f.text_field :max_pressure_point %>
+  </div>
+  <div class="field">
+    <%= f.label :total_static_loss %><br>
+    <%= f.text_field :total_static_loss %>
+  </div>
+  <div class="field">
+    <%= f.label :total_dynamic_loss %><br>
+    <%= f.text_field :total_dynamic_loss %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

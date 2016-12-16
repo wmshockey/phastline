@@ -1,0 +1,39 @@
+<h2>Nomination</h2>
+<%= form_for(@nomination) do |f| %>
+  <p>
+  <% if @nomination.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@nomination.errors.count, "error") %> prohibited this nomination from being saved:</h2>
+
+      <ul>
+      <% @nomination.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  </p>
+
+	<table class="fixed", style="width: 1200px;">
+	  <thead>
+	    <tr>
+	      <th>Nomination Name</th>
+		  <th>Description</th>
+		  <th>Nomination Date</th>
+		  <th>Period (days)</th>
+	    </tr>
+	  </thead>
+
+	  <tbody>
+	      <tr>
+	        <td><%= f.text_field :name %></td>
+	        <td><%= f.text_field :description %></td>
+			<td><%= f.date_select :nom_date %>
+			<td><%= f.text_field :period %>
+	      </tr>
+	  </tbody>
+	</table>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

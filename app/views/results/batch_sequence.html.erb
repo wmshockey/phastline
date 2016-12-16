@@ -1,0 +1,42 @@
+<p id="notice"><%= notice %></p>
+<%= render 'top' %>
+
+<% btsqar = Array.new %>
+<% stations = Array.new %>
+<% stn_ix = 0 %>
+<% @results.take_while{|i| i.step == 1 and i.batch_sequence_data != nil}.each do |r| %>
+	<% stations[stn_ix] = r.stat %>
+	<% station_batches = r.batch_sequence_data %>
+	<% btsqar[stn_ix] = station_batches %>
+	<% stn_ix = stn_ix + 1 %>
+<% end %>
+
+<h2>Batch Sequence</h2>
+<table>
+  <tbody>
+	  <% stn_ix = 0 %>
+	  <% num_stations = stations.size %>
+	  <% num_batches = btsqar[0].size %>
+	  <tr>
+	    <td>Batch</td>
+	    <% while stn_ix < num_stations %>
+	      <td> <%= stations[stn_ix] %> </td>
+		  <% stn_ix = stn_ix + 1 %>
+		<% end %>
+	  </tr>
+	  <% batch = 0 %>
+	  <% while batch <= num_batches - 1 %>
+	    <% stn_ix = 0 %>
+		<tr>
+		  <% batch_id = btsqar[stn_ix][batch].batch_id %>
+		  <td><%= link_to batch_id, batch_detail_result_path(batch_id) %></td>
+	      <% while stn_ix < num_stations %>
+		    <td><%= btsqar[stn_ix][batch].volume %></td>
+		    <% stn_ix = stn_ix + 1 %>
+	      <% end %>
+	    </tr>
+		<% batch = batch + 1 %>
+      <% end %>
+  </tbody>
+</table>
+

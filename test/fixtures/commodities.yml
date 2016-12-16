@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  commodity_id: MyString
+  commodity_name: MyString
+  temp1: 1.5
+  visc1: 1.5
+  temp2: 1.5
+  visc2: 1.5
+  density: 1.5
+  density_cf: 1.5
+  vapor: MyString
+
+two:
+  commodity_id: MyString
+  commodity_name: MyString
+  temp1: 1.5
+  visc1: 1.5
+  temp2: 1.5
+  visc2: 1.5
+  density: 1.5
+  density_cf: 1.5
+  vapor: MyString

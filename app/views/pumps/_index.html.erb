@@ -1,0 +1,37 @@
+<h2>Pumps</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Pump</th>
+      <th>Description</th>
+      <th>Flow<br>units</th>
+      <th>Head<br>units</th>
+      <th>Pressure<br>units</th>
+      <th>Minimum<br>suction</th>
+      <th>Stages</th>
+      <th>Impeller<br>diameter</th>
+	  <th>Efficiency<br>Correction<br>Factor</th>
+	  <th>Capacity<br>Correction<br>Factor</th>
+	  <th>Head<br>Correction<br>Factor</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @pumps.each do |pump| %>
+      <tr>
+        <td><%= link_to pump.pump_id, Pump.find {|p| p.pump_id == pump.pump_id} %></td>
+        <td><%= pump.description %></td>
+		<td><%= pump.flow_units %></td>
+        <td><%= pump.head_units %></td>
+        <td><%= pump.pressure_units %></td>
+        <td><%= pump.minimum_suction %></td>
+        <td><%= pump.stages %></td>
+        <td><%= pump.impeller_diameter %></td>
+		<td><%= pump.efficiency_correction_factor %></td>
+		<td><%= pump.capacity_correction_factor %></td>
+		<td><%= pump.head_correction_factor %></td>
+      </tr>
+    <% end %>
+	<td colspan="11"><%= link_to 'Add Pump', new_pump_path %></td>
+  </tbody>
+</table>

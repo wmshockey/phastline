@@ -1,0 +1,19 @@
+<h2>Temperatures</h2>
+<table  class="fixed", style="width: 500px;">
+  <thead>
+   <tr>
+	  <th>Distance (kmp)</th>
+      <th>Temperature<br>(deg C)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @pipeline.temperatures.order(kmp: :asc).each do |temperature| %>
+      <tr>
+		<td><%= link_to temperature.kmp, pipeline_temperature_path(temperature.pipeline_id, temperature.id) %></td>
+        <td><%= temperature.temperature %></td>
+      </tr>
+	<% end %>
+	<td colspan="2"><%= link_to 'Add Temperature', new_pipeline_temperature_path(@pipeline) %></td>
+  </tbody>
+</table>

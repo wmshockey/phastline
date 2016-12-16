@@ -1,0 +1,36 @@
+<%= form_for([@pump, @headpoint]) do |f| %>
+  <% head_units = @pump.head_units %>
+  <% flow_units = @pump.flow_units %>
+  <p>
+  <% if @headpoint.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@headpoint.errors.count, "error") %> prohibited this headpoint from being saved:</h2>
+
+      <ul>
+      <% @headpoint.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  </p>
+
+<table class="fixed", style="width: 500px;">
+  <thead>
+    <tr>
+	  <th>Flowrate (<%= flow_units %>)</th>
+      <th>Head (<%= head_units %>)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+		<td><%= f.number_field :flow,  :autofocus => true, :step => "any"  %></td>
+        <td><%= f.number_field :head,  :step => "any"  %></td>
+      </tr>
+  </tbody>
+</table>
+<div class="actions">
+  <%= f.submit %>
+</div>
+<% end %>

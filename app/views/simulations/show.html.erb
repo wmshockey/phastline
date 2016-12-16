@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+<%= render 'shared/error_messages', :object => @simulation %>
+
+<%= render 'show' %>
+
+<%= link_to 'Edit Simulation', edit_simulation_path(@simulation) %> |
+<%= link_to 'Delete', simulation_path(@simulation.id), method: :delete, data: { confirm: 'Are you sure you want to delete this simulation?' } %> |
+<%= link_to 'Back', simulations_path %>
+<br><br>
+
+<%= button_to "Run Simulation", {:controller => :simulations, :action => 'run'}, :method => :get %>
+
+
+
+

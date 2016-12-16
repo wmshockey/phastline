@@ -1,0 +1,23 @@
+<h2>Nominations</h2>
+<table class="fixed", style="width: 1200px;">
+  <thead>
+   <tr>
+      <th>Name</th>
+	  <th>Description</th>
+	  <th>Nomination Date</th>
+	  <th>Period (days)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @nominations.order(name: :asc).each do |nomination| %>
+      <tr>
+        <td><%= link_to nomination.name, nomination_path(nomination) %></td>
+        <td><%= nomination.description %></td>
+		<td><%= nomination.nom_date %></td>
+		<td><%= nomination.period %></td>
+      </tr>
+	<% end %>
+	<td colspan="4"><%= link_to 'Add Nomination', new_nomination_path %></td>
+  </tbody>
+</table>

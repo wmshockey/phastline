@@ -1,0 +1,19 @@
+<h2>Elevations</h2>
+<table class="fixed", style="width: 500px;">
+  <thead>
+   <tr>
+	  <th>Distance (kmp)</th>
+      <th>Elevation</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @pipeline.elevations.order(kmp: :asc).each do |elevation| %>
+      <tr>
+		<td><%= link_to elevation.kmp, pipeline_elevation_path(elevation.pipeline_id, elevation.id) %></td>
+        <td><%= '%.2f' % elevation.elevation %></td>
+      </tr>
+	<% end %>
+	<td colspan="2"><%= link_to 'Add Elevation', new_pipeline_elevation_path(@pipeline) %></td>
+  </tbody>
+</table>

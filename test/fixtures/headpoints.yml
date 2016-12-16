@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pump_id: MyString
+  flow: 1.5
+  head: 1.5
+
+two:
+  pump_id: MyString
+  flow: 1.5
+  head: 1.5

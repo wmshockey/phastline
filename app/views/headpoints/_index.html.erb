@@ -1,0 +1,26 @@
+<h2>Headpoints</h2>
+<table class="fixed", style="width: 500px;">
+  <% head_units = @pump.head_units %>
+  <% flow_units = @pump.flow_units %>
+  <thead>
+    <tr>
+      <th>Flow (<%= flow_units %>)</th>
+      <th>Head (<%= head_units %>)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @pump.headpoints.order(flow: :asc).each do |headpoint| %>
+	  <% if !headpoint.id.nil? then %>
+	      <tr>
+	        <td><%= link_to headpoint.flow, pump_headpoint_path(headpoint.pump_id, headpoint.id) %></td>
+	        <td><%= headpoint.head %></td>
+	      </tr>
+	  <% end %>
+	<% end %>
+    <tr><td colspan="2"><%= link_to 'Add Headpoint', new_pump_headpoint_path(@pump) %></td></tr>
+  </tbody>
+</table>
+
+<br>
+
+

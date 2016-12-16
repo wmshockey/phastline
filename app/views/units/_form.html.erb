@@ -1,0 +1,38 @@
+<h2>Pump Unit</h2>
+<%= form_for([@pipeline, @station, @unit]) do |f| %>
+	<p>
+	<% if @unit.errors.any? %>
+	  <div id="error_explanation">
+	    <h2><%= pluralize(@unit.errors.count, "error") %> prohibited this unit from being saved:</h2>
+
+	    <ul>
+	    <% @unit.errors.full_messages.each do |message| %>
+	      <li><%= message %></li>
+	    <% end %>
+	    </ul>
+	  </div>
+	<% end %>
+	</p>
+
+	<table class="fixed", style="width: 860px;">
+	  <thead>
+	    <tr>
+		  <th>Row</th>
+	      <th>Column</th>
+		  <th>Pump ID</th>
+	    </tr>
+	  </thead>
+
+	  <tbody>
+	      <tr>
+			<td><%= f.number_field :unit_row,  :step => 1 %></td>
+	        <td><%= f.number_field :unit_column, :step => 1 %></td>
+			<td><%= f.select :pump_id, Pump.all.collect {|p| [p.pump_id]} %></td>
+	      </tr>
+	  </tbody>
+	</table>
+	<div class="actions">
+	   <%= f.submit %>
+	</div>
+<% end %>
+

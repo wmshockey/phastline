@@ -1,0 +1,29 @@
+<h2>Simulation</h2>
+<table class="fixed", style="width: 600px;">
+	<thead>
+		<tr>
+			<th>Pipeline Simulation</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><strong>Name: </strong></td><td><%= @simulation.name %></td>
+		</tr>
+		<tr>
+			<td><strong>Description: </strong></td><td><%= @simulation.description %></td>
+		</tr>
+		<tr>
+			<td><strong>Pipeline: </strong></td><td><%= link_to @simulation.pipeline_name,  Pipeline.find {|p| p.name == @simulation.pipeline_name}  %></td>
+		</tr>
+		<tr>
+			<td><strong>Nomination: </strong></td><td><%= link_to @simulation.nomination_name, Nomination.find {|n| n.name == @simulation.nomination_name} %></td>
+		</tr>
+		<tr>
+			<td><strong>Max Flowrate: </strong></td><td><%= @simulation.max_flowrate %></td>
+		</tr>
+		<tr>
+			<td><strong>Max Batch Size: </strong></td><td><%= @simulation.max_batchsize %></td>
+		</tr>
+	</tbody>
+</table>

@@ -1,0 +1,1 @@
+json.extract! @pump, :id, :pump_id, :description, :flow_units, :head_units, :pressure_units, :minimum_suction, :stages, :impeller_diameter, :efficiency_correction_factor, :capacity_correction_factor, :head_correction_factor, :created_at, :updated_at

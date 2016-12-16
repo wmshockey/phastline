@@ -1,0 +1,10 @@
+<p id="notice"><%= notice %></p>
+<%= render 'show_one' %>
+
+<%= link_to 'Edit Pump', edit_pump_path(@pump) %> |
+<%= link_to 'Delete', @pump, method: :delete, data: { confirm: 'Are you sure?' } %> |
+<%= link_to 'Back', :back %>
+
+<%= render 'headpoints/index' %>
+
+

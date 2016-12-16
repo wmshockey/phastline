@@ -1,0 +1,27 @@
+<h2>Shipments</h2>
+<table class="fixed", style="width: 1200px;">
+  <thead>
+   <tr>
+	  <th>Start Location</th>
+      <th>End Location</th>
+      <th>Shipper</th>
+      <th>Commodity ID</th>
+      <th>Volume</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @nomination.shipments.order(start_location: :asc).each do |shipment| %>
+      <tr>
+		<td><%= link_to shipment.start_location, nomination_shipment_path(shipment.nomination_id, shipment.id) %></td>
+        <td><%= shipment.end_location %></td>
+		<td><%= shipment.shipper %></td>
+		<td><%= link_to shipment.commodity_id, Commodity.find {|c| c.commodity_id == shipment.commodity_id} %></td>
+		<td><%= shipment.volume %></td>
+      </tr>
+	<% end %>
+	<td colspan="5"><%= link_to 'Add Shipment', new_nomination_shipment_path(@nomination) %></td>
+  </tbody>
+</table>
+
+
