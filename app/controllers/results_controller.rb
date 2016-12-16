@@ -42,6 +42,10 @@ class ResultsController < ApplicationController
     @batch = params[:id]
     @results = Result.select {|r| r.step == 1}
   end
+  
+  def power
+    @results = Result.all
+  end
 
   # GET /results/1
   # GET /results/1.json

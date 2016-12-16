@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+<%= render 'top' %>
+
+<h2>Power Consumption</h2>
+<table>
+
+  <thead>
+   <tr>
+      <th>Station</th>
+	  <th>Total<br>Energy<br>(KwH)</th>
+	  <th>Peak<br>Power<br>(KW)</th>
+	  <th>Minimum<br>Power<br>(KW)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% stations = @results.map {|r| r.station_id_id}.uniq %>
+	<% stations.each do |s| %>
+	    <% station_results = @results.select {|r| r.station_id_id == s} %>
+		<% station_name = station_results[0].stat %>
+		<% station_powers = station_results.map {|r| r.hhp} %>
+		<% total_power = station_powers.sum %>
+		<% peak_power = station_powers.max %>
+		<% min_power = station_powers.min %>
+		<tr>
+			<td><%= station_name %></td>
+			<td><%= '%8.1f'% total_power %></td>
+			<td><%= '%8.1f'% peak_power %></td>
+			<td><%= '%8.1f'% min_power %></td>
+		</tr>
+	<% end %>
+  </tbody>
+</table>

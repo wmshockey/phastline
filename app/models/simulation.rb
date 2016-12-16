@@ -65,6 +65,7 @@ class Simulation < ActiveRecord::Base
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
         @pumpar = Pump.all
+        @units = Unit.all
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
         @volmar = @pipeline.get_volumes
         @tempar = @pipeline.get_all_temps
@@ -89,6 +90,7 @@ class Simulation < ActiveRecord::Base
           @ratear = calc_rate_ratios(@statar, @btsqar)
           iter = 1; iterdone = false; flow = max_flowrate; new_flow = max_flowrate
           viol = -9.0e9
+#         Iterate on flowrate to find the maximum flow (capacity rate)
           while not iterdone
             prev_flow = flow
             prev_viol = viol
@@ -97,6 +99,7 @@ class Simulation < ActiveRecord::Base
             @headar = head_calc(@statar, @statcv, @flowar, @densar)
             @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
             steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
+#           Adjust the flowrate to converge on the capacity flow rate
             new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
             if flow == max_flowrate and viol <= 0 then
               iterdone = true
@@ -109,9 +112,11 @@ class Simulation < ActiveRecord::Base
               iter = iter + 1
             end
           end
-  #       Save step results and then shift batches into position for the next step
+#         Shift batches into position for the next step, then save the step results
+          stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
+#         Update the step records with the step duration time (time_shift)
+          steprecs.each {|r| r.step_time = time_shift}
           @stepar = @stepar + steprecs
-          stepdone = step_shift_volumes(@statar, @btsqar, @flowar)
           $step = $step + 1
           if $step > 1000 then
             raise "Error - exceeded maximum number of steps 1000 - simulation stopped"
@@ -366,7 +371,7 @@ class Simulation < ActiveRecord::Base
       if all_done then
         $timestamp = $timestamp + time_shift
       end
-      return all_done
+      return all_done, time_shift
     end        
 
     def get_next_batch(btsqar, stn_ix, batch, direction)
@@ -848,14 +853,22 @@ class Simulation < ActiveRecord::Base
         upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
         upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
       end
+#     Calculate the Hydraulic Horsepower (HHP) at the station
+      if casep-suct > 0 then
+        hhp = flow * (casep - suct) / 3600
+      else
+        hhp = 0
+      end
 #     Save step result record
-      steprecs << Steprec.new($step, $timestamp, kmp, stat, station_id, flow, i.pumped_volume, upstream_batch_str, downstream_batch_str, hold, suct, head, casep, disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos)
+      steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, upstream_batch_str, downstream_batch_str, hold, suct, head, casep, disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp)
     end
     return steprecs
   end
 
 
   def summary_results_calc(statar, stepar)
+#   Get the list of stations from the saved step results
+    stations = @results.map do |s| {station_id: s.station_id_id, name: s.stat}
 #   Find the bottleneck points for each step on the line
     bottlenecks = Array[$maxsteps]
     step_ix = 0
@@ -872,7 +885,8 @@ class Simulation < ActiveRecord::Base
       step_ix = step_ix + 1
     end
     summary_results = Array.new    
-    statar[0...-1].each do |i|
+#   Calculate the totals and averages for each station across all steps
+    stations[0...-1].each do |i|
       stat = i.name
       station_id = i.station_id
       total_time = 0
@@ -882,6 +896,7 @@ class Simulation < ActiveRecord::Base
       accum_head = 0
       accum_casep = 0
       accum_disc = 0
+      kwh = 0
       bottleneck_time = 0
       station_step_results = stepar.select {|s| s.stat == stat}
       step_ix = 1
@@ -894,6 +909,7 @@ class Simulation < ActiveRecord::Base
         accum_head = accum_head + s.head*steptime
         accum_casep = accum_casep + s.casep*steptime
         accum_disc = accum_disc + s.disc*steptime
+        kwh = s.hhp * steptime
         if bottlenecks[step_ix - 1] == stat then
           bottleneck_time = bottleneck_time + steptime
         end
@@ -908,7 +924,7 @@ class Simulation < ActiveRecord::Base
       avg_head = accum_head / total_time
       avg_casep = accum_casep / total_time
       avg_disc = accum_disc / total_time
-      summary_results << Sumresultrec.new(stat, station_id, avg_flow, total_pumped, avg_hold, avg_suct, avg_head, avg_casep, avg_disc, bottleneck_pct)
+      summary_results << Sumresultrec.new(stat, station_id, avg_flow, total_pumped, avg_hold, avg_suct, avg_head, avg_casep, avg_disc, bottleneck_pct, kwh)
     end
     return summary_results
   end
@@ -921,6 +937,7 @@ class Simulation < ActiveRecord::Base
         result.simulation_name = self.name
         result.step = s.step
         result.timestamp = s.timestamp
+        result.step_time = s.step_time
         result.kmp = s.kmp
         result.station_id_id = station.id
         result.stat = s.stat
@@ -940,6 +957,7 @@ class Simulation < ActiveRecord::Base
         result.max_pressure_point = s.max_pressure_point
         result.total_static_loss = s.total_static_loss
         result.total_dynamic_loss = s.total_dynamic_loss
+        result.hhp = s.hhp
 #       The station curves only need to be stored once as they don't change from step to step
 #       The batch squence also only needs to be stored once as it doesn't change from step to step
         if s.step == 1 then
@@ -1113,6 +1131,7 @@ end
 class Steprec
   attr_accessor :step
   attr_accessor :timestamp
+  attr_accessor :step_time
   attr_accessor :kmp
   attr_accessor :stat
   attr_accessor :station_id
@@ -1132,9 +1151,11 @@ class Steprec
   attr_accessor :max_pressure_point
   attr_accessor :total_static_loss
   attr_accessor :total_dynamic_loss
-  def initialize (step, timestamp, kmp, stat, station_id, flow, pumped_volume, upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss)
+  attr_accessor :hhp
+  def initialize (step, timestamp, step_time, kmp, stat, station_id, flow, pumped_volume, upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss, hhp)
     @step = step
     @timestamp = timestamp
+    @step_time = step_time
     @kmp = kmp
     @stat = stat
     @station_id = station_id
@@ -1154,6 +1175,7 @@ class Steprec
     @max_pressure_point = max_pressure_point
     @total_static_loss = total_static_loss
     @total_dynamic_loss = total_dynamic_loss
+    @hhp = hhp
   end
 end
 
@@ -1169,7 +1191,8 @@ class Sumresultrec
   attr_accessor :casep
   attr_accessor :disc
   attr_accessor :bottleneck_pct
-  def initialize(stat, station_id, flow, pumped_volume, hold, suct, head, casep, disc, bottleneck_pct)
+  attr_accessor :kwh
+  def initialize(stat, station_id, flow, pumped_volume, hold, suct, head, casep, disc, bottleneck_pct, kwh)
     @stat = stat
     @station_id = station_id
     @flow = flow
@@ -1180,6 +1203,7 @@ class Sumresultrec
     @casep = casep
     @disc = disc
     @bottleneck_pct = bottleneck_pct
+    @kwh = kwh
   end
 end
 

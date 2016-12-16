@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161214000606) do
+ActiveRecord::Schema.define(version: 20161216051932) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -109,6 +109,8 @@ ActiveRecord::Schema.define(version: 20161214000606) do
     t.datetime "updated_at",                           null: false
     t.text     "station_curve_data",     limit: 65535
     t.text     "batch_sequence_data",    limit: 65535
+    t.float    "hhp",                    limit: 24
+    t.float    "step_time",              limit: 24
   end
 
   create_table "segments", force: :cascade do |t|

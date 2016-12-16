@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       get 'step_flowrates'
       get 'batch_sequence'
       get 'batch_detail'
+      get 'power'
     end
   end
   resources :pumps do

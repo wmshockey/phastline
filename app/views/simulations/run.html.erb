@@ -21,6 +21,7 @@
 			<th>Case</th>
 			<th>Discharge</th>
 			<th>Bottleneck<br>Percent</th>
+			<th>Energy<br>(KwH)</th>
 		</tr>
 	</thead>
 	
@@ -39,6 +40,7 @@
 				<td><%= '%.1f'% s.casep %></td>
 				<td><%= '%.1f'% s.disc %></td>
 				<td><%= '%-8.1f'% s.bottleneck_pct.round(2) %></td>
+				<td><%= '%8.1f'% s.kwh %></td>
 			</tr>
 		<% end %>
 	</tbody>
