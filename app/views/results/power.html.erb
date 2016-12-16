@@ -14,9 +14,9 @@
   </thead>
 
   <tbody>
-	<% stations = @results.map {|r| r.station_id_id}.uniq %>
+	<% stations = @results.map {|r| r.station_id}.uniq %>
 	<% stations.each do |s| %>
-	    <% station_results = @results.select {|r| r.station_id_id == s} %>
+	    <% station_results = @results.select {|r| r.station_id == s} %>
 		<% station_name = station_results[0].stat %>
 		<% station_powers = station_results.map {|r| r.hhp} %>
 		<% total_power = station_powers.sum %>

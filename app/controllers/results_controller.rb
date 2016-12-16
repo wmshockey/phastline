@@ -22,7 +22,7 @@ class ResultsController < ApplicationController
   
   def station_detail
     @station = Station.find(params[:id])
-    @results = Result.select {|r| r.station_id_id == @station.id}
+    @results = Result.select {|r| r.station_id == @station.id}
   end
 
   def station_step_detail

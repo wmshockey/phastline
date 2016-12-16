@@ -222,7 +222,7 @@ class Simulation < ActiveRecord::Base
       max_batch = btsqar[0].size - 1
 #     Specify initial split across first station
       batch = 1
-      batch_vol = 1000
+      batch_vol = 0
 #     Calculate the linefill between stations.
       while stn_ix < statar.count - 1
         stat = statar[stn_ix].name
@@ -231,7 +231,7 @@ class Simulation < ActiveRecord::Base
         kmp_end = statar[stn_ix + 1].kmp
         vol_end = volmar.interpolate_y(kmp_end)
 #       Determine initial volume pumped
-        initial_volume = 0
+        initial_volume = 10000
         bix = 0
         while bix != batch 
           initial_volume = initial_volume + btsqar[stn_ix][bix].volume
@@ -851,6 +851,8 @@ class Simulation < ActiveRecord::Base
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
         upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
         upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
+        flow = 0
+        pumped_volume = 0
       end
 #     Calculate the Hydraulic Horsepower (HHP) at the station
       if casep-suct > 0 then
@@ -868,7 +870,7 @@ class Simulation < ActiveRecord::Base
   def summary_results_calc(results)
 #   Get the list of stations from the saved step results.  @results is the only data available at this point.
 #    logger.info "summary_results_calc: #{@results.inspect}"
-    stations = results.map {|s| [s.station_id_id, s.kmp, s.stat]}.uniq
+    stations = results.map {|s| [s.station_id, s.kmp, s.stat]}.uniq
     stations.sort_by! {|s| s[1]}
 #   Find the bottleneck points for each step on the line
     bottlenecks = Array[$maxsteps]
@@ -887,7 +889,7 @@ class Simulation < ActiveRecord::Base
     end
     summary_results = Array.new    
 #   Calculate the totals and averages for each station across all steps
-    stations[0...-1].each do |i|
+    stations.each do |i|
       station_id = i[0]
       kmp = i[1]
       stat = i[2]
@@ -933,13 +935,13 @@ class Simulation < ActiveRecord::Base
     @stepar.each do |s|
         result = Result.new
         station = @pipeline.stations.find{|i| i.name == s.stat}        
-        result.simulation_id_id = self.id
+        result.simulation_id = self.id
         result.simulation_name = self.name
         result.step = s.step
         result.timestamp = s.timestamp
         result.step_time = s.step_time
         result.kmp = s.kmp
-        result.station_id_id = station.id
+        result.station_id = station.id
         result.stat = s.stat
         result.flow = s.flow
         result.pumped_volume = s.pumped_volume

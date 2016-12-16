@@ -7,7 +7,7 @@
 		<% @results.each do |r| %>
 			<% station_name = r.stat %>
 			<tr><td colspan="2"><strong>Station: <%= station_name %></strong><br>
-				 <% station_units = Unit.select {|u| u.station_id == r.station_id_id} %>
+				 <% station_units = Unit.select {|u| u.station_id == r.station_id} %>
 				 <% (1..6).each do |row| %>
 					<% row_units = station_units.select {|su| su.unit_row == row} %>
 					<% if row_units.size > 0 then %>
