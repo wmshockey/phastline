@@ -31,6 +31,7 @@ class SimulationsController < ApplicationController
   # POST /simulations
   # POST /simulations.json
   def create
+    @simulations = Simulation.all
     @simulation = Simulation.new(simulation_params)
     respond_to do |format|
       if @simulation.save

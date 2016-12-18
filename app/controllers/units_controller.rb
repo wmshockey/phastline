@@ -13,6 +13,9 @@ class UnitsController < ApplicationController
   # GET /units/1
   # GET /units/1.json
   def show
+    @pipeline = Pipeline.find(params[:pipeline_id])
+    @station = Station.find(params[:station_id])
+    @units = @station.units.all
   end
 
   # GET /units/new
@@ -25,6 +28,9 @@ class UnitsController < ApplicationController
 
   # GET /units/1/edit
   def edit
+    @pipeline = Pipeline.find(params[:pipeline_id])
+    @station = Station.find(params[:station_id])
+    @units = @station.units.all
   end
 
   # POST /units

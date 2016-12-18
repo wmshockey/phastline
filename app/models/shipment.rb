@@ -4,5 +4,5 @@ class Shipment < ActiveRecord::Base
     validates :end_location, :presence => true
     validates :shipper, :presence => true
     validates :commodity_id, :presence => true
-    validates :volume, :presence => true, numericality: {:greater_than_or_equal_to => 0} 
+    validates :volume, :presence => true, numericality: {:greater_than => 0} 
 end

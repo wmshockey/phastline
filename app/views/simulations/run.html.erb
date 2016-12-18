@@ -7,8 +7,12 @@
 <% @pipeline = Pipeline.find {|s| s.name == @simulation.pipeline_name} %>
 <% @nomination = Nomination.find {|s| s.name == @simulation.nomination_name} %>
 
-<h2>Simulation Ran Successfully</h2>
-Duration: <%= $timestamp.round(2) %> hours<br>
-Number of steps: <%=  $maxsteps %>
+<% if @simulation.errors.empty? then %>
+	<h2>Simulation Ran Successfully</h2>
+	Duration: <%= $timestamp.round(2) %> hours<br>
+	Number of steps: <%=  $maxsteps %>
+<% else %>
+	<h2>Simulation Failed!</h2>
+<% end %>
 
 

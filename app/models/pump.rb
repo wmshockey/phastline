@@ -5,8 +5,8 @@ class Pump < ActiveRecord::Base
   validates :head_units, :presence => true;
   validates :pressure_units, :presence => true
   validates :minimum_suction, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 1000}
-  validates :stages, :presence => true
-  validates :efficiency_correction_factor, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 10}
-  validates :capacity_correction_factor, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 10}
-  validates :head_correction_factor, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 10}
+  validates :stages, numericality: {:greater_than => 0, :less_than => 20}
+  validates :efficiency_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
+  validates :capacity_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
+  validates :head_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
 end

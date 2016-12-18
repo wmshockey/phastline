@@ -2,5 +2,5 @@ class Nomination < ActiveRecord::Base
     has_many :shipments, dependent: :destroy
     validates :name, :presence => true
     validates :nom_date, :presence => true
-    validates :period, :presence => true, numericality: {:greater_than_or_equal_to => 0}
+    validates :period, :presence => true, numericality: {:greater_than_or_equal_to => 0,  :less_than => 366}
 end

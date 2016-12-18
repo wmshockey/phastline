@@ -24,7 +24,7 @@ class Simulation < ActiveRecord::Base
     validates :name, :presence => true
     validates :pipeline_name, :presence => true
     validates :nomination_name, :presence => true
-    validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 10000}
+    validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
 
 # Constants and conversion factors
@@ -55,82 +55,86 @@ class Simulation < ActiveRecord::Base
 
 # Mainline driver code
     def run
-      begin
         @pipelines = Pipeline.all
         @nominations = Nomination.all
         Result.delete_all
         @pipeline = @pipelines.detect{ |p| p.name == pipeline_name }
+        if @pipeline.nil? then self.errors.add(:base, "Pipeline cannot be found") end
         @nomination = @nominations.detect{ |n| n.name == nomination_name }
+        if @nomination.nil? then self.errors.add(:base, "Nomination cannot be found") end
         @commodities = Commodity.all
         @shipments = @nomination.shipments
+        if @shipments.empty? then self.errors.add(:base, "Nomination does not contain any shipments") end
         @stations = @pipeline.stations
+        if @stations.empty? then self.errors.add(:base, "Pipeline does not have any stations") end
         @pumpar = Pump.all
         @units = Unit.all
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
+        if @segmar.empty? then self.errors.add(:base, "Pipeline does not have any pipe segments") end
         @volmar = @pipeline.get_volumes
         @tempar = @pipeline.get_all_temps
+        if @tempar.empty? then self.errors.add(:base, "Pipeline does not have any temperatures specified") end
         @maxpressar = @pipeline.get_all_maxpress
         @elevar = @pipeline.get_all_elevations
+        if @elevar.empty? then self.errors.add(:base, "Pipeline does not have any elevations specified") end
         @statar = @pipeline.get_all_stations(@volmar)
         @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
-  #     Get the batch sequence for the simulation 
-        @btsqar = batch_sequence(@shipments, @statar)      
-  #     Set initial positioning of batches in the line (linefill)
-        initial_batch_positioning(@statar, @btsqar, @volmar)
-        $step = 1; stepdone = false; $timestamp = 0.0
-        @stepar = Array.new
-  #     Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
-        while not stepdone
-          @lfill = linefill(@statar, @btsqar, @volmar)
-          @viscar = visc_profile(@lfill, @tempar)
-          @densar = dens_profile(@lfill, @tempar)
-          @slossar = static_loss(@densar, @elevar)
-          @minpressar = min_press(@lfill)
-          @suctar = suct_calc(@lfill)
-          @ratear = calc_rate_ratios(@statar, @btsqar)
-          iter = 1; iterdone = false; flow = max_flowrate; new_flow = max_flowrate
-          viol = -9.0e9
-#         Iterate on flowrate to find the maximum flow (capacity rate)
-          while not iterdone
-            prev_flow = flow
-            prev_viol = viol
-            flow = new_flow
-            @flowar = calc_flowrates(flow, ratear)
-            @headar = head_calc(@statar, @statcv, @flowar, @densar)
-            @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
-            steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
-#           Adjust the flowrate to converge on the capacity flow rate
-            new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
-            if flow == max_flowrate and viol <= 0 then
-              iterdone = true
+        if @pipeline.errors.any? then self.errors.add(:base, @pipeline.errors.full_messages) end
+        if self.errors.empty? then          
+  #       Get the batch sequence for the simulation 
+          @btsqar = batch_sequence(@shipments, @statar)      
+  #       Set initial positioning of batches in the line (linefill)
+          initial_batch_positioning(@statar, @btsqar, @volmar)
+          $step = 1; stepdone = false; $timestamp = 0.0
+          @stepar = Array.new
+  #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
+          while not stepdone
+            @lfill = linefill(@statar, @btsqar, @volmar)
+            @viscar = visc_profile(@lfill, @tempar)
+            @densar = dens_profile(@lfill, @tempar)
+            @slossar = static_loss(@densar, @elevar)
+            @minpressar = min_press(@lfill)
+            @suctar = suct_calc(@lfill)
+            @ratear = calc_rate_ratios(@statar, @btsqar)
+            iter = 1; iterdone = false; flow = max_flowrate; new_flow = max_flowrate
+            viol = -9.0e9
+  #         Iterate on flowrate to find the maximum flow (capacity rate)
+            while not iterdone
+              prev_flow = flow
+              prev_viol = viol
+              flow = new_flow
+              @flowar = calc_flowrates(flow, ratear)
+              @headar = head_calc(@statar, @statcv, @flowar, @densar)
+              @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
+              steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
+  #           Adjust the flowrate to converge on the capacity flow rate
+              new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
+              if flow == max_flowrate and viol <= 0 then
+                iterdone = true
+              end
+              if flow <= 0.0 and viol > 0 then
+                self.errors.add(:base, :flowrate_iterations_cannot_converge, message: "Flowrate iterations cannot converge in step #{$step}")
+                iterdone = true
+              end
+              if not iterdone then
+                iter = iter + 1
+              end
             end
-            if flow <= 0.0 and viol > 0 then
-              iterdone = true
-              raise "Error - flowrate iterations cannot converge in step #{$step}"
-            end
-            if not iterdone then
-              iter = iter + 1
+  #         Shift batches into position for the next step, then save the step results
+            stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
+  #         Update the step records with the step duration time (time_shift)
+            steprecs.each {|r| r.step_time = time_shift}
+            @stepar = @stepar + steprecs
+            $step = $step + 1
+            if $step > 1000 then
+              self.errors.add(:base, :steps_greater_than_100, message: "Number of steps exceeds 100.  Simulation stpped at step 100")
+              stepdone = true
             end
           end
-#         Shift batches into position for the next step, then save the step results
-          stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
-#         Update the step records with the step duration time (time_shift)
-          steprecs.each {|r| r.step_time = time_shift}
-          @stepar = @stepar + steprecs
-          $step = $step + 1
-          if $step > 1000 then
-            raise "Error - exceeded maximum number of steps 1000 - simulation stopped"
-          end
+          $maxsteps = $step - 1
+  #       Save step results in database table for user viewing
+          save_results
         end
-        $maxsteps = $step - 1
-#       Save step results in database table for user viewing
-        save_results
-#      rescue => e
-#        logger.fatal e.message + "\n"
-#        self.errors.add(:base, e.message)
-#        stepdone = true
-#        printf("Simulation had to be rescued after step #{$step} \n")
-      end
     end
 
     def cole_loss(flow, visc, dens, diam, thick, ruff)
@@ -221,7 +225,7 @@ class Simulation < ActiveRecord::Base
       stat = statar[stn_ix].name
       max_batch = btsqar[0].size - 1
 #     Specify initial split across first station
-      batch = 1
+      batch = 0
       batch_vol = 0
 #     Calculate the linefill between stations.
       while stn_ix < statar.count - 1
@@ -231,7 +235,7 @@ class Simulation < ActiveRecord::Base
         kmp_end = statar[stn_ix + 1].kmp
         vol_end = volmar.interpolate_y(kmp_end)
 #       Determine initial volume pumped
-        initial_volume = 10000
+        initial_volume = 0
         bix = 0
         while bix != batch 
           initial_volume = initial_volume + btsqar[stn_ix][bix].volume
@@ -562,7 +566,7 @@ class Simulation < ActiveRecord::Base
           new_flow = 0
         end
         if iter > 20 then
-          raise "flowrate iterations stopped at 20.  Cannot converge on a flowrate"
+          self.errors.add(:base, "flowrate iterations stopped at 20.  Cannot converge on a flowrate in step #{$step}")
           iterdone = true
         else
           iterdone = false
@@ -798,7 +802,7 @@ class Simulation < ActiveRecord::Base
           volume_shift = statar[stn_ix - 1].initial_volume - statar[stn_ix - 1].pipe_volume + statar[stn_ix - 1].pumped_volume
           upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
           if upstream_vol < 0.0000001 then
-            raise "step_calc error: upstream volume < 0.0000001  step:#{$step}  stn:#{stn_ix}  upstream_vol:#{upstream_vol}"
+            self.errors.add(:base, "step_calc error: upstream volume < 0.0000001  step:#{$step}  stn:#{stn_ix}  upstream_vol:#{upstream_vol}")
           end
           upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
           upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
@@ -1089,7 +1093,7 @@ class Profile < Array
       end
     end
     if not match then
-      raise "Could not interpolate value in interpolate_x method"
+      self.errors.add(:base, "Could not interpolate value in interpolate_x method, x= #{x}")
     end
     return x
   end      
