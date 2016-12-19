@@ -1,8 +1,4 @@
-<p id="notice"><%= notice %></p>
-<%= render 'shared/error_messages', :object => @simulation %>
-
-<%= render 'simulations/show' %>
-<%= render 'simulations/sim_result_links' %>
+<%= render 'top' %>
 
 <% @pipeline = Pipeline.find {|s| s.name == @simulation.pipeline_name} %>
 <% @nomination = Nomination.find {|s| s.name == @simulation.nomination_name} %>

@@ -27,6 +27,7 @@ class Simulation < ActiveRecord::Base
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
 
+
 # Constants and conversion factors
     Gconstant = 0.00980652       # Gravitational constant (km/sec2)
 
@@ -79,6 +80,7 @@ class Simulation < ActiveRecord::Base
         if @elevar.empty? then self.errors.add(:base, "Pipeline does not have any elevations specified") end
         @statar = @pipeline.get_all_stations(@volmar)
         @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
+        data_integrity_check(@pipeline)
         if @pipeline.errors.any? then self.errors.add(:base, @pipeline.errors.full_messages) end
         if self.errors.empty? then          
   #       Get the batch sequence for the simulation 
@@ -113,7 +115,7 @@ class Simulation < ActiveRecord::Base
                 iterdone = true
               end
               if flow <= 0.0 and viol > 0 then
-                self.errors.add(:base, :flowrate_iterations_cannot_converge, message: "Flowrate iterations cannot converge in step #{$step}")
+                self.errors.add(:base, "Flowrate iterations cannot converge in step #{$step}")
                 iterdone = true
               end
               if not iterdone then
@@ -127,7 +129,7 @@ class Simulation < ActiveRecord::Base
             @stepar = @stepar + steprecs
             $step = $step + 1
             if $step > 1000 then
-              self.errors.add(:base, :steps_greater_than_100, message: "Number of steps exceeds 100.  Simulation stpped at step 100")
+              self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
               stepdone = true
             end
           end
@@ -135,7 +137,28 @@ class Simulation < ActiveRecord::Base
   #       Save step results in database table for user viewing
           save_results
         end
+        if self.errors.empty? then          
+          return true
+        else 
+          return false
+        end
     end
+
+    def data_integrity_check(pipeline)
+      if pipeline.stations.count <= 1 then
+        pipeline.errors.add(:base, "No station specified at end of line")
+      end
+      if pipeline.segments[0].kmp != pipeline.stations[0].kmp then
+        pipeline.errors.add(:base, "Pipeline segments not specified for first station in the line")
+      end
+      if pipeline.elevations[0].kmp != pipeline.stations[0].kmp then
+        pipeline.errors.add(:base, "Pipeline elevations not specified for first station in the line")
+      end
+      if pipeline.temperatures[0].kmp != pipeline.stations[0].kmp then
+        pipeline.errors.add(:base, "Pipeline temperatures not specified for first station in the line")
+      end
+    end
+      
 
     def cole_loss(flow, visc, dens, diam, thick, ruff)
 #   Calculate the dynamic (flowing) pressure loss of a pipe segment using the Colebrook White equation.
@@ -979,10 +1002,9 @@ class Simulation < ActiveRecord::Base
         result.save
     end    
   end
-
+      
 
   def get_record(record_array, kmp)
-# Get the record for a specified kmp
     i = 0
     until i == record_array.count - 1
       if record_array[i].kmp > kmp then break end
@@ -991,7 +1013,8 @@ class Simulation < ActiveRecord::Base
     i = i - 1
     return record_array[i]
   end
-
+  
+    
   def next_record (record_array, kmp)
 # Find the next point in a record array
     np = nil

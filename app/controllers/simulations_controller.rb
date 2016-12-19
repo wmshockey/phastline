@@ -25,7 +25,17 @@ class SimulationsController < ApplicationController
   # GET /simulations/1/run
   def run
     @simulation = Simulation.find(params[:id])
-    @simulation.run
+    respond_to do |format|
+      if @simulation.run
+        flash.notice = "Simulation ran successfully."
+        format.html { render :run, status: :ok, location: @simulation }
+        format.json { render :run, status: :ok, location: @simulation }
+      else
+        flash.notice = "Simulation run failed!"
+        format.html { render :run, notice: 'Simulation run failed.' }
+        format.json { render json: @simulation.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   # POST /simulations

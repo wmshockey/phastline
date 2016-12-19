@@ -12,7 +12,6 @@ class ResultsController < ApplicationController
   def summary
     @results = Result.all
     @simulation = Simulation.find(params[:id])
-    printf("results_controller: @results.size= %6d \n", @results.size)
     @summary_results = @simulation.summary_results_calc(@results)
   end
   
