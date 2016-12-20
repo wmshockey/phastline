@@ -1,0 +1,35 @@
+<h2>Activities</h2>
+<table>
+  <thead>
+   <tr>
+      <th>Batch</th>
+      <th>Start time</th>
+      <th>End time</th>
+      <th>Activity type</th>
+      <th>Volume</th>
+      <th>Source location</th>
+      <th>Destination location</th>
+      <th>Destination facility</th>
+      <th>Shipper</th>
+      <th>Nomination</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @schedule.activities.order(start_time: :asc).each do |activity| %>
+      <tr>
+        <td><%= link_to activity.batch_id, schedule_activity_path(activity.schedule_id, activity.id) %></td>
+        <td><%= activity.start_time.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= activity.end_time.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= activity.activity_type %></td>
+        <td><%= activity.volume %></td>
+        <td><%= activity.source_location %></td>
+        <td><%= activity.destination_location %></td>
+        <td><%= activity.destination_facility %></td>
+        <td><%= activity.shipper %></td>
+        <td><%= link_to activity.nomination_name, Nomination.find {|n| n.name == activity.nomination_name} %></td>
+      </tr>
+	<% end %>
+	<td colspan="10"><%= link_to 'Add Activity', new_schedule_activity_path(@schedule) %></td>
+  </tbody>
+</table>

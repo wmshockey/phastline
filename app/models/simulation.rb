@@ -28,60 +28,27 @@ class Simulation < ActiveRecord::Base
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
 
 
-# Constants and conversion factors
-    Gconstant = 0.00980652       # Gravitational constant (km/sec2)
-
-# US to metric
-    $M3dy_m3hr = 0.04166666       #conversion from m3/dy to m3/hr
-    $Blhr_m3hr = 0.15898251       #conversion from bl/hr to m3/hr
-    $Bldy_m3hr = 0.00662427       #conversion from bl/dy to m3/hr
-    $Gpm_m3hr  = 0.2271253        #conversion from gpm   to m3/hr
-    $Bl_m3     = 0.15898251       #conversion from bl to m3
-    $Psig_kpa  = 6.8944           #conversion from psig to kpa
-    $Miles_km  = 1.60934          #conversion from miles to km
-    $In_m      = 0.0254           #conversion from in to m
-    $Ft_m      = 0.3048           #conversion from ft to m
-
-# Metric to US
-    $M3hr_m3dy   = 24.0           #conversion from m3/hr to m3/dy
-    $M3hr_blhr   = 6.29           #conversion from m3/hr to bl/hr
-    $M3hr_bldy   = 150.960030     #conversion from m3/hr to bl/dy
-    $M3hr_gpm    = 4.40285604     #conversion from m3/hr to gpm
-    $M3_bl       = 6.29           #conversion from m3 to bl
-    $Kpa_psig    = 0.14504525     #conversion from kpa to psig
-    $Km_miles    = 0.62137274     #conversion from km to miles
-    $M_in        = 39.3700787     #conversion from m to in
-    $M_ft        = 3.28083989     #conversion from m to ft
-
-
 # Mainline driver code
     def run
+        define_all_constants
         @pipelines = Pipeline.all
         @nominations = Nomination.all
         Result.delete_all
         @pipeline = @pipelines.detect{ |p| p.name == pipeline_name }
-        if @pipeline.nil? then self.errors.add(:base, "Pipeline cannot be found") end
         @nomination = @nominations.detect{ |n| n.name == nomination_name }
-        if @nomination.nil? then self.errors.add(:base, "Nomination cannot be found") end
         @commodities = Commodity.all
         @shipments = @nomination.shipments
-        if @shipments.empty? then self.errors.add(:base, "Nomination does not contain any shipments") end
         @stations = @pipeline.stations
-        if @stations.empty? then self.errors.add(:base, "Pipeline does not have any stations") end
         @pumpar = Pump.all
         @units = Unit.all
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
-        if @segmar.empty? then self.errors.add(:base, "Pipeline does not have any pipe segments") end
         @volmar = @pipeline.get_volumes
         @tempar = @pipeline.get_all_temps
-        if @tempar.empty? then self.errors.add(:base, "Pipeline does not have any temperatures specified") end
         @maxpressar = @pipeline.get_all_maxpress
         @elevar = @pipeline.get_all_elevations
-        if @elevar.empty? then self.errors.add(:base, "Pipeline does not have any elevations specified") end
         @statar = @pipeline.get_all_stations(@volmar)
         @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
-        data_integrity_check(@pipeline)
-        if @pipeline.errors.any? then self.errors.add(:base, @pipeline.errors.full_messages) end
+        data_integrity_checks(@pipeline)
         if self.errors.empty? then          
   #       Get the batch sequence for the simulation 
           @btsqar = batch_sequence(@shipments, @statar)      
@@ -144,18 +111,62 @@ class Simulation < ActiveRecord::Base
         end
     end
 
-    def data_integrity_check(pipeline)
+    def define_all_constants
+#     Constants and conversion factors
+      $Gconstant = 0.00980652       # Gravitational constant (km/sec2)
+#     US to metric
+      $M3dy_m3hr = 0.04166666       #conversion from m3/dy to m3/hr
+      $Blhr_m3hr = 0.15898251       #conversion from bl/hr to m3/hr
+      $Bldy_m3hr = 0.00662427       #conversion from bl/dy to m3/hr
+      $Gpm_m3hr  = 0.2271253        #conversion from gpm   to m3/hr
+      $Bl_m3     = 0.15898251       #conversion from bl to m3
+      $Psig_kpa  = 6.8944           #conversion from psig to kpa
+      $Miles_km  = 1.60934          #conversion from miles to km
+      $In_m      = 0.0254           #conversion from in to m
+      $Ft_m      = 0.3048           #conversion from ft to m
+#     Metric to US
+      $M3hr_m3dy   = 24.0           #conversion from m3/hr to m3/dy
+      $M3hr_blhr   = 6.29           #conversion from m3/hr to bl/hr
+      $M3hr_bldy   = 150.960030     #conversion from m3/hr to bl/dy
+      $M3hr_gpm    = 4.40285604     #conversion from m3/hr to gpm
+      $M3_bl       = 6.29           #conversion from m3 to bl
+      $Kpa_psig    = 0.14504525     #conversion from kpa to psig
+      $Km_miles    = 0.62137274     #conversion from km to miles
+      $M_in        = 39.3700787     #conversion from m to in
+      $M_ft        = 3.28083989     #conversion from m to ft      
+    end
+
+    def data_integrity_checks(pipeline)
+      if @pipeline.nil? then self.errors.add(:base, "Pipeline cannot be found") end
+      if @nomination.nil? then self.errors.add(:base, "Nomination cannot be found") end
+      if @shipments.empty? then self.errors.add(:base, "Nomination does not contain any shipments") end
+      if @stations.empty? then self.errors.add(:base, "Pipeline does not have any stations") end
+      if @segmar.empty? then self.errors.add(:base, "Pipeline does not have any pipe segments") end  
+      if @tempar.empty? then self.errors.add(:base, "Pipeline does not have any temperatures specified") end
+      if @elevar.empty? then self.errors.add(:base, "Pipeline does not have any elevations specified") end
       if pipeline.stations.count <= 1 then
         pipeline.errors.add(:base, "No station specified at end of line")
       end
       if pipeline.segments[0].kmp != pipeline.stations[0].kmp then
         pipeline.errors.add(:base, "Pipeline segments not specified for first station in the line")
       end
+      if pipeline.segments.last.kmp > pipeline.stations.last.kmp then
+        pipeline.errors.add(:base, "Pipeline segments are specified beyond last station on the line")
+      end
       if pipeline.elevations[0].kmp != pipeline.stations[0].kmp then
         pipeline.errors.add(:base, "Pipeline elevations not specified for first station in the line")
       end
+      if pipeline.elevations.last.kmp > pipeline.stations.last.kmp then
+        pipeline.errors.add(:base, "Pipeline elevations are specified beyond last station on the line")
+      end
       if pipeline.temperatures[0].kmp != pipeline.stations[0].kmp then
         pipeline.errors.add(:base, "Pipeline temperatures not specified for first station in the line")
+      end
+      if pipeline.temperatures.last.kmp > pipeline.stations.last.kmp then
+        pipeline.errors.add(:base, "Pipeline temperatures are specified beyond last station on the line")
+      end
+      if @pipeline.errors.any? then
+        self.errors.add(:base, @pipeline.errors.full_messages)
       end
     end
       
@@ -236,7 +247,6 @@ class Simulation < ActiveRecord::Base
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
       end
-      logger.info "btsqar = #{bs.inspect}"
       return bs
     end
           
@@ -676,7 +686,7 @@ class Simulation < ActiveRecord::Base
       else
         slope = 0
       end
-      sloss = dens * Gconstant * slope
+      sloss = dens * $Gconstant * slope
       sl.add_point(kmp,sloss)
       kmp = next_kmp
     end
@@ -733,11 +743,11 @@ class Simulation < ActiveRecord::Base
       if station_curve.size > 0 then
   #     Get the head at this station for the current flowrate through it
         if station_flow < station_curve.first.flow then
-          pres = Gconstant * dens * station_curve.first.head
+          pres = $Gconstant * dens * station_curve.first.head
         elsif station_flow > station_curve.last.flow then
           pres = 0.0
         else
-          pres = Gconstant * dens * station_curve.interpolate_y(station_flow)
+          pres = $Gconstant * dens * station_curve.interpolate_y(station_flow)
         end
         hd << Profile_point.new(kmp, pres)
       else

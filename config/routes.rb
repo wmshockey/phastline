@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
 
+  resources :schedules do
+    resources :activities
+  end    
   resources :results do
     member do
       get 'summary'

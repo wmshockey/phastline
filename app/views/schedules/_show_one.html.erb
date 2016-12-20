@@ -1,0 +1,24 @@
+<h2>Schedule</h2>
+<table class="fixed", style="width: 1200px;">
+  <thead>
+    <tr>
+      <th>Schedule Name</th>
+	  <th>Description</th>
+	  <th>Schedule Start Date</th>
+	  <th>Period (days)</th>
+	  <th>Simulation</th>
+	  <th>Type</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td><%= @schedule.name %></td>
+      <td><%= @schedule.description %></td>
+	  <td><%= @schedule.start_date %></td>
+	  <td><%= @schedule.period %></td>
+	  <td><%= @schedule.simulation_name %></td>
+	  <td><%= @schedule.sched_type %></td>
+    </tr>
+  </tbody>
+</table>

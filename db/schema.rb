@@ -11,7 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161216164204) do
+ActiveRecord::Schema.define(version: 20161219211432) do
+
+  create_table "activities", force: :cascade do |t|
+    t.string   "batch_id",             limit: 255
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.string   "activity_type",        limit: 255
+    t.float    "volume",               limit: 24
+    t.string   "source_location",      limit: 255
+    t.string   "destination_location", limit: 255
+    t.string   "destination_facility", limit: 255
+    t.string   "shipper",              limit: 255
+    t.string   "nomination_name",      limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.integer  "schedule_id",          limit: 4
+  end
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -111,6 +127,17 @@ ActiveRecord::Schema.define(version: 20161216164204) do
     t.text     "batch_sequence_data",    limit: 65535
     t.float    "hhp",                    limit: 24
     t.float    "step_time",              limit: 24
+  end
+
+  create_table "schedules", force: :cascade do |t|
+    t.string   "name",            limit: 255
+    t.text     "description",     limit: 65535
+    t.date     "start_date"
+    t.integer  "period",          limit: 4
+    t.string   "simulation_name", limit: 255
+    t.string   "sched_type",      limit: 255
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "segments", force: :cascade do |t|
