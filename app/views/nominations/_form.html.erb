@@ -21,6 +21,7 @@
 		  <th>Description</th>
 		  <th>Nomination Date</th>
 		  <th>Period (days)</th>
+		  <th>Pipeline</th>
 	    </tr>
 	  </thead>
 
@@ -30,6 +31,7 @@
 	        <td><%= f.text_field :description %></td>
 			<td><%= f.date_select :nom_date %>
 			<td><%= f.text_field :period %>
+			<td><%= f.select :pipeline_name, Pipeline.all.collect {|p| [p.name]} %>
 	      </tr>
 	  </tbody>
 	</table>

@@ -16,6 +16,8 @@ class ActivitiesController < ApplicationController
   # GET /activities/new
   def new
     @schedule = Schedule.find(params[:schedule_id])
+    @pipeline = Pipeline.find {|p| p.name == @schedule.pipeline_name}
+    @stations = @pipeline.stations
     @activity = @schedule.activities.build
   end
 
@@ -76,6 +78,6 @@ class ActivitiesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def activity_params
-      params.require(:activity).permit(:batch_id, :start_time, :end_time, :activity_type, :volume, :source_location, :destination_location, :destination_facility, :shipper, :nomination_name)
+      params.require(:activity).permit(:batch_id, :start_time, :end_time, :activity_type, :volume, :station, :shipper, :nomination_name)
     end
 end

@@ -32,8 +32,8 @@
 	        <td><%= f.text_field :description %></td>
 			<td><%= f.date_select :start_date %>
 			<td><%= f.number_field :period %>
-			<td><%= f.number_field :simulation_name %></td>
-			<td><%= f.select :sched_type, ["ACTUAL", "PRELIMINARY", "SIMULATED"] %></td>
+			<td><%= f.select :pipeline_name, Pipeline.all.collect {|p| [p.name]} %>
+			<td><%= f.select :sched_type, ["PRIOR", "PRELIMINARY", "SIMULATED"] %></td>
 	      </tr>
 	  </tbody>
 	</table>

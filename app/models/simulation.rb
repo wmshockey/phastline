@@ -20,6 +20,7 @@ class Simulation < ActiveRecord::Base
     attr_accessor :stepar
     attr_accessor :statcv
     attr_accessor :summary_results
+    attr_accessor :prior_activities
     has_many :results, dependent: :destroy
     validates :name, :presence => true
     validates :pipeline_name, :presence => true
@@ -33,12 +34,15 @@ class Simulation < ActiveRecord::Base
         define_all_constants
         @pipelines = Pipeline.all
         @nominations = Nomination.all
+        @schedules = Schedule.all
         Result.delete_all
         @pipeline = @pipelines.detect{ |p| p.name == pipeline_name }
+        @schedule = @schedules.detect{|s| s.name == schedule_name}
         @nomination = @nominations.detect{ |n| n.name == nomination_name }
         @commodities = Commodity.all
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
+        @prior_activities = @schedule.activities 
         @pumpar = Pump.all
         @units = Unit.all
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
@@ -50,8 +54,9 @@ class Simulation < ActiveRecord::Base
         @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
         data_integrity_checks(@pipeline)
         if self.errors.empty? then          
-  #       Get the batch sequence for the simulation 
-          @btsqar = batch_sequence(@shipments, @statar)      
+  #       Get the batch sequence for the simulation
+          @btsqar = @schedule.initialize_batch_sequence(@prior_activities, @statar)
+  #        @btsqar = batch_sequence(@shipments, @statar)      
   #       Set initial positioning of batches in the line (linefill)
           initial_batch_positioning(@statar, @btsqar, @volmar)
           $step = 1; stepdone = false; $timestamp = 0.0
@@ -906,7 +911,6 @@ class Simulation < ActiveRecord::Base
 
   def summary_results_calc(results)
 #   Get the list of stations from the saved step results.  @results is the only data available at this point.
-#    logger.info "summary_results_calc: #{@results.inspect}"
     stations = results.map {|s| [s.station_id, s.kmp, s.stat]}.uniq
     stations.sort_by! {|s| s[1]}
 #   Find the bottleneck points for each step on the line

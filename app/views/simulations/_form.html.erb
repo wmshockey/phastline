@@ -35,6 +35,9 @@
 				<td><strong>Nomination: </strong></td><td><%= f.select :nomination_name , Nomination.all.collect {|n| [n.name]} %></td>
 			</tr>
 			<tr>
+				<td><strong>Prior Schedule: </strong></td><td><%= f.select :schedule_name , Schedule.all.collect {|s| [s.name]} %></td>
+			</tr>
+			<tr>
 				<td><strong>Max Flowrate: </strong></td><td><%= f.number_field :max_flowrate, :step => "any"  %></td>
 			</tr>
 			<tr>

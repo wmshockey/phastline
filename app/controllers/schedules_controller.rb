@@ -10,6 +10,7 @@ class SchedulesController < ApplicationController
   # GET /schedules/1
   # GET /schedules/1.json
   def show
+        @activities = @schedule.activities.all
   end
 
   # GET /schedules/new
@@ -71,6 +72,6 @@ class SchedulesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def schedule_params
-      params.require(:schedule).permit(:name, :description, :start_date, :period, :simulation_name, :sched_type)
+      params.require(:schedule).permit(:name, :description, :start_date, :period, :pipeline_name, :sched_type)
     end
 end

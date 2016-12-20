@@ -11,10 +11,8 @@
       <th>Start time</th>
       <th>End time</th>
       <th>Activity type</th>
+      <th>Station</th>
       <th>Volume</th>
-      <th>Source location</th>
-      <th>Destination location</th>
-      <th>Destination facility</th>
       <th>Shipper</th>
       <th>Nomination</th>
     </tr>
@@ -23,13 +21,19 @@
   <tbody>
       <tr>
         <td><%= @activity.batch_id %></td>
-        <td><%= @activity.start_time.strftime("%Y-%m-%d %H:%M") %></td>
-        <td><%= @activity.end_time.strftime("%Y-%m-%d %H:%M") %></td>
+		<% if @activity.start_time.nil? %>
+			<td></td>
+		<% else %>
+        	<td><%= @activity.start_time.strftime("%Y-%m-%d %H:%M") %></td>
+		<% end %>
+		<% if @activity.end_time.nil? %>
+			<td></td>
+		<% else %>
+        	<td><%= @activity.end_time.strftime("%Y-%m-%d %H:%M") %></td>
+		<% end %>
         <td><%= @activity.activity_type %></td>
+        <td><%= @activity.station %></td>
         <td><%= @activity.volume %></td>
-        <td><%= @activity.source_location %></td>
-        <td><%= @activity.destination_location %></td>
-        <td><%= @activity.destination_facility %></td>
         <td><%= @activity.shipper %></td>
 		<td><%= link_to @activity.nomination_name, Nomination.find {|n| n.name == @activity.nomination_name} %></td>
         

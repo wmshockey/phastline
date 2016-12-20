@@ -6,6 +6,7 @@
 	  <th>Description</th>
       <th>Pipeline</th>
 	  <th>Nomination</th>
+	  <th>Prior Schedule</th>
 	  <th>Max Flowrate</th>
 	  <th>Max Batchsize</th>
     </tr>
@@ -18,10 +19,11 @@
         <td><%= simulation.description %></td>
         <td><%= link_to simulation.pipeline_name, Pipeline.find {|p| p.name == simulation.pipeline_name} %></td>
         <td><%= link_to simulation.nomination_name, Nomination.find {|n| n.name == simulation.nomination_name} %></td>
+        <td><%= link_to simulation.schedule_name, Schedule.find {|s| s.name == simulation.schedule_name} %></td>
         <td><%= simulation.max_flowrate %></td>
         <td><%= simulation.max_batchsize %></td>
       </tr>
 	<% end %>
-	<td colspan="6"><%= link_to 'Add Simulation', new_simulation_path %></td>
+	<td colspan="7"><%= link_to 'Add Simulation', new_simulation_path %></td>
   </tbody>
 </table>

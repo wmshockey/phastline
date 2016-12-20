@@ -20,6 +20,9 @@
 			<td><strong>Nomination: </strong></td><td><%= link_to @simulation.nomination_name, Nomination.find {|n| n.name == @simulation.nomination_name} %></td>
 		</tr>
 		<tr>
+			<td><strong>Prior Schedule: </strong></td><td><%= link_to @simulation.schedule_name, Schedule.find {|s| s.name == @simulation.schedule_name} %></td>
+		</tr>
+		<tr>
 			<td><strong>Max Flowrate: </strong></td><td><%= @simulation.max_flowrate %></td>
 		</tr>
 		<tr>

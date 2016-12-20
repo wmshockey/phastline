@@ -5,21 +5,25 @@ class Schedule < ActiveRecord::Base
     validates :description, allow_blank: true, length: { maximum: 512 }
     validates :start_date, :presence => true
     validates :period, :presence => true, numericality: {:greather_than_or_equal_to => 0, :less_than => 366}
-    validates :simulation_name, allow_blank: true, length: { maximum: 512 }
-    validates :sched_type, :presence => true, inclusion: { in: %w(ACTUAL PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
+    validates :pipeline_name, allow_blank: true, length: { maximum: 512 }
+    validates :sched_type, :presence => true, inclusion: { in: %w(PRIOR PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
 
 
-    def initialize_batch_sequence(prev_schedule, statar)
+    def initialize_batch_sequence(prior_activities, statar)
 #     Go through previous schedule to identify injections and reciepts to get list of batches
-      prev_schedule.sort_by! {|t| t.start_time}
+      prior_activities = prior_activities.sort_by {|t| t.start_time}
       batches = Array.new
-      prev_schedule.each do |s|
+      prior_activities.each do |s|
         if s.activity_type == "INJECTION" or s.activity_type == "RECEIPT" then
           batch_temp = s.batch_id.partition("-")
           commodity_id = batch_temp[0]
           batch_number = batch_temp[2].partition(" ")[0]
-          batches << Batchrec.new(batch_number, commodity_id, s.volume, s.source_location, s.destination_location, s.shipper, 0)
+          batches << Batchrec.new(batch_number, commodity_id, s.volume, s.station, "Superior", s.shipper, 0)
         end
+      end
+#     Assign the batch id's
+      batches.each_with_index do |b, bix|
+        b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
       end
 #     Create the two-dimensional batch sequence array
       max_batches = batches.count

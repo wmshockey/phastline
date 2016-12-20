@@ -28,8 +28,8 @@
 
 	  <tbody>
 	      <tr>
-			<td><%= f.text_field :start_location %></td>
-			<td><%= f.text_field :end_location %></td>
+			<td><%= f.select :start_location, @stations.all.collect {|s| [s.name]} %></td>
+			<td><%= f.select :end_location, @stations.all.collect {|s| [s.name]} %></td>
 			<td><%= f.text_field :shipper %></td>
 			<td><%= f.select :commodity_id, Commodity.all.collect {|c| [c.commodity_id]} %></td>
 			<td><%= f.number_field :volume,  :step => "any"  %></td>

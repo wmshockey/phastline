@@ -16,6 +16,8 @@ class ShipmentsController < ApplicationController
   # GET /shipments/new
   def new
     @nomination = Nomination.find(params[:nomination_id])
+    @pipeline = Pipeline.find {|p| p.name == @nomination.pipeline_name}
+    @stations = @pipeline.stations
     @shipment = @nomination.shipments.build
   end
 
