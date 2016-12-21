@@ -24,6 +24,9 @@ class ActivitiesController < ApplicationController
 
   # GET /activities/1/edit
   def edit
+    @schedule = Schedule.find(params[:schedule_id])
+    @pipeline = Pipeline.find {|p| p.name == @schedule.pipeline_name}
+    @stations = @pipeline.stations
   end
 
   # POST /activities

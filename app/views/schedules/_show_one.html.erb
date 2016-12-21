@@ -4,9 +4,9 @@
     <tr>
       <th>Schedule Name</th>
 	  <th>Description</th>
+	  <th>Pipeline</th>
 	  <th>Schedule Start Date</th>
 	  <th>Period (days)</th>
-	  <th>Pipeline</th>
 	  <th>Type</th>
     </tr>
   </thead>
@@ -15,9 +15,9 @@
     <tr>
       <td><%= @schedule.name %></td>
       <td><%= @schedule.description %></td>
+	  <td><%= @schedule.pipeline_name %></td>
 	  <td><%= @schedule.start_date %></td>
 	  <td><%= @schedule.period %></td>
-	  <td><%= @schedule.pipeline_name %></td>
 	  <td><%= @schedule.sched_type %></td>
     </tr>
   </tbody>

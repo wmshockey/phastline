@@ -54,9 +54,10 @@ class Simulation < ActiveRecord::Base
         @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
         data_integrity_checks(@pipeline)
         if self.errors.empty? then          
-  #       Get the batch sequence for the simulation
+  #       Initialize the Batch Sequence with prior activities
           @btsqar = @schedule.initialize_batch_sequence(@prior_activities, @statar)
-  #        @btsqar = batch_sequence(@shipments, @statar)      
+  #       Add the new batches from the nominations onto the end of the existing batch sequence
+          @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @shipments, @statar)      
   #       Set initial positioning of batches in the line (linefill)
           initial_batch_positioning(@statar, @btsqar, @volmar)
           $step = 1; stepdone = false; $timestamp = 0.0
@@ -173,6 +174,20 @@ class Simulation < ActiveRecord::Base
       if @pipeline.errors.any? then
         self.errors.add(:base, @pipeline.errors.full_messages)
       end
+#     Check to ensure the stations listed for the pipeline, nomination and prior schedule all match
+      pipeline_stations = @statar.map {|s| s.name}
+      schedule_stations = (@prior_activities.map {|s| s.station}).uniq
+      nomination_stations = (@shipments.map {|s| s.start_location} + @shipments.map {|t| t.end_location}).uniq
+      schedule_stations.each do |stn|
+        if not pipeline_stations.include? stn then
+          self.errors.add(:base, "Station #{stn} listed in the prior schedule #{@schedule.name} is not a station listed for pipeline #{@pipeline.name}")
+        end
+      end
+      nomination_stations.each do |stn|
+        if not pipeline_stations.include? stn then
+          self.errors.add(:base, "Station #{stn} listed in the nomination #{@nomination.name} is not a station listed for pipeline #{@pipeline.name}")
+        end
+      end
     end
       
 
@@ -202,58 +217,6 @@ class Simulation < ActiveRecord::Base
     end
 
 
-    def batch_sequence(shipments, statar)
-#     Break up shipments into batches
-      batches = Array.new
-      number_of_shipments = shipments.count
-      total_volume_of_shipments = shipments.sum("volume")
-      total_number_of_batches = total_volume_of_shipments / max_batchsize
-      shipments.each_with_index do |s, ix|
-        number_of_batches_in_shipment = s.volume / max_batchsize
-        spacing_of_batches = (total_number_of_batches / number_of_batches_in_shipment).round
-        vol = s.volume
-        batch_number_within_shipment = 0
-        while vol > max_batchsize
-          batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, s.shipper, ix+1)
-          vol = vol - max_batchsize
-          batch_number_within_shipment = batch_number_within_shipment + 1
-        end
-        if vol > 0.0 then
-          batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, s.shipper, ix+1)
-        end
-      end
-#     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
-      batches.sort! { |a, b| a.batch_number <=> b.batch_number }
-      batches.each_with_index do |b, bix|
-        b.batch_number = bix + 1
-        b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
-      end
-#     Create the two-dimensional batch sequence array
-      max_batches = batches.count
-      bs = Array.new(statar.count-1){Array.new(max_batches)}
-      batches.each_with_index do |b, btix|
-        start_loc = b.start_location
-        station_rec = statar.detect {|s| s.name == start_loc}
-        start_kmp = station_rec.kmp
-        end_loc = b.end_location
-        station_rec = statar.detect {|s| s.name == end_loc}
-        end_kmp = station_rec.kmp
-        statar[0...-1].each_with_index do |s, stix|
-          stat = s.name
-          kmp = s.kmp
-          if start_kmp <= kmp and end_kmp > kmp then
-            bs[stix][btix] = batches[btix].dup
-          else
-            bs[stix][btix] = batches[btix].dup
-            bs[stix][btix].volume = 0.0
-          end
-          s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
-        end
-      end
-      return bs
-    end
           
     def initial_batch_positioning(statar, btsqar, volmar)
 #     Calculate the linefill.  Fill the line between stations with commodities using the batch sequence array.

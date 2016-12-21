@@ -23,6 +23,9 @@ class ShipmentsController < ApplicationController
 
   # GET /shipments/1/edit
   def edit
+    @nomination = Nomination.find(params[:nomination_id])
+    @pipeline = Pipeline.find {|p| p.name == @nomination.pipeline_name}
+    @stations = @pipeline.stations
   end
 
   # POST /shipments

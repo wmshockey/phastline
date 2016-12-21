@@ -4,9 +4,9 @@
    <tr>
       <th>Name</th>
 	  <th>Description</th>
+	  <th>Pipeline</th>
 	  <th>Nomination Date</th>
 	  <th>Period (days)</th>
-	  <th>Pipeline</th>
     </tr>
   </thead>
 
@@ -15,9 +15,9 @@
       <tr>
         <td><%= link_to nomination.name, nomination_path(nomination) %></td>
         <td><%= nomination.description %></td>
+		<td><%= nomination.pipeline_name %></td>
 		<td><%= nomination.nom_date %></td>
 		<td><%= nomination.period %></td>
-		<td><%= nomination.pipeline_name %></td>
       </tr>
 	<% end %>
 	<td colspan="5"><%= link_to 'Add Nomination', new_nomination_path %></td>
