@@ -35,16 +35,16 @@ class Simulation < ActiveRecord::Base
         @pipelines = Pipeline.all
         @nominations = Nomination.all
         @schedules = Schedule.all
+        @commodities = Commodity.all
+        @pumpar = Pump.all
+        @units = Unit.all
         Result.delete_all
         @pipeline = @pipelines.detect{ |p| p.name == pipeline_name }
         @schedule = @schedules.detect{|s| s.name == schedule_name}
         @nomination = @nominations.detect{ |n| n.name == nomination_name }
-        @commodities = Commodity.all
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
         @prior_activities = @schedule.activities 
-        @pumpar = Pump.all
-        @units = Unit.all
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
         @volmar = @pipeline.get_volumes
         @tempar = @pipeline.get_all_temps
@@ -99,6 +99,8 @@ class Simulation < ActiveRecord::Base
             stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
   #         Update the step records with the step duration time (time_shift)
             steprecs.each {|r| r.step_time = time_shift}
+  #         Save the linefill in the results
+            steprecs.first.linefill = @lfill
             @stepar = @stepar + steprecs
             $step = $step + 1
             if $step > 1000 then
@@ -143,9 +145,12 @@ class Simulation < ActiveRecord::Base
     end
 
     def data_integrity_checks(pipeline)
+#     Check for any missing or empty input data
       if @pipeline.nil? then self.errors.add(:base, "Pipeline cannot be found") end
       if @nomination.nil? then self.errors.add(:base, "Nomination cannot be found") end
       if @shipments.empty? then self.errors.add(:base, "Nomination does not contain any shipments") end
+      if @schedule.nil? then self.errors.add(:base, "Schedule cannot be found") end
+      if @prior_activities.nil? then self.errors.add(:base, "Schedule does not contain any activities") end
       if @stations.empty? then self.errors.add(:base, "Pipeline does not have any stations") end
       if @segmar.empty? then self.errors.add(:base, "Pipeline does not have any pipe segments") end  
       if @tempar.empty? then self.errors.add(:base, "Pipeline does not have any temperatures specified") end
@@ -159,11 +164,17 @@ class Simulation < ActiveRecord::Base
       if pipeline.segments.last.kmp > pipeline.stations.last.kmp then
         pipeline.errors.add(:base, "Pipeline segments are specified beyond last station on the line")
       end
+      if pipeline.segments.last.kmp < pipeline.stations.last.kmp then
+        pipeline.errors.add(:base, "Pipeline segments must include an entry for the last point on the line")
+      end
       if pipeline.elevations[0].kmp != pipeline.stations[0].kmp then
         pipeline.errors.add(:base, "Pipeline elevations not specified for first station in the line")
       end
       if pipeline.elevations.last.kmp > pipeline.stations.last.kmp then
         pipeline.errors.add(:base, "Pipeline elevations are specified beyond last station on the line")
+      end
+      if pipeline.elevations.last.kmp != pipeline.stations.last.kmp then
+        pipeline.errors.add(:base, "There must be an elevation specified for the last point on the line")
       end
       if pipeline.temperatures[0].kmp != pipeline.stations[0].kmp then
         pipeline.errors.add(:base, "Pipeline temperatures not specified for first station in the line")
@@ -254,11 +265,13 @@ class Simulation < ActiveRecord::Base
         pipe_volume = volmar.interpolate_y(kmp_end) - volmar.interpolate_y(kmp)
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume - pipe_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        logger.info "initial_batch_positioning: stn_ix=#{stn_ix}  downstream_batch=#{downstream_batch}  downstream_vol=#{downstream_vol}"
         batch = downstream_batch
         batch_vol = downstream_vol
         stn_ix = stn_ix + 1
       end      
     end           
+
 
     def linefill(statar, btsqar, volmar)
 #     Calculate the linefill.  Fill the line between stations with commodities using the batch sequence array.
@@ -279,18 +292,29 @@ class Simulation < ActiveRecord::Base
         upstream_batch = batch
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift , stn_ix)
+        if $step == 1 then
+          logger.info "#{stat}  initial_volume= #{statar[stn_ix].initial_volume}  volume_shift=#{volume_shift}  pumped_vol = #{statar[stn_ix].pumped_volume}  downstream_vol=#{downstream_vol}"
+        end
         batch = downstream_batch
         commodity_id = btsqar[stn_ix][downstream_batch].commodity_id
         batch_vol = downstream_vol
 #       Walk down the line to the next station, adding a new linefill record at each batch interface point
         while kmp < kmp_end
-          lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
           next_vol1 = vol + batch_vol
           if next_vol1 <= vol_end then
+#            if $step == 1 then
+#              logger.info "Getting new batch: #{stat}  #{kmp}  #{commodity_id}  #{batch}  #{batch_vol}"
+#            end
+            lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
             vol = next_vol1
             kmp = volmar.interpolate_x(vol)
             batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
           else
+            batch_vol = batch_vol - (next_vol1 - vol_end)
+#            if $step == 1 then
+#              logger.info "Getting new batch: #{stat}  #{kmp}  #{commodity_id}  #{batch}  #{batch_vol}"
+#            end
+            lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
             kmp = kmp_end
           end
         end            
@@ -866,7 +890,7 @@ class Simulation < ActiveRecord::Base
         hhp = 0
       end
 #     Save step result record
-      steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, upstream_batch_str, downstream_batch_str, hold, suct, head, casep, disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp)
+      steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, upstream_batch_str, downstream_batch_str, hold, suct, head, casep, disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp, [])
     end
     return steprecs
   end
@@ -934,6 +958,48 @@ class Simulation < ActiveRecord::Base
     end
     return summary_results
   end
+
+=begin
+  def save_linefill(steprecs)
+#   Collect linefill downstream of station so it can be saved in step results
+    station_linefill = Array.new
+    stn_ix = 0
+    while stn_ix < statar.count - 1
+      station_linefill = Array.new
+      stat = statar[stn_ix].name
+      stn_kmp = statar[stn_ix].kmp
+      stn_vol = volmar.interpolate_y(stn_kmp)
+      next_stn_kmp = statar[stn_ix + 1].kmp
+      next_stn_vol = volmar.interpolate_y(next_stn_kmp)
+      lf_kmp = stn_kmp
+      lf_vol = 0
+      while lf_kmp < next_stn_kmp
+#        logger.info "#{$step}  #{stat}  lf_vol = #{lf_vol}"
+        volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume + lf_vol
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
+        downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(2).to_s
+        lf_vol = lf_vol + downstream_vol
+        line_vol = stn_vol + lf_vol
+        if line_vol < next_stn_vol
+          station_linefill << [lf_kmp, downstream_batch_str]          
+          lf_kmp = volmar.interpolate_x(line_vol)          
+        else
+          lf_kmp = next_stn_vol
+          break
+        end
+      end
+      steprecs[stn_ix].linefill = station_linefill
+      stn_ix = stn_ix + 1
+    end
+    steprecs.each do |s|
+      printf("step=%4d  station=%15s \n", $step, s.stat)
+      s.linefill.each do |i|
+        printf("%8.2f  %25s \n", i[0], i[1])
+      end
+    end
+  end
+=end
         
   def save_results
     @stepar.each do |s|
@@ -964,8 +1030,9 @@ class Simulation < ActiveRecord::Base
         result.total_static_loss = s.total_static_loss
         result.total_dynamic_loss = s.total_dynamic_loss
         result.hhp = s.hhp
-#       The station curves only need to be stored once as they don't change from step to step
-#       The batch squence also only needs to be stored once as it doesn't change from step to step
+        result.linefill = s.linefill
+#       The station curves only need to be stored once (for step 1) as they don't change from step to step
+#       The batch squence also only needs to be stored once (for step 1) as it doesn't change from step to step
         if s.step == 1 then
           station_curve = statcv.select {|c| c.station_id == s.station_id}
           result.station_curve_data = station_curve
@@ -1075,8 +1142,10 @@ class Profile < Array
   end
 
   def interpolate_x (y)
-    if y < self.map {|t| t.y}.min or y > self.map {|t| t.y}.max then
-      x = 0.0
+    if y < self.map {|t| t.y}.min then
+      x = self.first.x
+    elsif y > self.map {|t| t.y}.max then
+      x = self.last.x
     else
       match = false
       self[0...-1].each_with_index do |i, ix|
@@ -1091,9 +1160,6 @@ class Profile < Array
           match = true
         end
       end
-    end
-    if not match then
-      self.errors.add(:base, "Could not interpolate value in interpolate_x method, x= #{x}")
     end
     return x
   end      
@@ -1158,7 +1224,8 @@ class Steprec
   attr_accessor :total_static_loss
   attr_accessor :total_dynamic_loss
   attr_accessor :hhp
-  def initialize (step, timestamp, step_time, kmp, stat, station_id, flow, pumped_volume, upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss, hhp)
+  attr_accessor :linefill
+  def initialize (step, timestamp, step_time, kmp, stat, station_id, flow, pumped_volume, upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss, hhp, linefill)
     @step = step
     @timestamp = timestamp
     @step_time = step_time
@@ -1182,6 +1249,7 @@ class Steprec
     @total_static_loss = total_static_loss
     @total_dynamic_loss = total_dynamic_loss
     @hhp = hhp
+    @linefill = linefill
   end
 end
 

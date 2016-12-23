@@ -16,3 +16,24 @@
 <% end %>
 
 
+<br>
+Temperatures Profile is: <br>
+<% @pipeline.temperatures.each do |i| %>
+  <%= '%8.2f' % i.kmp %> <%= '%6.2f' % i.temperature %><br>
+<% end %>
+<br>
+Volumes Profile is: <br>
+<% @simulation.volmar.each do |i| %>
+  <%= '%8.2f' % i.kmp %> <%= '%8.2f' % i.val %><br>
+<% end %>
+<br>
+Elevations Profile is: <br>
+<% @simulation.elevar.each do |i| %>
+  <%= '%.2f' % i.kmp %> | <%= '%.2f' % i.val %><br>
+<% end %>
+<br>
+Linefill is: <br>
+<% @simulation.lfill.each do |i| %>
+  <%= '%-15s'% i.stat %> | <%= '%8.2f'% i.kmp %> | <%= '%6d'% i.batch %> | <%= '%-6s'% i.commodity_id %> | <%= '%8.2f'% i.batch_vol %><br>
+<% end %>
+

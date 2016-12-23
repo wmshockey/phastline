@@ -90,9 +90,10 @@ class Schedule < ActiveRecord::Base
         end
       end
 #     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
+#     Give newly nominated batches a batch number starting at 10000 to distinguish them from old batches previously in the line from prior schedule.
       batches.sort! { |a, b| a.batch_number <=> b.batch_number }
       batches.each_with_index do |b, bix|
-        b.batch_number = bix + 1
+        b.batch_number = 10000 + bix + 1
         b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
       end
 #     Create the two-dimensional batch sequence array

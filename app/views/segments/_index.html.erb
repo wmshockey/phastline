@@ -7,9 +7,14 @@
 	  <th>Thickness (meters)</th>
       <th>Roughness (meters)</th>
 	  <th>MAWP (kpa)</th>
+	  <th>Pipe Volume (m3)</th>
     </tr>
   </thead>
 
+  <% prev_kmp = @pipeline.segments.first.kmp %>
+  <% prev_diam = @pipeline.segments.first.diameter %>
+  <% prev_thickness = @pipeline.segments.first.thickness %>
+  <% prev_vol = 0 %>
   <tbody>
 	<% @pipeline.segments.order(kmp: :asc).each do |segment| %>
       <tr>
@@ -18,8 +23,15 @@
         <td><%= segment.thickness %></td>
         <td><%= '%12.10f' % segment.roughness %></td>
         <td><%= segment.mawp %></td>
+		<% diam = prev_diam - 2*prev_thickness %>
+		<% volume = 1000* (segment.kmp - prev_kmp) * Math::PI * (diam/2)**2  + prev_vol %>
+		<td><%= volume.round(2) %></td>
+		<% prev_kmp = segment.kmp %>
+		<% prev_diam = segment.diameter %>
+		<% prev_thickness = segment.thickness %>
+		<% prev_vol = volume %>
       </tr>
 	<% end %>
-	<td colspan="5"><%= link_to 'Add Segment', new_pipeline_segment_path(@pipeline) %></td>
+	<td colspan="6"><%= link_to 'Add Segment', new_pipeline_segment_path(@pipeline) %></td>
   </tbody>
 </table>

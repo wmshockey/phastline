@@ -30,7 +30,6 @@ class ResultsController < ApplicationController
     @results = Result.select {|r| r.step == @step}
   end
 
-
   def station_curves
     @results = Result.select {|r| r.step == 1}
   end
@@ -50,6 +49,12 @@ class ResultsController < ApplicationController
   end
   
   def power
+    @results = Result.all
+  end
+  
+  def step_linefill
+    step = params[:id]
+    @step = step.to_i
     @results = Result.all
   end
 

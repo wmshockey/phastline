@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161220164256) do
+ActiveRecord::Schema.define(version: 20161222172802) do
 
   create_table "activities", force: :cascade do |t|
     t.string   "batch_id",        limit: 255
@@ -126,6 +126,7 @@ ActiveRecord::Schema.define(version: 20161220164256) do
     t.text     "batch_sequence_data",    limit: 65535
     t.float    "hhp",                    limit: 24
     t.float    "step_time",              limit: 24
+    t.text     "linefill",               limit: 65535
   end
 
   create_table "schedules", force: :cascade do |t|

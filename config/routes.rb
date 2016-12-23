@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       get 'batch_sequence'
       get 'batch_detail'
       get 'power'
+      get 'step_linefill'
     end
   end
   resources :pumps do

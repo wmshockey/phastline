@@ -1,0 +1,44 @@
+<%= render 'top' %>
+
+<% btsqar = Array.new %>
+<% stations = Array.new %>
+<% stn_ix = 0 %>
+<% @results.take_while{|i| i.step == 1 and i.batch_sequence_data != nil}.each do |r| %>
+	<% stations[stn_ix] = r.stat %>
+	<% station_batches = r.batch_sequence_data %>
+	<% btsqar[stn_ix] = station_batches %>
+	<% stn_ix = stn_ix + 1 %>
+<% end %>
+<% steprecs = @results.select {|r| r.step == @step} %>
+<% linefill = steprecs[0].linefill %>
+
+
+<h2>Linefill for step <%= @step.to_s %></h2>
+
+<table>
+  <thead>
+   <tr>
+      <th>Station</th>
+	  <th>Kmp</th>
+	  <th>Batch</th>
+	  <th>Volume</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+	<% linefill.each do |i| %>
+	  <tr>
+		<% stn_ix = stations.index(i.stat) %>
+		<% batch = i.batch %>
+		<% batch_id = btsqar[stn_ix][batch].batch_id %>
+		<td><%= i.stat %></td>
+		<td><%= '%8.2f'% i.kmp %></td>
+		<td><%= batch_id %></td>
+		<td><%= '%8.2f'% i.batch_vol %></td>
+	  </tr>
+	<% end %>
+
+ </tbody>
+</table>
+

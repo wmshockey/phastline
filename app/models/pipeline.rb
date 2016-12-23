@@ -7,27 +7,26 @@ class Pipeline < ActiveRecord::Base
 
   def get_volumes
 # Calculate the pipeline volumes to each kmp point into a profile array
+# Note that user input for segments must include an entry for the last point on the line.
     volumes = Profile.new
-    segs_sorted = segments.sort_by {|a| a.kmp}    
+    segs_sorted = segments.sort_by {|a| a.kmp}
+#   Record volume of first kmp on the line as 0
     i = 0
+    kmp = segs_sorted[i].kmp
+    volumes.add_point(kmp,0)
+#   Record volume points for remaining segments on the line
+    i = 1
     while i <= segs_sorted.count-1
-      if i < segs_sorted.count-1       
-        kmp = segs_sorted[i].kmp
-      elsif i == segs_sorted.count-1
-        kmp = stations.last.kmp
-      end     
-      if i == 0 then
-        volumes.add_point(kmp,0)
-      else
-        diam = segs_sorted[i-1].diameter - 2*segs_sorted[i-1].thickness
-        length = kmp - segs_sorted[i-1].kmp
-        volm = 1000 * length * Math::PI * (diam/2)**2 + volumes[i-1].val
-        volumes.add_point(kmp,volm)
-      end
-      i = i +1
+      kmp = segs_sorted[i].kmp
+      diam = segs_sorted[i-1].diameter - 2*segs_sorted[i-1].thickness
+      length = kmp - segs_sorted[i-1].kmp
+      volm = 1000 * length * Math::PI * (diam/2)**2 + volumes[i-1].val
+      volumes.add_point(kmp,volm)
+      i = i + 1
     end
     return volumes
   end
+
 
   def get_all_temps
 # Get all temperatures into a profile array
