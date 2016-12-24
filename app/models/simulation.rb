@@ -265,7 +265,6 @@ class Simulation < ActiveRecord::Base
         pipe_volume = volmar.interpolate_y(kmp_end) - volmar.interpolate_y(kmp)
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume - pipe_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
-        logger.info "initial_batch_positioning: stn_ix=#{stn_ix}  volume_shift=#{volume_shift}  downstream_batch=#{downstream_batch}  downstream_vol=#{downstream_vol}"
         batch = downstream_batch
         batch_vol = downstream_vol
         stn_ix = stn_ix + 1
@@ -292,21 +291,18 @@ class Simulation < ActiveRecord::Base
         upstream_batch = batch
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift , stn_ix)
-        if $step == 1 then
-          logger.info "#{stat}  initial_volume= #{statar[stn_ix].initial_volume}  volume_shift=#{volume_shift}  pumped_vol = #{statar[stn_ix].pumped_volume}  downstream_batch=#{downstream_batch}  downstream_vol=#{downstream_vol}"
-        end
         batch = downstream_batch
         commodity_id = btsqar[stn_ix][downstream_batch].commodity_id
         batch_vol = downstream_vol
 #       Walk down the line to the next station, adding a new linefill record at each batch interface point
         while kmp < kmp_end
           next_vol1 = vol + batch_vol
-          if next_vol1 <= vol_end then
+          if (vol_end - next_vol1) > 0 then
             lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
             vol = next_vol1
             kmp = volmar.interpolate_x(vol)
             batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
-          else
+          elsif (vol_end - next_vol1) <= 0 then
             batch_vol = batch_vol - (next_vol1 - vol_end)
             lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
             kmp = kmp_end
@@ -432,10 +428,6 @@ class Simulation < ActiveRecord::Base
         else
           batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
         end
-      end
-
-      if $step==1 then
-        logger.info "stn_ix=#{stn_ix}  volume_shift=#{volume_shift}  batch=#{batch}  commodity_id=#{commodity_id}  "
       end
 
 #     After shifting through the batch sequence, determine upstream and downstream volumes based on amount of shifting left over.
@@ -958,47 +950,6 @@ class Simulation < ActiveRecord::Base
     return summary_results
   end
 
-=begin
-  def save_linefill(steprecs)
-#   Collect linefill downstream of station so it can be saved in step results
-    station_linefill = Array.new
-    stn_ix = 0
-    while stn_ix < statar.count - 1
-      station_linefill = Array.new
-      stat = statar[stn_ix].name
-      stn_kmp = statar[stn_ix].kmp
-      stn_vol = volmar.interpolate_y(stn_kmp)
-      next_stn_kmp = statar[stn_ix + 1].kmp
-      next_stn_vol = volmar.interpolate_y(next_stn_kmp)
-      lf_kmp = stn_kmp
-      lf_vol = 0
-      while lf_kmp < next_stn_kmp
-#        logger.info "#{$step}  #{stat}  lf_vol = #{lf_vol}"
-        volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume + lf_vol
-        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
-        downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
-        downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(2).to_s
-        lf_vol = lf_vol + downstream_vol
-        line_vol = stn_vol + lf_vol
-        if line_vol < next_stn_vol
-          station_linefill << [lf_kmp, downstream_batch_str]          
-          lf_kmp = volmar.interpolate_x(line_vol)          
-        else
-          lf_kmp = next_stn_vol
-          break
-        end
-      end
-      steprecs[stn_ix].linefill = station_linefill
-      stn_ix = stn_ix + 1
-    end
-    steprecs.each do |s|
-      printf("step=%4d  station=%15s \n", $step, s.stat)
-      s.linefill.each do |i|
-        printf("%8.2f  %25s \n", i[0], i[1])
-      end
-    end
-  end
-=end
         
   def save_results
     @stepar.each do |s|

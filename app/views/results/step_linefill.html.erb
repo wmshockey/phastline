@@ -27,10 +27,10 @@
 <% end %>
 </h2>
 
-<table>
+<table  style="width:1200px">
   <thead>
    <tr>
-      <th>Station</th>
+      <th>Upstream Station</th>
 	  <th>Kmp</th>
 	  <th>Batch</th>
 	  <th>Volume</th>
@@ -44,10 +44,10 @@
 		<% stn_ix = stations.index(i.stat) %>
 		<% batch = i.batch %>
 		<% batch_id = btsqar[stn_ix][batch].batch_id %>
-		<td><%= i.stat %></td>
-		<td><%= '%8.2f'% i.kmp %></td>
-		<td><%= batch_id %></td>
-		<td><%= '%8.2f'% i.batch_vol %></td>
+		<td style="width: 25%;"><%= i.stat %></td>
+		<td style="width: 25%;"><%= '%8.2f'% i.kmp %></td>
+		<td style="width: 25%;"><%= batch_id %></td>
+		<td style="width: 25%;"><%= '%20.12f'% i.batch_vol %></td>
 	  </tr>
 	<% end %>
 
