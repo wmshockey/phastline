@@ -13,7 +13,19 @@
 <% linefill = steprecs[0].linefill %>
 
 
-<h2>Linefill for step <%= @step.to_s %></h2>
+<h2>Linefill for step <%= @step.to_s %><%= "......" %>
+<% if @step == 1 then %>
+	<%= link_to "Prev", step_linefill_result_path($maxsteps) %>
+<% else %>
+	<%= link_to "Prev", step_linefill_result_path(@step-1) %>
+<% end %>
+<%= " | " %>
+<% if @step == $maxsteps %>
+	 <%= link_to "Next", step_linefill_result_path(1) %>
+<% else %>
+	<%= link_to "Next", step_linefill_result_path(@step+1) %>
+<% end %>
+</h2>
 
 <table>
   <thead>

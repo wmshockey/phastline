@@ -1,6 +1,21 @@
 <%= render 'top' %>
 
-<h2>Step Details</h2>
+<% stepresults = @results.select {|r| r.step == @step} %>
+
+<h2>Details for Step <%= @step %> @ <%= '%8.4f'% stepresults[0].timestamp %> Hours <%= "......" %>
+	<% if @step == 1 then %>
+		<%= link_to "Prev", step_detail_result_path($maxsteps) %>
+	<% else %>
+		<%= link_to "Prev", step_detail_result_path(@step-1) %>
+	<% end %>
+	<%= " | " %>
+	<% if @step == $maxsteps %>
+		 <%= link_to "Next", step_detail_result_path(1) %>
+	<% else %>
+		<%= link_to "Next", step_detail_result_path(@step+1) %>
+	<% end %>	
+</h2>
+
 <table>
   <thead>
    <tr>
@@ -26,12 +41,7 @@
   </thead>
 
   <tbody>
-	<% prev_step = 0 %>
-	<% @results.each do | i | %>
-	  <% if i.step != prev_step %>
-		<tr><td colspan="18"><strong>Step <%= i.step %>  @ <%= '%8.4f'% i.timestamp %> Hours</strong></td></tr>
-		<% prev_step = i.step %>
-	  <% end %>
+	<% stepresults.each do | i | %>
       <tr>
 		<td><%= i.stat %></td>
         <td><%= '%.2f'% i.kmp %></td>

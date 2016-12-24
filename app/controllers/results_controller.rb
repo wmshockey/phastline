@@ -16,6 +16,8 @@ class ResultsController < ApplicationController
   end
   
   def step_detail
+    step = params[:id]
+    @step = step.to_i
     @results = Result.all
   end
   

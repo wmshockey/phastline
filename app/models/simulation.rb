@@ -237,8 +237,8 @@ class Simulation < ActiveRecord::Base
       stat = statar[stn_ix].name
       max_batch = btsqar[0].size - 1
 #     Specify initial split across first station
-      batch = 0
-      batch_vol = 0
+      batch = max_batch
+      batch_vol = btsqar[stn_ix][batch].volume
 #     Calculate the linefill between stations.
       while stn_ix < statar.count - 1
         stat = statar[stn_ix].name
@@ -254,18 +254,18 @@ class Simulation < ActiveRecord::Base
           if bix < max_batch then bix = bix+1 else bix = 0 end
         end
 #       Adjust the volume of the downstream batch at this station based on volume of batch left on the upstream side.
-        if stn_ix > 0 and batch_vol > 0 then
-          fraction_left_on_upstream_batch = batch_vol / btsqar[stn_ix - 1][batch].volume
-          volume_left_on_downstream_batch = btsqar[stn_ix][batch].volume * fraction_left_on_upstream_batch
-          batch_vol = volume_left_on_downstream_batch
-        end
+#        if stn_ix > 0 and batch_vol > 0 then
+#          fraction_left_on_upstream_batch = batch_vol / btsqar[stn_ix - 1][batch].volume
+#          volume_left_on_downstream_batch = btsqar[stn_ix][batch].volume * fraction_left_on_upstream_batch
+#          batch_vol = btsqar[stn_ix][batch].volume - volume_left_on_downstream_batch
+#        end
         initial_volume = initial_volume + batch_vol
         statar[stn_ix].initial_volume = initial_volume        
 #       Get batch split at downstream station
         pipe_volume = volmar.interpolate_y(kmp_end) - volmar.interpolate_y(kmp)
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume - pipe_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
-        logger.info "initial_batch_positioning: stn_ix=#{stn_ix}  downstream_batch=#{downstream_batch}  downstream_vol=#{downstream_vol}"
+        logger.info "initial_batch_positioning: stn_ix=#{stn_ix}  volume_shift=#{volume_shift}  downstream_batch=#{downstream_batch}  downstream_vol=#{downstream_vol}"
         batch = downstream_batch
         batch_vol = downstream_vol
         stn_ix = stn_ix + 1
@@ -293,7 +293,7 @@ class Simulation < ActiveRecord::Base
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift , stn_ix)
         if $step == 1 then
-          logger.info "#{stat}  initial_volume= #{statar[stn_ix].initial_volume}  volume_shift=#{volume_shift}  pumped_vol = #{statar[stn_ix].pumped_volume}  downstream_vol=#{downstream_vol}"
+          logger.info "#{stat}  initial_volume= #{statar[stn_ix].initial_volume}  volume_shift=#{volume_shift}  pumped_vol = #{statar[stn_ix].pumped_volume}  downstream_batch=#{downstream_batch}  downstream_vol=#{downstream_vol}"
         end
         batch = downstream_batch
         commodity_id = btsqar[stn_ix][downstream_batch].commodity_id
@@ -302,18 +302,12 @@ class Simulation < ActiveRecord::Base
         while kmp < kmp_end
           next_vol1 = vol + batch_vol
           if next_vol1 <= vol_end then
-#            if $step == 1 then
-#              logger.info "Getting new batch: #{stat}  #{kmp}  #{commodity_id}  #{batch}  #{batch_vol}"
-#            end
             lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
             vol = next_vol1
             kmp = volmar.interpolate_x(vol)
             batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
           else
             batch_vol = batch_vol - (next_vol1 - vol_end)
-#            if $step == 1 then
-#              logger.info "Getting new batch: #{stat}  #{kmp}  #{commodity_id}  #{batch}  #{batch_vol}"
-#            end
             lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
             kmp = kmp_end
           end
@@ -439,6 +433,11 @@ class Simulation < ActiveRecord::Base
           batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
         end
       end
+
+      if $step==1 then
+        logger.info "stn_ix=#{stn_ix}  volume_shift=#{volume_shift}  batch=#{batch}  commodity_id=#{commodity_id}  "
+      end
+
 #     After shifting through the batch sequence, determine upstream and downstream volumes based on amount of shifting left over.
       if volume_shift >= 0 then
         downstream_vol = vol
