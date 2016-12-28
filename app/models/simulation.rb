@@ -952,6 +952,7 @@ class Simulation < ActiveRecord::Base
 
         
   def save_results
+    @results = Array.new
     @stepar.each do |s|
         result = Result.new
         station = @pipeline.stations.find{|i| i.name == s.stat}        
@@ -993,8 +994,9 @@ class Simulation < ActiveRecord::Base
             result.batch_sequence_data = batch_seq
           end
         end
-        result.save
-    end    
+        @results << result
+    end
+    Result.import @results
   end
       
 
