@@ -296,17 +296,23 @@ class Simulation < ActiveRecord::Base
         batch_vol = downstream_vol
 #       Walk down the line to the next station, adding a new linefill record at each batch interface point
         while kmp < kmp_end
-          next_vol1 = vol + batch_vol
-          if (vol_end - next_vol1) > 0 then
-            lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
-            vol = next_vol1
-            kmp = volmar.interpolate_x(vol)
-            batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
-          elsif (vol_end - next_vol1) <= 0 then
-            batch_vol = batch_vol - (next_vol1 - vol_end)
-            lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
-            kmp = kmp_end
-          end
+            next_vol1 = vol + batch_vol
+            if (vol_end - next_vol1) > 0 then
+#             Don't record sliver batches
+              if batch_vol > 0.01 then
+                lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+                vol = next_vol1
+              end
+              kmp = volmar.interpolate_x(vol)
+              batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
+            elsif (vol_end - next_vol1) <= 0 then
+              batch_vol = batch_vol - (next_vol1 - vol_end)
+#             Don't record sliver batches
+              if batch_vol > 0.01 then
+                lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+              end
+              kmp = kmp_end
+            end
         end            
         stn_ix = stn_ix + 1
       end
@@ -358,14 +364,16 @@ class Simulation < ActiveRecord::Base
 #       If this is last step, set the volume shift so it doesn't exceed the total sequence volume
         stn_ix = 0
         while stn_ix < statar.count - 1
-          kmp = statar[stn_ix].kmp
-          flow = flowar.get_y(kmp)
-          pumped_vol_increment = flow * time_shift
-          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
-          if next_vol > statar[stn_ix].sequence_volume then
-            time_shift_adjusted = (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) / flow
-            if time_shift_adjusted < time_shift then
-              time_shift = time_shift_adjusted
+          if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
+            kmp = statar[stn_ix].kmp
+            flow = flowar.get_y(kmp)
+            pumped_vol_increment = flow * time_shift
+            next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
+            if next_vol > statar[stn_ix].sequence_volume then
+              time_shift_adjusted = (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) / flow
+              if time_shift_adjusted < time_shift then
+                time_shift = time_shift_adjusted
+              end
             end
           end
           stn_ix = stn_ix + 1
@@ -374,14 +382,16 @@ class Simulation < ActiveRecord::Base
         stn_ix = 0
         $timestamp = $timestamp + time_shift
         while stn_ix < statar.count - 1
-          kmp = statar[stn_ix].kmp
-          flow = flowar.get_y(kmp)
-          pumped_vol_increment = flow * time_shift
-          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
-          if next_vol > statar[stn_ix].sequence_volume then
-            next_vol = statar[stn_ix].sequence_volume
-          end        
-          statar[stn_ix].pumped_volume = statar[stn_ix].pumped_volume + pumped_vol_increment
+          if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
+            kmp = statar[stn_ix].kmp
+            flow = flowar.get_y(kmp)
+            pumped_vol_increment = flow * time_shift
+            next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
+            if next_vol > statar[stn_ix].sequence_volume then
+              next_vol = statar[stn_ix].sequence_volume
+            end        
+            statar[stn_ix].pumped_volume = statar[stn_ix].pumped_volume + pumped_vol_increment
+          end
           stn_ix = stn_ix + 1
         end
       end
@@ -429,7 +439,6 @@ class Simulation < ActiveRecord::Base
           batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
         end
       end
-
 #     After shifting through the batch sequence, determine upstream and downstream volumes based on amount of shifting left over.
       if volume_shift >= 0 then
         downstream_vol = vol
@@ -996,7 +1005,7 @@ class Simulation < ActiveRecord::Base
         end
         @results << result
     end
-    Result.import @results
+    Result.import @results, validate: false
   end
       
 
@@ -1177,7 +1186,9 @@ class Steprec
   attr_accessor :total_dynamic_loss
   attr_accessor :hhp
   attr_accessor :linefill
-  def initialize (step, timestamp, step_time, kmp, stat, station_id, flow, pumped_volume, upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss, hhp, linefill)
+  def initialize (step, timestamp, step_time, kmp, stat, station_id, flow, pumped_volume, \
+                  upstream_batch, downstream_batch, hold, suct, head, casep, disc, max_disc_pressure, min_pressure_violation, \
+                  min_pressure_point, max_pressure_violation, max_pressure_point, total_static_loss, total_dynamic_loss, hhp, linefill)
     @step = step
     @timestamp = timestamp
     @step_time = step_time

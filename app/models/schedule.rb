@@ -19,16 +19,18 @@ class Schedule < ActiveRecord::Base
         batch_temp = batch_activities[0].batch_id.partition("-")
         commodity_id = batch_temp[0]
         batch_number = batch_temp[2].partition(" ")[0]
-        batch_volume = batch_activities[0].volume
         batch_shipper = batch_activities[0].shipper 
         batch_nomination = batch_activities[0].nomination_name
         start_location = ""
-        end_location = ""    
+        end_location = "" 
+        batch_volume = 0   
         batch_activities.each do |ba|
           if ba.activity_type == "INJECTION" then
             start_location = ba.station
+            batch_volume = ba.volume
           elsif ba.activity_type == "RECEIPT" then
             start_location = ba.station
+            batch_volume = ba.volume
           elsif ba.activity_type == "LANDING" then
             end_location = ba.station
           elsif ba.activity_type == "DELIVERY" then
@@ -68,7 +70,7 @@ class Schedule < ActiveRecord::Base
 
     def finalize_batch_sequence(max_batchsize, btsqar, shipments, statar)
 #     Break up shipments into batches
-      logger.info "max_batchsize=#{max_batchsize}"
+#      logger.info "max_batchsize=#{max_batchsize}"
       batches = Array.new
       number_of_shipments = shipments.count
       total_volume_of_shipments = shipments.sum("volume")
@@ -118,11 +120,13 @@ class Schedule < ActiveRecord::Base
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
       end
-#     Now tack the new batches from the nomination shipments onto the end of the existing batch sequence array btsqar
+#     Now tack the new batches from the nomination shipments onto the front end of the existing batch sequence array btsqar
+#     The new batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence downstream of the first station
+#     and we want those to be from the prior period schedule batches.
       number_of_prior_batches = btsqar[0].length
       final_bs = Array.new(statar.count-1){Array.new(max_batches + number_of_prior_batches)}
       statar[0...-1].each_with_index do |s, stix|
-        final_bs[stix] = btsqar[stix] + bs[stix]
+        final_bs[stix] = bs[stix] + btsqar[stix]
       end
       return final_bs
     end
