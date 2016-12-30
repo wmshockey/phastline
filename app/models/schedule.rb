@@ -37,7 +37,7 @@ class Schedule < ActiveRecord::Base
             end_location = ba.station
           end
         end
-        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, batch_shipper, batch_nomination)
+        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, 0, 0, "", batch_shipper, batch_nomination)
 #       Assign the batch id's
         batches.each_with_index do |b, bix|
           b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
@@ -82,13 +82,13 @@ class Schedule < ActiveRecord::Base
         batch_number_within_shipment = 0
         while vol > max_batchsize
           batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, s.shipper, ix+1)
+          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, 0, 0, "", s.shipper, ix+1)
           vol = vol - max_batchsize
           batch_number_within_shipment = batch_number_within_shipment + 1
         end
         if vol > 0.0 then
           batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, s.shipper, ix+1)
+          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, 0, 0, "", s.shipper, ix+1)
         end
       end
 #     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.

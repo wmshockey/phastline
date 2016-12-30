@@ -84,28 +84,26 @@ class Simulation < ActiveRecord::Base
               steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
   #           Adjust the flowrate to converge on the capacity flow rate
               new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
-              if flow == max_flowrate and viol <= 0 then
-                iterdone = true
-              end
+              iterdone = true if flow == max_flowrate and viol <= 0
               if flow <= 0.0 and viol > 0 then
                 self.errors.add(:base, "Flowrate iterations cannot converge in step #{$step}")
                 iterdone = true
               end
-              if not iterdone then
-                iter = iter + 1
-              end
+              iter = iter + 1 if not iterdone
             end
   #         Shift batches into position for the next step, then save the step results
             stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
-  #         Update the step records with the step duration time (time_shift)
-            steprecs.each {|r| r.step_time = time_shift}
-  #         Save the linefill in the results
-            steprecs.first.linefill = @lfill
-            @stepar = @stepar + steprecs
-            $step = $step + 1
-            if $step > 1000 then
-              self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
-              stepdone = true
+            if not stepdone then
+    #         Update the step records with the step duration time (time_shift)
+              steprecs.each {|r| r.step_time = time_shift}
+    #         Save the linefill in the results
+              steprecs.first.linefill = @lfill
+              @stepar = @stepar + steprecs
+              $step = $step + 1
+              if $step > 1000 then
+                self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
+                stepdone = true
+              end
             end
           end
           $maxsteps = $step - 1
@@ -228,7 +226,22 @@ class Simulation < ActiveRecord::Base
     end
 
 
+    def initial_batch_positioning(statar, btsqar, volmar)
+#   Calculate the initial linefill by setting the initial_volume setting for each station.
+#   The initial volume setting for each station is the total sequence volume for the station minus the pipe volume to that point in the line.
+    stn_ix = 0
+    while stn_ix < statar.count - 1
+      kmp = statar[stn_ix].kmp
+      stat = statar[stn_ix].name
+      sequence_volume = statar[stn_ix].sequence_volume
+      pipe_volume_to_station = volmar.interpolate_y(kmp)
+      statar[stn_ix].initial_volume = sequence_volume - pipe_volume_to_station
+      stn_ix = stn_ix + 1
+    end
+  end
+
           
+=begin
     def initial_batch_positioning(statar, btsqar, volmar)
 #     Calculate the linefill.  Fill the line between stations with commodities using the batch sequence array.
       lf = Array.new
@@ -269,7 +282,8 @@ class Simulation < ActiveRecord::Base
         batch_vol = downstream_vol
         stn_ix = stn_ix + 1
       end      
-    end           
+    end  
+=end         
 
 
     def linefill(statar, btsqar, volmar)
@@ -325,6 +339,12 @@ class Simulation < ActiveRecord::Base
 #     Will need to update this in the future to check for batches hitting elevation change and segment change points as well
       stn_ix = 0
       time_shift = 999999.0
+      step_events = Array.new
+#     Initialize the event record so that schedule information can be captured
+      event_station = 0
+      event_batch = 0
+      event_activity = ""
+#     Loop through all stations, looking for the next event
       while stn_ix < statar.count - 1
         kmp = statar[stn_ix].kmp
         stat = statar[stn_ix].name
@@ -347,6 +367,16 @@ class Simulation < ActiveRecord::Base
         end
         if time_step < time_shift then
           time_shift = time_step
+          event_station = stn_ix
+          if vol1 < vol2 then
+            event_station = stn_ix
+            event_batch = batch1
+            event_activity = "leaves"
+          else
+            event_station = stn_ix + 1
+            event_batch = batch2
+            event_activity = "arrives"
+          end
         end
         stn_ix = stn_ix + 1
       end
@@ -359,7 +389,6 @@ class Simulation < ActiveRecord::Base
         end
         stn_ix = stn_ix + 1
       end
-#     Update the volumes pumped for all stations
       if not all_done then
 #       If this is last step, set the volume shift so it doesn't exceed the total sequence volume
         stn_ix = 0
@@ -377,6 +406,18 @@ class Simulation < ActiveRecord::Base
             end
           end
           stn_ix = stn_ix + 1
+        end
+#       Record the event for the schedule
+        if event_station == statar.count - 1 then
+          logger.info "@step #{$step+1} batch #{btsqar[event_station-1][event_batch].batch_id} finishes at #{statar.last.name} station"
+          if event_batch == btsqar[0].count-1 then event_batch = 0  else event_batch = event_batch + 1 end
+          logger.info "@step #{$step+1} batch #{btsqar[event_station-1][event_batch].batch_id} starts at #{statar.last.name} station"
+        else
+          btsqar[event_station][event_batch].end_time = $timestamp + time_shift
+          logger.info "@step #{$step+1} batch #{btsqar[event_station][event_batch].batch_id} finishes at #{statar[event_station].name} station"
+          if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
+          btsqar[event_station][event_batch].start_time = $timestamp + time_shift
+          logger.info "@step #{$step+1} batch #{btsqar[event_station-1][event_batch].batch_id} starts at #{statar[event_station].name} station"
         end
 #       Update the pumped volumes for all stations to advance to the next step
         stn_ix = 0
@@ -470,6 +511,7 @@ class Simulation < ActiveRecord::Base
         downstream_vol = batch_vol
       end
       if upstream_vol <= 0.0000001 then
+        self.errors.add(:base, "Failure of get_batch_split: #{$step} #{stn_ix} #{upstream_batch} #{upstream_vol} #{downstream_batch} #{downstream_vol}")
         printf("Failure of get_batch_split: %5d  %3d  %3d  %8.2f  %3d  %8.2f \n", $step, stn_ix, upstream_batch, upstream_vol, downstream_batch, downstream_vol)
         exit
       end
@@ -890,7 +932,9 @@ class Simulation < ActiveRecord::Base
         hhp = 0
       end
 #     Save step result record
-      steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, upstream_batch_str, downstream_batch_str, hold, suct, head, casep, disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp, [])
+      steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, \
+                              upstream_batch_str, downstream_batch_str, hold, suct, head, casep, \
+                              disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp, [])
     end
     return steprecs
   end
@@ -1279,14 +1323,20 @@ class Batchrec
   attr_accessor :volume
   attr_accessor :start_location
   attr_accessor :end_location
+  attr_accessor :start_time
+  attr_accessor :end_time
+  attr_accessor :activity_type
   attr_accessor :shipper
   attr_accessor :shipment_number
-  def initialize (batch_number, commodity_id, volume, start_location, end_location, shipper, shipment_number)
+  def initialize (batch_number, commodity_id, volume, start_location, end_location, start_time, end_time, activity_type, shipper, shipment_number)
     @batch_number = batch_number
     @commodity_id = commodity_id
     @volume = volume
     @start_location = start_location
     @end_location = end_location
+    @start_time = start_time
+    @end_time = end_time
+    @activity_type = activity_type
     @shipper = shipper
     @shipment_number = shipment_number
   end
