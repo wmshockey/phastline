@@ -93,17 +93,15 @@ class Simulation < ActiveRecord::Base
             end
   #         Shift batches into position for the next step, then save the step results
             stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
-            if not stepdone then
-    #         Update the step records with the step duration time (time_shift)
-              steprecs.each {|r| r.step_time = time_shift}
-    #         Save the linefill in the results
-              steprecs.first.linefill = @lfill
-              @stepar = @stepar + steprecs
-              $step = $step + 1
-              if $step > 1000 then
-                self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
-                stepdone = true
-              end
+  #         Update the step records with the step duration time (time_shift)
+            steprecs.each {|r| r.step_time = time_shift}
+  #         Save the linefill in the results
+            steprecs.first.linefill = @lfill
+            @stepar = @stepar + steprecs
+            $step = $step + 1
+            if $step > 1000 then
+              self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
+              stepdone = true
             end
           end
           $maxsteps = $step - 1
@@ -380,44 +378,44 @@ class Simulation < ActiveRecord::Base
         end
         stn_ix = stn_ix + 1
       end
-#     Check if all done
+#     Check if last step or all done and set the volume shift so it doesn't exceed the total sequence volume
       all_done = true
+      last_step = false
       stn_ix = 0
       while stn_ix < statar.count - 1
         if (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) > 0.001 then
           all_done = false
+          kmp = statar[stn_ix].kmp
+          flow = flowar.get_y(kmp)
+          pumped_vol_increment = flow * time_shift
+          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
+          if next_vol > statar[stn_ix].sequence_volume then
+            last_step = true
+            time_shift_adjusted = (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) / flow
+            if time_shift_adjusted < time_shift then
+              time_shift = time_shift_adjusted
+            end
+          end
         end
         stn_ix = stn_ix + 1
       end
       if not all_done then
-#       If this is last step, set the volume shift so it doesn't exceed the total sequence volume
-        stn_ix = 0
-        while stn_ix < statar.count - 1
-          if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
-            kmp = statar[stn_ix].kmp
-            flow = flowar.get_y(kmp)
-            pumped_vol_increment = flow * time_shift
-            next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
-            if next_vol > statar[stn_ix].sequence_volume then
-              time_shift_adjusted = (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) / flow
-              if time_shift_adjusted < time_shift then
-                time_shift = time_shift_adjusted
-              end
-            end
-          end
-          stn_ix = stn_ix + 1
+#       Record the start and end times of the event in btsqar for the schedule
+#       Set start time of the first batch out of the first station
+        if $step == 1
+          btsqar[0][0].start_time = $timestamp
         end
-#       Record the event for the schedule
-        if event_station == statar.count - 1 then
-          logger.info "@step #{$step+1} batch #{btsqar[event_station-1][event_batch].batch_id} finishes at #{statar.last.name} station"
-          if event_batch == btsqar[0].count-1 then event_batch = 0  else event_batch = event_batch + 1 end
-          logger.info "@step #{$step+1} batch #{btsqar[event_station-1][event_batch].batch_id} starts at #{statar.last.name} station"
-        else
+        if event_station != statar.count - 1 then
           btsqar[event_station][event_batch].end_time = $timestamp + time_shift
-          logger.info "@step #{$step+1} batch #{btsqar[event_station][event_batch].batch_id} finishes at #{statar[event_station].name} station"
           if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-          btsqar[event_station][event_batch].start_time = $timestamp + time_shift
-          logger.info "@step #{$step+1} batch #{btsqar[event_station-1][event_batch].batch_id} starts at #{statar[event_station].name} station"
+          btsqar[event_station][event_batch].start_time = $timestamp + time_shift if btsqar[event_station][event_batch].end_time == nil
+#         If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
+          while btsqar[event_station][event_batch].volume == 0
+            zero_volume_event_time = btsqar[event_station][event_batch].start_time
+            btsqar[event_station][event_batch].end_time = zero_volume_event_time
+            if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
+            btsqar[event_station][event_batch].start_time = zero_volume_event_time
+          end
         end
 #       Update the pumped volumes for all stations to advance to the next step
         stn_ix = 0

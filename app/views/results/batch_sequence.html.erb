@@ -30,7 +30,7 @@
 		  <% batch_id = btsqar[stn_ix][batch].batch_id %>
 		  <td><%= link_to batch_id, batch_detail_result_path(batch_id) %></td>
 	      <% while stn_ix < num_stations %>
-		    <td><%= btsqar[stn_ix][batch].volume %> start:<%= '%.2f'% btsqar[stn_ix][batch].start_time %> end:<%= '%.2f'% btsqar[stn_ix][batch].end_time %></td>
+		    <td><%= btsqar[stn_ix][batch].volume %> start:<%= '%.2f'% btsqar[stn_ix][batch].start_time if btsqar[stn_ix][batch].start_time %> end:<%= '%.2f'% btsqar[stn_ix][batch].end_time if btsqar[stn_ix][batch].end_time %></td>
 		    <% stn_ix = stn_ix + 1 %>
 	      <% end %>
 	    </tr>

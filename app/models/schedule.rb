@@ -11,9 +11,8 @@ class Schedule < ActiveRecord::Base
 
     def initialize_batch_sequence(prior_activities, statar)      
 #     Go through previous schedule to identify injections and receipts to get list of batches
-      prior_activities = prior_activities.sort_by {|a| a.start_time}
       batches = Array.new
-      batch_list = prior_activities.map {|p| p.batch_id}.uniq 
+      batch_list = prior_activities.map {|p| p.batch_id}.uniq
       batch_list.each do |b|
         batch_activities = prior_activities.select {|p| p.batch_id == b}
         batch_temp = batch_activities[0].batch_id.partition("-")
@@ -37,12 +36,13 @@ class Schedule < ActiveRecord::Base
             end_location = ba.station
           end
         end
-        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, 0, 0, "", batch_shipper, batch_nomination)
+        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, nil, nil, nil, batch_shipper, batch_nomination)
 #       Assign the batch id's
         batches.each_with_index do |b, bix|
           b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
         end
       end
+      batches.sort! {|a, b| a.start_time <=> b.start_time}
 #     Create the two-dimensional batch sequence array
       max_batches = batches.count
       bs = Array.new(statar.count-1){Array.new(max_batches)}
@@ -82,13 +82,13 @@ class Schedule < ActiveRecord::Base
         batch_number_within_shipment = 0
         while vol > max_batchsize
           batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, 0, 0, "", s.shipper, ix+1)
+          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, nil, nil, nil, s.shipper, ix+1)
           vol = vol - max_batchsize
           batch_number_within_shipment = batch_number_within_shipment + 1
         end
         if vol > 0.0 then
           batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, 0, 0, "", s.shipper, ix+1)
+          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, nil, nil, nil, s.shipper, ix+1)
         end
       end
 #     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
