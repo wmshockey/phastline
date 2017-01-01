@@ -9,8 +9,9 @@ class Schedule < ActiveRecord::Base
     validates :sched_type, :presence => true, inclusion: { in: %w(PRIOR PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
 
 
-    def initialize_batch_sequence(prior_activities, statar)      
+    def initialize_batch_sequence(prior_activities, statar) 
 #     Go through previous schedule to identify injections and receipts to get list of batches
+#     Convert from sa chedule form to a list of batches form    
       batches = Array.new
       batch_list = prior_activities.map {|p| p.batch_id}.uniq
       batch_list.each do |b|
@@ -42,10 +43,12 @@ class Schedule < ActiveRecord::Base
           b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
         end
       end
+#     Ensure list of batches are sorted by the start_time
       batches.sort! {|a, b| a.start_time <=> b.start_time}
 #     Create the two-dimensional batch sequence array
+#     Convert from list of batches form to the 2-D batch sequence form
       max_batches = batches.count
-      bs = Array.new(statar.count-1){Array.new(max_batches)}
+      bs = Array.new(statar.count){Array.new(max_batches)}
       batches.each_with_index do |b, btix|
         start_loc = b.start_location
         station_rec = statar.detect {|s| s.name == start_loc}
@@ -53,7 +56,7 @@ class Schedule < ActiveRecord::Base
         end_loc = b.end_location
         station_rec = statar.detect {|s| s.name == end_loc}
         end_kmp = station_rec.kmp
-        statar[0...-1].each_with_index do |s, stix|
+        statar.each_with_index do |s, stix|
           stat = s.name
           kmp = s.kmp
           if start_kmp <= kmp and end_kmp > kmp then
@@ -69,8 +72,7 @@ class Schedule < ActiveRecord::Base
     end     
 
     def finalize_batch_sequence(max_batchsize, btsqar, shipments, statar)
-#     Break up shipments into batches
-#      logger.info "max_batchsize=#{max_batchsize}"
+#     Break up shipments into a list of batches
       batches = Array.new
       number_of_shipments = shipments.count
       total_volume_of_shipments = shipments.sum("volume")
@@ -100,7 +102,7 @@ class Schedule < ActiveRecord::Base
       end
 #     Create the two-dimensional batch sequence array
       max_batches = batches.count
-      bs = Array.new(statar.count-1){Array.new(max_batches)}
+      bs = Array.new(statar.count){Array.new(max_batches)}
       batches.each_with_index do |b, btix|
         start_loc = b.start_location
         station_rec = statar.detect {|s| s.name == start_loc}
@@ -108,7 +110,7 @@ class Schedule < ActiveRecord::Base
         end_loc = b.end_location
         station_rec = statar.detect {|s| s.name == end_loc}
         end_kmp = station_rec.kmp
-        statar[0...-1].each_with_index do |s, stix|
+        statar.each_with_index do |s, stix|
           stat = s.name
           kmp = s.kmp
           if start_kmp <= kmp and end_kmp > kmp then
@@ -124,9 +126,17 @@ class Schedule < ActiveRecord::Base
 #     The new batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence downstream of the first station
 #     and we want those to be from the prior period schedule batches.
       number_of_prior_batches = btsqar[0].length
-      final_bs = Array.new(statar.count-1){Array.new(max_batches + number_of_prior_batches)}
-      statar[0...-1].each_with_index do |s, stix|
+      final_bs = Array.new(statar.count){Array.new(max_batches + number_of_prior_batches)}
+      statar.each_with_index do |s, stix|
         final_bs[stix] = bs[stix] + btsqar[stix]
+      end
+#     Populate batches into last column of batch sequence array for last station on the line.  This is necessary so that start and end times of batches arriving at the last station can be recorded.
+      last_stn_ix = statar.count - 1
+      batch_ix = 0
+      while batch_ix < final_bs[0].count - 1
+        batch_rec = final_bs[last_stn_ix - 1][batch_ix]
+        final_bs[last_stn_ix][batch_ix] = batch_rec.dup
+        batch_ix = batch_ix + 1
       end
       return final_bs
     end

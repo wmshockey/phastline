@@ -369,11 +369,11 @@ class Simulation < ActiveRecord::Base
           if vol1 < vol2 then
             event_station = stn_ix
             event_batch = batch1
-            event_activity = "leaves"
+#            event_activity = "leaves"
           else
             event_station = stn_ix + 1
             event_batch = batch2
-            event_activity = "arrives"
+#            event_activity = "arrives"
           end
         end
         stn_ix = stn_ix + 1
@@ -400,16 +400,21 @@ class Simulation < ActiveRecord::Base
         stn_ix = stn_ix + 1
       end
       if not all_done then
-#       Record the start and end times of the event in btsqar for the schedule
+#       Record the start and end times of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
 #       Set start time of the first batch out of the first station
         if $step == 1
           btsqar[0][0].start_time = $timestamp
         end
+#       Set the end_time of the event
+        btsqar[event_station][event_batch].end_time = $timestamp + time_shift
+        if event_station == 2 or event_station == 1 then
+          logger.info "station:#{event_station}  batch:#{event_batch}  #{btsqar[event_station][event_batch].batch_id}  #{btsqar[event_station][event_batch].end_time}"
+        end
+#       Also set the start_time for the next batch in the sequence.
+        if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
+        btsqar[event_station][event_batch].start_time = $timestamp + time_shift if btsqar[event_station][event_batch].end_time == nil
+#       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
         if event_station != statar.count - 1 then
-          btsqar[event_station][event_batch].end_time = $timestamp + time_shift
-          if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-          btsqar[event_station][event_batch].start_time = $timestamp + time_shift if btsqar[event_station][event_batch].end_time == nil
-#         If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
           while btsqar[event_station][event_batch].volume == 0
             zero_volume_event_time = btsqar[event_station][event_batch].start_time
             btsqar[event_station][event_batch].end_time = zero_volume_event_time
@@ -1039,11 +1044,7 @@ class Simulation < ActiveRecord::Base
           station_curve = statcv.select {|c| c.station_id == s.station_id}
           result.station_curve_data = station_curve
           stn_ix = @statar.index {|i| i.name == s.stat}
-#         Save batch sequence for this station, but there is no batch sequence for the last station on the line
-          if stn_ix < @statar.count - 1 then
-            batch_seq = btsqar[stn_ix]
-            result.batch_sequence_data = batch_seq
-          end
+          result.batch_sequence_data = btsqar[stn_ix]
         end
         @results << result
     end
