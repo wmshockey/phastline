@@ -23,21 +23,26 @@ class Schedule < ActiveRecord::Base
         batch_nomination = batch_activities[0].nomination_name
         start_location = ""
         end_location = "" 
-        batch_volume = 0   
+        batch_volume = 0
+        activity_type = "" 
         batch_activities.each do |ba|
           if ba.activity_type == "INJECTION" then
             start_location = ba.station
             batch_volume = ba.volume
+            activity_type = "INJECTION"
           elsif ba.activity_type == "RECEIPT" then
             start_location = ba.station
             batch_volume = ba.volume
+            activity_type = "RECEIPT"
           elsif ba.activity_type == "LANDING" then
             end_location = ba.station
+            activity_type = "LANDING"
           elsif ba.activity_type == "DELIVERY" then
             end_location = ba.station
+            activity_type = "DELIVERY"
           end
         end
-        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, nil, nil, nil, batch_shipper, batch_nomination)
+        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, nil, nil, activity_type, batch_shipper, batch_nomination)
 #       Assign the batch id's
         batches.each_with_index do |b, bix|
           b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
@@ -45,6 +50,7 @@ class Schedule < ActiveRecord::Base
       end
 #     Ensure list of batches are sorted by the start_time
       batches.sort! {|a, b| a.start_time <=> b.start_time}
+      byebug
 #     Create the two-dimensional batch sequence array
 #     Convert from list of batches form to the 2-D batch sequence form
       max_batches = batches.count
@@ -63,7 +69,6 @@ class Schedule < ActiveRecord::Base
             bs[stix][btix] = batches[btix].dup
           else
             bs[stix][btix] = batches[btix].dup
-            bs[stix][btix].volume = 0.0
           end
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
@@ -114,10 +119,22 @@ class Schedule < ActiveRecord::Base
           stat = s.name
           kmp = s.kmp
           if start_kmp <= kmp and end_kmp > kmp then
-            bs[stix][btix] = batches[btix].dup
+            batch_rec = batches[btix].dup
+            if statar[stix].name == start_loc then
+              batch_rec.activity_type = "INJECTION"
+            else
+              batch_rec.activity_type = "EVEN"
+            end
+            bs[stix][btix] = batch_rec
           else
-            bs[stix][btix] = batches[btix].dup
-            bs[stix][btix].volume = 0.0
+            batch_rec = batches[btix].dup
+            if statar[stix].name == end_loc then
+              batch_rec.activity_type = "DELIVERY"
+              bs[stix][btix] = batch_rec
+            else
+              bs[stix][btix] = batch_rec
+              bs[stix][btix].volume = 0.0
+            end
           end
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
@@ -129,14 +146,6 @@ class Schedule < ActiveRecord::Base
       final_bs = Array.new(statar.count){Array.new(max_batches + number_of_prior_batches)}
       statar.each_with_index do |s, stix|
         final_bs[stix] = bs[stix] + btsqar[stix]
-      end
-#     Populate batches into last column of batch sequence array for last station on the line.  This is necessary so that start and end times of batches arriving at the last station can be recorded.
-      last_stn_ix = statar.count - 1
-      batch_ix = 0
-      while batch_ix < final_bs[0].count - 1
-        batch_rec = final_bs[last_stn_ix - 1][batch_ix]
-        final_bs[last_stn_ix][batch_ix] = batch_rec.dup
-        batch_ix = batch_ix + 1
       end
       return final_bs
     end

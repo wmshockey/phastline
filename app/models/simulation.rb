@@ -337,6 +337,7 @@ class Simulation < ActiveRecord::Base
 #     Will need to update this in the future to check for batches hitting elevation change and segment change points as well
       stn_ix = 0
       time_shift = 999999.0
+      all_done = false
       step_events = Array.new
 #     Initialize the event record so that schedule information can be captured
       event_station = 0
@@ -349,14 +350,10 @@ class Simulation < ActiveRecord::Base
         flow = flowar.get_y(kmp)
 #       Get the volume to the next batch at the station
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
-        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
-        batch1 = upstream_batch
-        vol1 = upstream_vol
+        batch1, vol1, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
 #       Get the volume to the next batch coming into the downstream station
         volume_shift = statar[stn_ix].initial_volume - statar[stn_ix].pipe_volume + statar[stn_ix].pumped_volume
-        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
-        batch2 = upstream_batch
-        vol2 = upstream_vol
+        batch2, vol2, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
 #       Calculate the time to next batch interface between this station and the next.
         if flow > 0 then
           time_step = [vol1, vol2].min / flow
@@ -369,32 +366,9 @@ class Simulation < ActiveRecord::Base
           if vol1 < vol2 then
             event_station = stn_ix
             event_batch = batch1
-#            event_activity = "leaves"
           else
             event_station = stn_ix + 1
             event_batch = batch2
-#            event_activity = "arrives"
-          end
-        end
-        stn_ix = stn_ix + 1
-      end
-#     Check if last step or all done and set the volume shift so it doesn't exceed the total sequence volume
-      all_done = true
-      last_step = false
-      stn_ix = 0
-      while stn_ix < statar.count - 1
-        if (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) > 0.001 then
-          all_done = false
-          kmp = statar[stn_ix].kmp
-          flow = flowar.get_y(kmp)
-          pumped_vol_increment = flow * time_shift
-          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
-          if next_vol > statar[stn_ix].sequence_volume then
-            last_step = true
-            time_shift_adjusted = (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) / flow
-            if time_shift_adjusted < time_shift then
-              time_shift = time_shift_adjusted
-            end
           end
         end
         stn_ix = stn_ix + 1
@@ -407,12 +381,13 @@ class Simulation < ActiveRecord::Base
         end
 #       Set the end_time of the event
         btsqar[event_station][event_batch].end_time = $timestamp + time_shift
-        if event_station == 2 or event_station == 1 then
-          logger.info "station:#{event_station}  batch:#{event_batch}  #{btsqar[event_station][event_batch].batch_id}  #{btsqar[event_station][event_batch].end_time}"
-        end
-#       Also set the start_time for the next batch in the sequence.
+#       Also set the start_time for the next batch in the sequence and also check if we have reached the end of the batch sequence and are all done.
         if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-        btsqar[event_station][event_batch].start_time = $timestamp + time_shift if btsqar[event_station][event_batch].end_time == nil
+        if event_station == 0 and event_batch == btsqar[0].count-1 then
+          all_done = true
+        else
+          btsqar[event_station][event_batch].start_time = $timestamp + time_shift
+        end
 #       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
         if event_station != statar.count - 1 then
           while btsqar[event_station][event_batch].volume == 0

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>app/views/simulations/_show.html.erb</string>
+	<string>app/models/schedule.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -516,9 +516,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>112</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>89</integer>
+				<integer>28</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -744,30 +744,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>70</integer>
+				<integer>31</integer>
 				<key>line</key>
-				<integer>22</integer>
+				<integer>20</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>20</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>70</integer>
-				<key>line</key>
-				<integer>22</integer>
-			</dict>
 		</dict>
 		<key>app/models/pump.rb</key>
 		<dict>
@@ -802,14 +786,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>148</integer>
+				<integer>6</integer>
 				<key>line</key>
-				<integer>92</integer>
+				<integer>16</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>6</integer>
 		</dict>
 		<key>app/models/segment.rb</key>
 		<dict>
@@ -860,14 +844,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>103</integer>
 				<key>line</key>
-				<integer>97</integer>
+				<integer>384</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>76</integer>
+			<integer>339</integer>
 		</dict>
 		<key>app/models/station.rb</key>
 		<dict>
@@ -1774,30 +1758,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>106</integer>
 				<key>line</key>
-				<integer>11</integer>
+				<integer>34</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>2</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>11</integer>
-			</dict>
 		</dict>
 		<key>app/views/results/index.html.erb</key>
 		<dict>
@@ -1846,9 +1814,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>34</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>8</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -1932,9 +1900,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>8</integer>
+				<integer>24</integer>
 				<key>line</key>
-				<integer>55</integer>
+				<integer>43</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
@@ -1945,16 +1913,16 @@
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>17</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>43</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>8</integer>
+				<integer>24</integer>
 				<key>line</key>
-				<integer>55</integer>
+				<integer>43</integer>
 			</dict>
 		</dict>
 		<key>app/views/results/step_detail.html.erb</key>
@@ -1990,9 +1958,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>37</integer>
+				<integer>39</integer>
 				<key>line</key>
-				<integer>49</integer>
+				<integer>43</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -2004,9 +1972,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>8</integer>
+				<integer>45</integer>
 				<key>line</key>
-				<integer>42</integer>
+				<integer>31</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -2378,30 +2346,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>118</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>34</integer>
+				<integer>17</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>46</integer>
-				<key>line</key>
-				<integer>34</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>118</integer>
-				<key>line</key>
-				<integer>34</integer>
-			</dict>
 		</dict>
 		<key>app/views/simulations/_index.html.erb</key>
 		<dict>
@@ -2543,37 +2495,21 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>9</integer>
+			<integer>10</integer>
 		</dict>
 		<key>app/views/simulations/show.html.erb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>141</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>12</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>70</integer>
-				<key>line</key>
-				<integer>6</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>141</integer>
-				<key>line</key>
-				<integer>6</integer>
-			</dict>
 		</dict>
 		<key>app/views/simulations/show.json.jbuilder</key>
 		<dict>
@@ -3264,205 +3200,59 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>44</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>26</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>115</integer>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>16</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>44</integer>
+				<key>line</key>
+				<integer>26</integer>
+			</dict>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
 		<string>app/views/simulations/run.html.erb</string>
-		<string>app/helpers/simulations_helper.rb</string>
-		<string>app/views/simulations/show.json.jbuilder</string>
-		<string>app/views/results/index.html.erb</string>
-		<string>app/views/stations/show.html.erb</string>
-		<string>app/views/stations/new.html.erb</string>
-		<string>app/views/stations/edit.html.erb</string>
-		<string>app/views/stations/_index.html.erb</string>
-		<string>app/views/segments/show.html.erb</string>
-		<string>app/views/temperatures/show.html.erb</string>
-		<string>app/views/temperatures/new.html.erb</string>
-		<string>app/views/temperatures/edit.html.erb</string>
-		<string>app/views/units/show.json.jbuilder</string>
-		<string>app/views/units/new.html.erb</string>
-		<string>app/views/shipments/new.html.erb</string>
-		<string>app/views/shipments/_index.html.erb</string>
-		<string>app/views/activities/index.html.erb</string>
-		<string>app/views/activities/index.json.jbuilder</string>
-		<string>app/views/activities/_form.html.erb</string>
-		<string>app/views/units/_form.html.erb</string>
-		<string>db/migrate/20161219211432_rename_nomination_i_din_activities.rb</string>
-		<string>app/views/activities/edit.html.erb</string>
-		<string>app/views/shipments/edit.html.erb</string>
-		<string>app/views/activities/_index.html.erb</string>
-		<string>app/views/commodities/_form.html.erb</string>
-		<string>app/views/activities/show.html.erb</string>
-		<string>app/views/activities/show.json.jbuilder</string>
-		<string>app/views/activities/new.html.erb</string>
-		<string>app/views/shipments/show.html.erb</string>
-		<string>app/views/shipments/_form.html.erb</string>
-		<string>app/views/units/edit.html.erb</string>
-		<string>app/views/segments/new.html.erb</string>
-		<string>app/views/segments/edit.html.erb</string>
-		<string>app/models/simulation.rb</string>
-		<string>app/assets/javascripts/activities.coffee</string>
-		<string>app/assets/javascripts/application.js</string>
-		<string>app/assets/javascripts/commodities.coffee</string>
-		<string>app/assets/javascripts/elevations.coffee</string>
-		<string>app/assets/javascripts/headpoints.coffee</string>
-		<string>app/assets/javascripts/nominations.coffee</string>
-		<string>app/assets/stylesheets/activities.scss</string>
-		<string>app/assets/stylesheets/application.css</string>
-		<string>app/assets/javascripts/results.coffee</string>
-		<string>app/assets/javascripts/schedules.coffee</string>
-		<string>app/assets/javascripts/simulations.coffee</string>
-		<string>app/assets/javascripts/stations.coffee</string>
-		<string>app/assets/javascripts/temperatures.coffee</string>
-		<string>app/assets/javascripts/units.coffee</string>
-		<string>Gemfile</string>
-		<string>db/migrate/20161222172802_add_column_linefill_to_results.rb</string>
-		<string>app/controllers/schedules_controller.rb</string>
-		<string>app/controllers/nominations_controller.rb</string>
-		<string>app/helpers/nominations_helper.rb</string>
-		<string>app/helpers/schedules_helper.rb</string>
-		<string>app/views/pumps/_index.html.erb</string>
-		<string>app/controllers/segments_controller.rb</string>
-		<string>app/models/activity.rb</string>
-		<string>db/migrate/20161220143150_alter_activities_table.rb</string>
-		<string>app/models/schedule.rb</string>
-		<string>db/migrate/20161220164256_rename_column_simulation_name_in_schedules.rb</string>
-		<string>db/migrate/20161220015958_add_schedule_name_to_simulations.rb</string>
-		<string>app/views/schedules/_form.html.erb</string>
-		<string>app/views/nominations/_form.html.erb</string>
-		<string>app/views/schedules/edit.html.erb</string>
-		<string>app/views/schedules/index.html.erb</string>
-		<string>app/views/pumps/index.html.erb</string>
-		<string>app/views/schedules/_index.html.erb</string>
-		<string>app/views/schedules/index.json.jbuilder</string>
-		<string>app/views/schedules/new.html.erb</string>
-		<string>app/views/schedules/show.html.erb</string>
-		<string>app/views/schedules/_show_one.html.erb</string>
-		<string>app/views/schedules/show.json.jbuilder</string>
-		<string>db/migrate/20161219151050_create_schedules.rb</string>
-		<string>db/migrate/20161219152436_create_activities.rb</string>
-		<string>app/controllers/activities_controller.rb</string>
-		<string>app/controllers/pipelines_controller.rb</string>
-		<string>app/helpers/shipments_helper.rb</string>
-		<string>app/helpers/pipelines_helper.rb</string>
-		<string>app/views/layouts/application.html.erb</string>
-		<string>app/views/nominations/_show_one.html.erb</string>
-		<string>app/views/nominations/edit.html.erb</string>
-		<string>app/views/nominations/_index.html.erb</string>
-		<string>app/views/nominations/index.html.erb</string>
-		<string>app/views/nominations/index.json.jbuilder</string>
-		<string>app/views/commodities/index.html.erb</string>
-		<string>app/models/station.rb</string>
-		<string>app/models/temperature.rb</string>
-		<string>app/views/elevations/_form.html.erb</string>
-		<string>app/views/elevations/show.html.erb</string>
-		<string>app/views/nominations/show.html.erb</string>
-		<string>app/views/nominations/show.json.jbuilder</string>
-		<string>app/views/elevations/new.html.erb</string>
-		<string>app/views/elevations/edit.html.erb</string>
-		<string>app/views/commodities/show.html.erb</string>
-		<string>app/views/commodities/edit.html.erb</string>
-		<string>app/views/commodities/new.html.erb</string>
-		<string>app/views/simulations/_form.html.erb</string>
-		<string>app/views/stations/_form.html.erb</string>
-		<string>app/views/segments/_form.html.erb</string>
-		<string>app/views/results/_form.html.erb</string>
-		<string>db/schema.rb</string>
-		<string>db/migrate/20161201151138_add_columns_to_pump.rb</string>
-		<string>db/migrate/20161219204143_change_column_batch_i_din_activities.rb</string>
-		<string>db/migrate/20161219200958_add_schedule_id_to_activities.rb</string>
-		<string>db/migrate/20161201011832_alter_column_pumps_description.rb</string>
-		<string>config/secrets.yml</string>
-		<string>db/migrate/20161216164204_rename_id_columns.rb</string>
-		<string>db/migrate/20161216020716_add_column_hhp_to_results.rb</string>
-		<string>db/migrate/20161216051932_add_column_step_time_to_results.rb</string>
-		<string>app/views/pumps/index.json.jbuilder</string>
-		<string>app/models/unit.rb</string>
-		<string>app/models/pipeline.rb</string>
-		<string>app/helpers/application_helper.rb</string>
-		<string>config/boot.rb</string>
-		<string>config/database.yml</string>
-		<string>config/environment.rb</string>
-		<string>app/models/pump.rb</string>
-		<string>db/migrate/20161213192606_add_station_curve_data_to_results.rb</string>
-		<string>db/migrate/20161214000606_add_batch_sequence_data_to_results.rb</string>
-		<string>app/views/results/step_detail.html.erb</string>
-		<string>app/views/results/step_flowrates.html.erb</string>
-		<string>config/routes.rb</string>
-		<string>app/models/result.rb</string>
-		<string>app/controllers/results_controller.rb</string>
-		<string>app/controllers/simulations_controller.rb</string>
-		<string>app/controllers/stations_controller.rb</string>
-		<string>app/controllers/pumps_controller.rb</string>
-		<string>app/controllers/shipments_controller.rb</string>
-		<string>app/views/results/station_detail.html.erb</string>
-		<string>app/views/results/power.html.erb</string>
-		<string>app/views/results/new.html.erb</string>
-		<string>app/views/results/index.json.jbuilder</string>
-		<string>app/views/results/show.html.erb</string>
-		<string>app/views/results/station_step_detail.html.erb</string>
-		<string>app/views/results/step_linefill.html.erb</string>
-		<string>app/views/results/station_curves.html.erb</string>
-		<string>app/views/pipelines/index.html.erb</string>
-		<string>app/views/pipelines/_index.html.erb</string>
-		<string>app/views/pipelines/_form.html.erb</string>
-		<string>app/views/pipelines/show.html.erb</string>
-		<string>app/views/segments/_index.html.erb</string>
-		<string>app/views/pipelines/_show_one.html.erb</string>
-		<string>app/views/units/show.html.erb</string>
-		<string>app/controllers/units_controller.rb</string>
-		<string>app/controllers/application_controller.rb</string>
-		<string>app/controllers/elevations_controller.rb</string>
-		<string>app/models/elevation.rb</string>
-		<string>app/views/units/index.html.erb</string>
-		<string>app/views/results/summary.html.erb</string>
-		<string>app/views/commodities/_index.html.erb</string>
-		<string>app/views/headpoints/_form.html.erb</string>
-		<string>app/views/units/_index.html.erb</string>
-		<string>app/views/headpoints/edit.html.erb</string>
-		<string>app/views/headpoints/index.html.erb</string>
-		<string>app/views/headpoints/_index.html.erb</string>
-		<string>app/views/pumps/show.html.erb</string>
-		<string>app/views/pumps/edit.html.erb</string>
-		<string>app/views/headpoints/new.html.erb</string>
-		<string>app/views/pumps/new.html.erb</string>
-		<string>app/views/pumps/_form.html.erb</string>
-		<string>app/views/headpoints/show.html.erb</string>
-		<string>app/models/headpoint.rb</string>
-		<string>app/models/nomination.rb</string>
-		<string>app/models/segment.rb</string>
-		<string>app/views/results/show.json.jbuilder</string>
-		<string>app/views/results/batch_sequence.html.erb</string>
-		<string>app/views/results/batch_detail.html.erb</string>
-		<string>app/models/shipment.rb</string>
-		<string>app/views/results/_top.html.erb</string>
 		<string>app/views/simulations/show.html.erb</string>
-		<string>app/views/shared/_error_messages.html.erb</string>
-		<string>app/views/pipelines/show.json.jbuilder</string>
-		<string>config/application.rb</string>
+		<string>app/models/simulation.rb</string>
+		<string>app/views/results/batch_sequence.html.erb</string>
+		<string>app/views/results/station_step_detail.html.erb</string>
+		<string>app/models/activity.rb</string>
+		<string>app/models/elevation.rb</string>
+		<string>app/models/headpoint.rb</string>
+		<string>app/views/results/summary.html.erb</string>
+		<string>app/models/pipeline.rb</string>
+		<string>app/models/schedule.rb</string>
+		<string>app/models/shipment.rb</string>
+		<string>app/controllers/simulations_controller.rb</string>
+		<string>app/views/simulations/_form.html.erb</string>
 		<string>app/views/simulations/_show.html.erb</string>
-		<string>app/views/pipelines/new.html.erb</string>
-		<string>app/views/nominations/new.html.erb</string>
-		<string>app/views/simulations/index.html.erb</string>
-		<string>app/views/simulations/edit.html.erb</string>
-		<string>app/views/simulations/new.html.erb</string>
-		<string>app/views/simulations/index.json.jbuilder</string>
-		<string>app/views/simulations/_sim_result_links.html.erb</string>
-		<string>app/views/simulations/debug_output.html.erb</string>
-		<string>app/views/simulations/_index.html.erb</string>
+		<string>app/views/results/step_linefill.html.erb</string>
+		<string>app/views/results/power.html.erb</string>
+		<string>db/migrate/20161220015958_add_schedule_name_to_simulations.rb</string>
+		<string>db/migrate/20161222172802_add_column_linefill_to_results.rb</string>
+		<string>app/models/result.rb</string>
+		<string>db/schema.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{348, 165}, {1506, 1252}}</string>
+	<string>{{405, 94}, {1935, 1252}}</string>
 </dict>
 </plist>
