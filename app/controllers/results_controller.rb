@@ -44,6 +44,10 @@ class ResultsController < ApplicationController
   def batch_sequence
     @results = Result.select {|r| r.step == 1}
   end
+
+  def schedule
+    @results = Result.select {|r| r.step == 1}
+  end
   
   def batch_detail
     @batch = params[:id]

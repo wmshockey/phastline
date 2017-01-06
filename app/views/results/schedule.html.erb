@@ -1,0 +1,57 @@
+<%= render 'top' %>
+
+<% btsqar = Array.new %>
+<% stations = Array.new %>
+<% stn_ix = 0 %>
+<% @results.take_while{|i| i.step == 1 and i.batch_sequence_data != nil}.each do |r| %>
+	<% stations[stn_ix] = r.stat %>
+	<% station_batches = r.batch_sequence_data %>
+	<% btsqar[stn_ix] = station_batches %>
+	<% stn_ix = stn_ix + 1 %>
+<% end %>
+
+<% stn_ix = 0 %>
+<% activities = Array.new %>
+<% while stn_ix <= stations.count - 1 %>
+	<% batch_ix = 0 %>
+	<% while batch_ix <= btsqar[0].count - 1 %>
+		<% brec = btsqar[stn_ix][batch_ix] %>
+		<% activities << [stations[stn_ix], brec] %>
+		<% batch_ix = batch_ix + 1 %>
+	<% end %>
+	<% stn_ix = stn_ix + 1 %>
+<% end %>
+
+<% activities.sort! {|a, b| (a[1].start_time and b[1].start_time) ? a[1].start_time<=>b[1].start_time : (a[1].start_time ? -1 : 1) }%>
+
+<h2>Pipeline Schedule</h2>
+<table>
+	
+  <thead>
+	   <tr>
+	      <th>Batch ID</th>
+		  <th>Start Time</th>
+		  <th>End Time</th>
+		  <th>Activity</th>
+		  <th>Station</th>
+		  <th>Volume</th>
+		  <th>Shipper</th>
+	    </tr>
+  </thead>
+  	
+  <tbody>
+	<% activities.each do |activity| %>
+      <tr>
+        <td><%= activity[1].batch_id %></td>
+        <td><%= '%.2f' % activity[1].start_time if activity[1].start_time %></td>
+        <td><%= '%.2f' % activity[1].end_time if activity[1].end_time %></td>
+        <td><%= activity[1].activity_type %></td>
+        <td><%= activity[0] %></td>
+        <td><%= '%.2f' % activity[1].volume if activity[1].volume %></td>
+        <td><%= activity[1].shipper %></td>
+      </tr>
+	<% end %>
+  </tbody>
+
+</table>
+

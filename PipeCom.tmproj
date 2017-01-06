@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>app/models/schedule.rb</string>
+	<string>app/views/results/schedule.html.erb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -376,9 +376,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>57</integer>
 				<key>line</key>
-				<integer>29</integer>
+				<integer>35</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -460,14 +460,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>5</integer>
 				<key>line</key>
-				<integer>20</integer>
+				<integer>49</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>5</integer>
 		</dict>
 		<key>app/controllers/schedules_controller.rb</key>
 		<dict>
@@ -523,7 +523,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>24</integer>
+			<integer>3</integer>
 		</dict>
 		<key>app/controllers/stations_controller.rb</key>
 		<dict>
@@ -642,14 +642,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>43</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>10</integer>
+				<integer>12</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>12</integer>
+			</dict>
 		</dict>
 		<key>app/models/commodity.rb</key>
 		<dict>
@@ -786,7 +802,7 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>28</integer>
 				<key>line</key>
 				<integer>16</integer>
 			</dict>
@@ -844,14 +860,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>103</integer>
+				<integer>27</integer>
 				<key>line</key>
-				<integer>384</integer>
+				<integer>707</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>339</integer>
+			<integer>673</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>20</integer>
+				<key>line</key>
+				<integer>707</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>27</integer>
+				<key>line</key>
+				<integer>707</integer>
+			</dict>
 		</dict>
 		<key>app/models/station.rb</key>
 		<dict>
@@ -946,9 +978,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>35</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>16</integer>
+				<integer>41</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
@@ -959,16 +991,16 @@
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>5</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>16</integer>
+				<integer>23</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>35</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>16</integer>
+				<integer>41</integer>
 			</dict>
 		</dict>
 		<key>app/views/activities/edit.html.erb</key>
@@ -1758,14 +1790,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>106</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>34</integer>
+				<integer>47</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>47</integer>
+			</dict>
 		</dict>
 		<key>app/views/results/index.html.erb</key>
 		<dict>
@@ -1814,9 +1862,39 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>34</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>8</integer>
+				<integer>13</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>5</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
+		</dict>
+		<key>app/views/results/schedule.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>44</integer>
+				<key>line</key>
+				<integer>49</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -2404,9 +2482,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>49</integer>
 				<key>line</key>
-				<integer>5</integer>
+				<integer>7</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -2490,12 +2568,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>78</integer>
+				<integer>17</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>10</integer>
+			<integer>0</integer>
 		</dict>
 		<key>app/views/simulations/show.html.erb</key>
 		<dict>
@@ -2828,9 +2906,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>25</integer>
+				<integer>20</integer>
 				<key>line</key>
-				<integer>16</integer>
+				<integer>14</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -3200,30 +3278,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>44</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>26</integer>
+				<integer>25</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>16</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>44</integer>
-				<key>line</key>
-				<integer>26</integer>
-			</dict>
+			<integer>89</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -3231,7 +3293,15 @@
 		<string>app/views/simulations/run.html.erb</string>
 		<string>app/views/simulations/show.html.erb</string>
 		<string>app/models/simulation.rb</string>
+		<string>app/views/activities/_index.html.erb</string>
 		<string>app/views/results/batch_sequence.html.erb</string>
+		<string>app/views/results/schedule.html.erb</string>
+		<string>app/controllers/activities_controller.rb</string>
+		<string>config/routes.rb</string>
+		<string>app/controllers/results_controller.rb</string>
+		<string>app/views/layouts/application.html.erb</string>
+		<string>app/views/results/_top.html.erb</string>
+		<string>app/views/simulations/_sim_result_links.html.erb</string>
 		<string>app/views/results/station_step_detail.html.erb</string>
 		<string>app/models/activity.rb</string>
 		<string>app/models/elevation.rb</string>
@@ -3239,6 +3309,7 @@
 		<string>app/views/results/summary.html.erb</string>
 		<string>app/models/pipeline.rb</string>
 		<string>app/models/schedule.rb</string>
+		<string>app/views/results/step_detail.html.erb</string>
 		<string>app/models/shipment.rb</string>
 		<string>app/controllers/simulations_controller.rb</string>
 		<string>app/views/simulations/_form.html.erb</string>

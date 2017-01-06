@@ -14,30 +14,34 @@
   </thead>
 
   <% @pipeline = Pipeline.find {|p| p.name == @schedule.pipeline_name} %>
-  <% @stations = @pipeline.stations %>
-  <tbody>
-	<% @stations.each do |s| %>
-		<% @schedule.activities.select {|a| a.station == s.name}.each do |activity| %>
-	      <tr>
-	        <td><%= link_to activity.batch_id, schedule_activity_path(activity.schedule_id, activity.id) %></td>
-			<% if activity.start_time.nil? then %>
-			  <td></td>
-			<% else %>
-	          <td><%= activity.start_time.strftime("%Y-%m-%d %H:%M") %></td>
+  <% if @pipeline.nil? then %>
+	<strong><%= "Warning: cannot find pipeline named: #{@schedule.pipeline_name}" %></strong>
+  <% else %>
+  	  <% @stations = @pipeline.stations %>
+	  <tbody>
+		<% @stations.each do |s| %>
+			<% @schedule.activities.select {|a| a.station == s.name}.each do |activity| %>
+		      <tr>
+		        <td><%= link_to activity.batch_id, schedule_activity_path(activity.schedule_id, activity.id) %></td>
+				<% if activity.start_time.nil? then %>
+				  <td></td>
+				<% else %>
+		          <td><%= activity.start_time.strftime("%Y-%m-%d %H:%M") %></td>
+				<% end %>
+				<% if activity.end_time.nil? then %>
+				  <td></td>
+				<% else %>
+		          <td><%= activity.end_time.strftime("%Y-%m-%d %H:%M") %></td>
+				<% end %>
+		        <td><%= activity.activity_type %></td>
+		        <td><%= activity.station %></td>
+		        <td><%= activity.volume %></td>
+		        <td><%= activity.shipper %></td>
+		        <td><%= link_to activity.nomination_name, Nomination.find {|n| n.name == activity.nomination_name} %></td>
+		      </tr>
 			<% end %>
-			<% if activity.end_time.nil? then %>
-			  <td></td>
-			<% else %>
-	          <td><%= activity.end_time.strftime("%Y-%m-%d %H:%M") %></td>
-			<% end %>
-	        <td><%= activity.activity_type %></td>
-	        <td><%= activity.station %></td>
-	        <td><%= activity.volume %></td>
-	        <td><%= activity.shipper %></td>
-	        <td><%= link_to activity.nomination_name, Nomination.find {|n| n.name == activity.nomination_name} %></td>
-	      </tr>
 		<% end %>
+		<td colspan="10"><%= link_to 'Add Activity', new_schedule_activity_path(@schedule) %></td>
+	  </tbody>
 	<% end %>
-	<td colspan="10"><%= link_to 'Add Activity', new_schedule_activity_path(@schedule) %></td>
-  </tbody>
 </table>

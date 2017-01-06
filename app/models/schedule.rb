@@ -11,7 +11,7 @@ class Schedule < ActiveRecord::Base
 
     def initialize_batch_sequence(prior_activities, statar) 
 #     Go through previous schedule to identify injections and receipts to get list of batches
-#     Convert from sa chedule form to a list of batches form    
+#     Convert from schedule form to a list of batches form    
       batches = Array.new
       batch_list = prior_activities.map {|p| p.batch_id}.uniq
       batch_list.each do |b|
@@ -50,7 +50,7 @@ class Schedule < ActiveRecord::Base
       end
 #     Ensure list of batches are sorted by the start_time
       batches.sort! {|a, b| a.start_time <=> b.start_time}
-      byebug
+#      byebug
 #     Create the two-dimensional batch sequence array
 #     Convert from list of batches form to the 2-D batch sequence form
       max_batches = batches.count
@@ -66,9 +66,22 @@ class Schedule < ActiveRecord::Base
           stat = s.name
           kmp = s.kmp
           if start_kmp <= kmp and end_kmp > kmp then
-            bs[stix][btix] = batches[btix].dup
+            batch_rec = batches[btix].dup
+            if statar[stix].name == start_loc then
+              batch_rec.activity_type = "INJECTION"
+            else
+              batch_rec.activity_type = "EVEN"
+            end
+            bs[stix][btix] = batch_rec
           else
-            bs[stix][btix] = batches[btix].dup
+            batch_rec = batches[btix].dup
+            if statar[stix].name == end_loc then
+              batch_rec.activity_type = "DELIVERY"
+              bs[stix][btix] = batch_rec
+            else
+              bs[stix][btix] = batch_rec
+              bs[stix][btix].volume = 0.0
+            end
           end
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
