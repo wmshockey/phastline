@@ -23,6 +23,8 @@ class Schedule < ActiveRecord::Base
         batch_nomination = batch_activities[0].nomination_name
         start_location = ""
         end_location = "" 
+        start_time = DateTime.new(2000,01,01)
+        end_time = DateTime.new(2000,01,01)
         batch_volume = 0
         activity_type = "" 
         batch_activities.each do |ba|
@@ -30,27 +32,34 @@ class Schedule < ActiveRecord::Base
             start_location = ba.station
             batch_volume = ba.volume
             activity_type = "INJECTION"
+            start_time = ba.start_time
+            end_time = ba.end_time
           elsif ba.activity_type == "RECEIPT" then
             start_location = ba.station
             batch_volume = ba.volume
             activity_type = "RECEIPT"
+            start_time = ba.start_time
+            end_time = ba.end_time
           elsif ba.activity_type == "LANDING" then
             end_location = ba.station
             activity_type = "LANDING"
+            start_time = ba.start_time
+            end_time = ba.end_time
           elsif ba.activity_type == "DELIVERY" then
             end_location = ba.station
             activity_type = "DELIVERY"
+            start_time = ba.start_time
+            end_time = ba.end_time
           end
         end
         batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, nil, nil, activity_type, batch_shipper, batch_nomination)
-#       Assign the batch id's
-        batches.each_with_index do |b, bix|
-          b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
-        end
+      end
+#     Assign the batch id's
+      batches.each do |b|
+        b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
       end
 #     Ensure list of batches are sorted by the start_time
       batches.sort! {|a, b| a.start_time <=> b.start_time}
-#      byebug
 #     Create the two-dimensional batch sequence array
 #     Convert from list of batches form to the 2-D batch sequence form
       max_batches = batches.count
@@ -83,7 +92,6 @@ class Schedule < ActiveRecord::Base
               bs[stix][btix].volume = 0.0
             end
           end
-          s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
       end
       return bs

@@ -225,15 +225,19 @@ class Simulation < ActiveRecord::Base
 
 
     def initial_batch_positioning(statar, btsqar, volmar)
-#   Calculate the initial linefill by setting the initial_volume setting for each station.
+#   Calculate the initial linefill by setting the initial_volume for each station.
 #   The initial volume setting for each station is the total sequence volume for the station minus the pipe volume to that point in the line.
+#   Note we are using the TOTAL sequence volume in this case which includes all the batches from the prior schedule so that the initial linefill shows them all downstream.
     stn_ix = 0
     while stn_ix < statar.count - 1
+      total_sequence_volume = 0
+      btsqar[stn_ix].each do |b|
+        total_sequence_volume = total_sequence_volume + b.volume
+      end
       kmp = statar[stn_ix].kmp
       stat = statar[stn_ix].name
-      sequence_volume = statar[stn_ix].sequence_volume
       pipe_volume_to_station = volmar.interpolate_y(kmp)
-      statar[stn_ix].initial_volume = sequence_volume - pipe_volume_to_station
+      statar[stn_ix].initial_volume = total_sequence_volume - pipe_volume_to_station
       stn_ix = stn_ix + 1
     end
   end
@@ -328,6 +332,15 @@ class Simulation < ActiveRecord::Base
         end
         stn_ix = stn_ix + 1
       end
+#     Check if all done
+      all_done = true
+      stn_ix = 0
+      while stn_ix < statar.count - 1
+        if (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) > 0.001 then
+          all_done = false
+        end
+        stn_ix = stn_ix + 1
+      end
       if not all_done then
 #       Record the start and end times of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
 #       Set start time of the first batch out of the first station
@@ -336,13 +349,9 @@ class Simulation < ActiveRecord::Base
         end
 #       Set the end_time of the event
         btsqar[event_station][event_batch].end_time = $timestamp + time_shift
-#       Also set the start_time for the next batch in the sequence and also check if we have reached the end of the batch sequence and are all done.
+#       Also set the start_time for the next batch in the sequence
         if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-        if event_station == 0 and event_batch == btsqar[0].count-1 then
-          all_done = true
-        else
-          btsqar[event_station][event_batch].start_time = $timestamp + time_shift
-        end
+        btsqar[event_station][event_batch].start_time = $timestamp + time_shift
 #       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
         if event_station != statar.count - 1 then
           while btsqar[event_station][event_batch].volume == 0
