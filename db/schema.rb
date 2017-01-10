@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161222172802) do
+ActiveRecord::Schema.define(version: 20170110145402) do
 
   create_table "activities", force: :cascade do |t|
     t.string   "batch_id",        limit: 255
@@ -100,7 +100,7 @@ ActiveRecord::Schema.define(version: 20161222172802) do
     t.integer  "simulation_id",          limit: 4
     t.string   "simulation_name",        limit: 255
     t.integer  "step",                   limit: 4
-    t.float    "timestamp",              limit: 24
+    t.datetime "timestamp"
     t.float    "kmp",                    limit: 24
     t.integer  "station_id",             limit: 4
     t.string   "stat",                   limit: 255

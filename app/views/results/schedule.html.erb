@@ -43,8 +43,8 @@
 	<% activities.each do |activity| %>
       <tr>
         <td><%= activity[1].batch_id %></td>
-        <td><%= '%.2f' % activity[1].start_time if activity[1].start_time %></td>
-        <td><%= '%.2f' % activity[1].end_time if activity[1].end_time %></td>
+        <td><%= activity[1].start_time.strftime("%Y-%m-%d %H:%M") if activity[1].start_time %></td>
+        <td><%= activity[1].end_time.strftime("%Y-%m-%d %H:%M") if activity[1].end_time %></td>
         <td><%= activity[1].activity_type %></td>
         <td><%= activity[0] %></td>
         <td><%= '%.2f' % activity[1].volume if activity[1].volume %></td>

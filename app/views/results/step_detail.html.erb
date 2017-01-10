@@ -2,7 +2,7 @@
 
 <% stepresults = @results.select {|r| r.step == @step} %>
 
-<h2>Details for Step <%= @step %> @ <%= '%8.4f'% stepresults[0].timestamp %> Hours <%= "......" %>
+<h2>Details for Step <%= @step %> @ <%= stepresults[0].timestamp.strftime("%Y-%m-%d %H:%M") %>
 	<% if @step == 1 then %>
 		<%= link_to "Prev", step_detail_result_path($maxsteps) %>
 	<% else %>

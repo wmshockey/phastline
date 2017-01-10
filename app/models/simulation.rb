@@ -59,10 +59,11 @@ class Simulation < ActiveRecord::Base
   #       Add the new batches from the nominations onto the front end of the existing batch sequence
           @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @nomination.name, @shipments, @statar)
   #       Find the initial start time of the study.  (the end time of the last injection out of the first station from the prior schedule)
-          $initial_start_time = @schedule.get_initial_time(btsqar)
+          $initial_timestamp = @schedule.get_initial_time(btsqar)
+          $timestamp = $initial_timestamp
   #       Set initial positioning of batches in the line (linefill)
           initial_batch_positioning(@statar, @btsqar, @volmar)
-          $step = 1; stepdone = false; $timestamp = 0.0
+          $step = 1; stepdone = false
           @stepar = Array.new
   #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
           while not stepdone
@@ -107,8 +108,6 @@ class Simulation < ActiveRecord::Base
             end
           end
           $maxsteps = $step - 1
-#         Clean Batch Sequence out of prior schedule batches that were not involved in the study
-#          cleaout_batch_sequence(@btsqar)
   #       Save step results in database table for user viewing
           save_results
         end
@@ -231,17 +230,11 @@ class Simulation < ActiveRecord::Base
     def initial_batch_positioning(statar, btsqar, volmar)
 #   Calculate the initial linefill by setting the initial_volume for each station.
 #   The initial volume setting for each station is the total sequence volume for the station minus the pipe volume to that point in the line.
-#   Note we are using the TOTAL sequence volume in this case which includes all the batches from the prior schedule so that the initial linefill shows them all downstream.
     stn_ix = 0
     while stn_ix < statar.count - 1
-      total_sequence_volume = 0
-      btsqar[stn_ix].each do |b|
-        total_sequence_volume = total_sequence_volume + b.volume
-      end
       kmp = statar[stn_ix].kmp
-      stat = statar[stn_ix].name
       pipe_volume_to_station = volmar.interpolate_y(kmp)
-      statar[stn_ix].initial_volume = total_sequence_volume - pipe_volume_to_station
+      statar[stn_ix].initial_volume = statar[stn_ix].sequence_volume - pipe_volume_to_station
       stn_ix = stn_ix + 1
     end
   end
@@ -341,7 +334,7 @@ class Simulation < ActiveRecord::Base
       if $step == 1
         btsqar[0][0].start_time = $timestamp
       end
-      $timestamp = $timestamp + time_shift
+      $timestamp = $timestamp + time_shift * 3600.0
       if not all_done then
 #       Record the end time of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
 #       Set the end_time of the event

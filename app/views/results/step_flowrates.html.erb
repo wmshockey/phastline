@@ -18,7 +18,7 @@
 	    <% stn_ix = 0 %>
 		<tr>
 		  <% step = @results[steprec].step %>
-		  <% step_string = "#{step} @ #{@results[steprec].timestamp} hrs" %>
+		  <% step_string = "#{step} @ #{@results[steprec].timestamp.strftime("%d-%m-%Y %H:%M")}" %>
 		  <td><%= link_to step_string, station_step_detail_result_path(step) %></td>
 	      <% while stn_ix < num_stations %>
 		    <td><%= '%8.2f'% @results[steprec].flow %></td>

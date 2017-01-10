@@ -32,8 +32,8 @@
 	      <% while stn_ix < num_stations %>
 			<% if btsqar[stn_ix][batch].volume > 0 and (btsqar[stn_ix][batch].start_time or btsqar[stn_ix][batch].end_time) then %>
 		    	<td><%= btsqar[stn_ix][batch].volume %> <%= btsqar[stn_ix][batch].activity_type %> /
-			            start:<%= '%.2f'% btsqar[stn_ix][batch].start_time if btsqar[stn_ix][batch].start_time %> /
-			            end:<%= '%.2f'% btsqar[stn_ix][batch].end_time if btsqar[stn_ix][batch].end_time %></td>
+			            start:<%= btsqar[stn_ix][batch].start_time.strftime('%Y-%m-%d %H:%M') if btsqar[stn_ix][batch].start_time %> /
+			            end:<%= btsqar[stn_ix][batch].end_time.strftime('%Y-%m-%d %H:%M') if btsqar[stn_ix][batch].end_time %></td>
 			<% else %>
 				<td></td>
 			<% end %>
