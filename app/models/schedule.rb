@@ -52,7 +52,7 @@ class Schedule < ActiveRecord::Base
             end_time = ba.end_time
           end
         end
-        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, nil, nil, activity_type, batch_shipper, batch_nomination)
+        batches << Batchrec.new(batch_number, commodity_id, batch_volume, start_location, end_location, start_time, end_time, activity_type, batch_shipper, batch_nomination)
       end
 #     Assign the batch id's
       batches.each do |b|
@@ -92,12 +92,13 @@ class Schedule < ActiveRecord::Base
               bs[stix][btix].volume = 0.0
             end
           end
+          s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
       end
       return bs
     end     
 
-    def finalize_batch_sequence(max_batchsize, btsqar, shipments, statar)
+    def finalize_batch_sequence(max_batchsize, btsqar, nomination_name, shipments, statar)
 #     Break up shipments into a list of batches
       batches = Array.new
       number_of_shipments = shipments.count
@@ -110,13 +111,13 @@ class Schedule < ActiveRecord::Base
         batch_number_within_shipment = 0
         while vol > max_batchsize
           batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, nil, nil, nil, s.shipper, ix+1)
+          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, nil, nil, nil, s.shipper, nomination_name)
           vol = vol - max_batchsize
           batch_number_within_shipment = batch_number_within_shipment + 1
         end
         if vol > 0.0 then
           batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
-          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, nil, nil, nil, s.shipper, ix+1)
+          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, nil, nil, nil, s.shipper, nomination_name)
         end
       end
 #     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
@@ -161,7 +162,7 @@ class Schedule < ActiveRecord::Base
         end
       end
 #     Now tack the new batches from the nomination shipments onto the front end of the existing batch sequence array btsqar
-#     The new batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence downstream of the first station
+#     The new month batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence downstream of the first station
 #     and we want those to be from the prior period schedule batches.
       number_of_prior_batches = btsqar[0].length
       final_bs = Array.new(statar.count){Array.new(max_batches + number_of_prior_batches)}
@@ -171,7 +172,12 @@ class Schedule < ActiveRecord::Base
       return final_bs
     end
 
-
-
+    def get_initial_time(btsqar)
+#   Find the initial starting time for the new study.  This is taken to be the latest end time of the prior month's scheduled injections out of the first station.
+      event_end_times = btsqar[0].map {|b| b.end_time}
+      event_end_times.select! { |x| !x.nil? }
+      initial_start_time = event_end_times.max
+      return initial_start_time
+    end
 
 end

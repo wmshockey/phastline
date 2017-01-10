@@ -56,8 +56,10 @@ class Simulation < ActiveRecord::Base
         if self.errors.empty? then          
   #       Initialize the Batch Sequence with prior activities
           @btsqar = @schedule.initialize_batch_sequence(@prior_activities, @statar)
-  #       Add the new batches from the nominations onto the end of the existing batch sequence
-          @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @shipments, @statar)      
+  #       Add the new batches from the nominations onto the front end of the existing batch sequence
+          @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @nomination.name, @shipments, @statar)
+  #       Find the initial start time of the study.  (the end time of the last injection out of the first station from the prior schedule)
+          $initial_start_time = @schedule.get_initial_time(btsqar)
   #       Set initial positioning of batches in the line (linefill)
           initial_batch_positioning(@statar, @btsqar, @volmar)
           $step = 1; stepdone = false; $timestamp = 0.0
@@ -105,6 +107,8 @@ class Simulation < ActiveRecord::Base
             end
           end
           $maxsteps = $step - 1
+#         Clean Batch Sequence out of prior schedule batches that were not involved in the study
+#          cleaout_batch_sequence(@btsqar)
   #       Save step results in database table for user viewing
           save_results
         end
@@ -329,41 +333,45 @@ class Simulation < ActiveRecord::Base
             event_station = stn_ix + 1
             event_batch = batch2
           end
+          event_activity = btsqar[event_station][event_batch].activity_type
         end
         stn_ix = stn_ix + 1
       end
-#     Check if all done
-      all_done = true
-      stn_ix = 0
-      while stn_ix < statar.count - 1
-        if (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) > 0.001 then
-          all_done = false
-        end
-        stn_ix = stn_ix + 1
+#     Set start time of the first batch out of the first station
+      if $step == 1
+        btsqar[0][0].start_time = $timestamp
       end
+      $timestamp = $timestamp + time_shift
       if not all_done then
-#       Record the start and end times of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
-#       Set start time of the first batch out of the first station
-        if $step == 1
-          btsqar[0][0].start_time = $timestamp
-        end
+#       Record the end time of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
 #       Set the end_time of the event
-        btsqar[event_station][event_batch].end_time = $timestamp + time_shift
-#       Also set the start_time for the next batch in the sequence
+        btsqar[event_station][event_batch].end_time = $timestamp
+#       Set the start_time for the next batch in the sequence
         if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-        btsqar[event_station][event_batch].start_time = $timestamp + time_shift
+#       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
+        event_activity = btsqar[event_station][event_batch].activity_type
+        if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
+          all_done = true
+        else
+          btsqar[event_station][event_batch].start_time = $timestamp
+        end
 #       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
         if event_station != statar.count - 1 then
           while btsqar[event_station][event_batch].volume == 0
             zero_volume_event_time = btsqar[event_station][event_batch].start_time
             btsqar[event_station][event_batch].end_time = zero_volume_event_time
             if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-            btsqar[event_station][event_batch].start_time = zero_volume_event_time
+    #       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
+            event_activity = btsqar[event_station][event_batch].activity_type
+            if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
+              all_done = true
+            else
+              btsqar[event_station][event_batch].start_time = zero_volume_event_time
+            end
           end
         end
 #       Update the pumped volumes for all stations to advance to the next step
         stn_ix = 0
-        $timestamp = $timestamp + time_shift
         while stn_ix < statar.count - 1
           if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
             kmp = statar[stn_ix].kmp
@@ -377,10 +385,6 @@ class Simulation < ActiveRecord::Base
           end
           stn_ix = stn_ix + 1
         end
-      end
-#     Ensure to update the timestamp on the last step of the run.
-      if all_done then
-        $timestamp = $timestamp + time_shift
       end
       return all_done, time_shift
     end        
@@ -917,7 +921,7 @@ class Simulation < ActiveRecord::Base
       total_kwh = 0
       bottleneck_time = 0
       station_step_results = results.select {|s| s.stat == stat}
-      station_step_results[0...-1].each do |s|
+      station_step_results.each do |s|
         step = s.step
         steptime = s.step_time
         accum_volume = accum_volume + s.flow*steptime
@@ -1265,8 +1269,8 @@ class Batchrec
   attr_accessor :end_time
   attr_accessor :activity_type
   attr_accessor :shipper
-  attr_accessor :shipment_number
-  def initialize (batch_number, commodity_id, volume, start_location, end_location, start_time, end_time, activity_type, shipper, shipment_number)
+  attr_accessor :nomination_name
+  def initialize (batch_number, commodity_id, volume, start_location, end_location, start_time, end_time, activity_type, shipper, nomination_name)
     @batch_number = batch_number
     @commodity_id = commodity_id
     @volume = volume
@@ -1276,7 +1280,7 @@ class Batchrec
     @end_time = end_time
     @activity_type = activity_type
     @shipper = shipper
-    @shipment_number = shipment_number
+    @nomination_name = nomination_name
   end
 end
 
