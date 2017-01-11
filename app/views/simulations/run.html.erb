@@ -9,7 +9,7 @@
 
 <% if @simulation.errors.empty? then %>
 	<h2>Simulation Ran Successfully</h2>
-	Duration: <%= $timestamp.round(2) %> hours<br>
+	Duration: <%= (($timestamp - $initial_timestamp)/3600.0).round(2) %> hours<br>
 	Number of steps: <%=  $maxsteps %>
 <% else %>
 	<h2>Simulation Failed!</h2>

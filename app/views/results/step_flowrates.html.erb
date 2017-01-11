@@ -8,6 +8,8 @@
 	  <% num_steprecs = @results.count %>
 	  <tr>
 	    <td>Step</td>
+	    <td>Timestamp</td>
+	    <td>Duration</td>
 	    <% while stn_ix <= num_stations - 1 %>
 	      <td> <%= @stations[stn_ix] %> </td>
 		  <% stn_ix = stn_ix + 1 %>
@@ -18,8 +20,9 @@
 	    <% stn_ix = 0 %>
 		<tr>
 		  <% step = @results[steprec].step %>
-		  <% step_string = "#{step} @ #{@results[steprec].timestamp.strftime("%d-%m-%Y %H:%M")}" %>
-		  <td><%= link_to step_string, station_step_detail_result_path(step) %></td>
+		  <td><%= link_to step.to_s, station_step_detail_result_path(step) %></td>
+		  <td><%= @results[steprec].timestamp.strftime("%d-%m-%Y %H:%M") %></td>
+		  <td><%= @results[steprec].step_time.round(2) %> hrs</td>
 	      <% while stn_ix < num_stations %>
 		    <td><%= '%8.2f'% @results[steprec].flow %></td>
 		    <% stn_ix = stn_ix + 1 %>

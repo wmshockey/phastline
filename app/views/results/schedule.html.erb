@@ -29,27 +29,31 @@
 	
   <thead>
 	   <tr>
-	      <th>Batch ID</th>
 		  <th>Start Time</th>
 		  <th>End Time</th>
+	      <th>Batch ID</th>
 		  <th>Activity</th>
 		  <th>Station</th>
 		  <th>Volume</th>
 		  <th>Shipper</th>
+		  <th>Nomination</th>
 	    </tr>
   </thead>
   	
   <tbody>
 	<% activities.each do |activity| %>
-      <tr>
-        <td><%= activity[1].batch_id %></td>
-        <td><%= activity[1].start_time.strftime("%Y-%m-%d %H:%M") if activity[1].start_time %></td>
-        <td><%= activity[1].end_time.strftime("%Y-%m-%d %H:%M") if activity[1].end_time %></td>
-        <td><%= activity[1].activity_type %></td>
-        <td><%= activity[0] %></td>
-        <td><%= '%.2f' % activity[1].volume if activity[1].volume %></td>
-        <td><%= activity[1].shipper %></td>
-      </tr>
+	  <% if activity[1].start_time or activity[1].end_time then %>
+	      <tr>
+	        <td><%= activity[1].start_time.strftime("%Y-%m-%d %H:%M") if activity[1].start_time %></td>
+	        <td><%= activity[1].end_time.strftime("%Y-%m-%d %H:%M") if activity[1].end_time %></td>
+	        <td><%= link_to activity[1].batch_id, batch_detail_result_path(activity[1].batch_id) %></td>
+	        <td><%= activity[1].activity_type %></td>
+	        <td><%= activity[0] %></td>
+	        <td><%= '%.2f' % activity[1].volume if activity[1].volume %></td>
+	        <td><%= activity[1].shipper %></td>
+			<td><%= activity[1].nomination_name %></td>
+	      </tr>
+	  <% end %>
 	<% end %>
   </tbody>
 

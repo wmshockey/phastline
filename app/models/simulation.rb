@@ -55,12 +55,10 @@ class Simulation < ActiveRecord::Base
         data_integrity_checks(@pipeline)
         if self.errors.empty? then          
   #       Initialize the Batch Sequence with prior activities
-          @btsqar = @schedule.initialize_batch_sequence(@prior_activities, @statar)
+          @btsqar, $initial_timestamp = @schedule.initialize_batch_sequence(@prior_activities, @statar)
+          $timestamp = $initial_timestamp
   #       Add the new batches from the nominations onto the front end of the existing batch sequence
           @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @nomination.name, @shipments, @statar)
-  #       Find the initial start time of the study.  (the end time of the last injection out of the first station from the prior schedule)
-          $initial_timestamp = @schedule.get_initial_time(btsqar)
-          $timestamp = $initial_timestamp
   #       Set initial positioning of batches in the line (linefill)
           initial_batch_positioning(@statar, @btsqar, @volmar)
           $step = 1; stepdone = false
@@ -108,6 +106,8 @@ class Simulation < ActiveRecord::Base
             end
           end
           $maxsteps = $step - 1
+  #       Clean up batch sequence and remove batches that had non activity in the simulation (e.g. prior schedule batches that were not intially in the line)
+          @schedule.clean_batch_sequence(@btsqar)
   #       Save step results in database table for user viewing
           save_results
         end
@@ -261,6 +261,8 @@ class Simulation < ActiveRecord::Base
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift , stn_ix)
         batch = downstream_batch
         commodity_id = btsqar[stn_ix][downstream_batch].commodity_id
+        batch_number = btsqar[stn_ix][downstream_batch].batch_number
+        batch_id = commodity_id + "-" + batch_number.to_s.rjust(5, "0")
         batch_vol = downstream_vol
 #       Walk down the line to the next station, adding a new linefill record at each batch interface point
         while kmp < kmp_end
@@ -268,16 +270,18 @@ class Simulation < ActiveRecord::Base
             if (vol_end - next_vol1) > 0 then
 #             Don't record sliver batches
               if batch_vol > 0.01 then
-                lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+                lf << Linefillrec.new(kmp, stat, batch, batch_id, commodity_id, batch_vol, upstream_batch)
                 vol = next_vol1
               end
               kmp = volmar.interpolate_x(vol)
               batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
+              batch_number = btsqar[stn_ix][batch].batch_number
+              batch_id = commodity_id + "-" + batch_number.to_s.rjust(5, "0")              
             elsif (vol_end - next_vol1) <= 0 then
               batch_vol = batch_vol - (next_vol1 - vol_end)
 #             Don't record sliver batches
               if batch_vol > 0.01 then
-                lf << Linefillrec.new(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+                lf << Linefillrec.new(kmp, stat, batch, batch_id, commodity_id, batch_vol, upstream_batch)
               end
               kmp = kmp_end
             end
@@ -1227,13 +1231,15 @@ class Linefillrec
   attr_accessor :kmp
   attr_accessor :stat
   attr_accessor :batch
+  attr_accessor :batch_id
   attr_accessor :commodity_id
   attr_accessor :batch_vol
   attr_accessor :upstream_batch
-  def initialize(kmp, stat, batch, commodity_id, batch_vol, upstream_batch)
+  def initialize(kmp, stat, batch, batch_id, commodity_id, batch_vol, upstream_batch)
     @kmp = kmp
     @stat = stat
     @batch = batch
+    @batch_id = batch_id
     @commodity_id = commodity_id
     @batch_vol = batch_vol
     @upstream_batch = upstream_batch

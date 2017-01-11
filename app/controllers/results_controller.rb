@@ -45,8 +45,8 @@ class ResultsController < ApplicationController
     @results = Result.select {|r| r.step == 1}
   end
 
-  def schedule
-    @results = Result.select {|r| r.step == 1}
+  def station_schedule
+    @results = Result.select {|r| r.step == 1 and r.stat == params[:id]}
   end
   
   def batch_detail

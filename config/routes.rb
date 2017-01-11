@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       get 'step_flowrates'
       get 'batch_sequence'
       get 'schedule'
+      get 'station_schedule'
       get 'batch_detail'
       get 'power'
       get 'step_linefill'

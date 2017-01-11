@@ -1,0 +1,38 @@
+<%= render 'top' %>
+
+<% activities = @results[0].batch_sequence_data %>
+
+<% activities.sort! {|a, b| (a.start_time and b.start_time) ? a.start_time<=>b.start_time : (a.start_time ? -1 : 1) }%>
+
+<h2>Schedule for Station <%= params[:id] %></h2>
+<table>
+	
+  <thead>
+	   <tr>
+		  <th>Start Time</th>
+		  <th>End Time</th>
+	      <th>Batch ID</th>
+		  <th>Activity</th>
+		  <th>Volume</th>
+		  <th>Shipper</th>
+		  <th>Nomination</th>
+	    </tr>
+  </thead>
+  	
+  <tbody>
+	<% activities.each do |activity| %>
+	  <% if activity.start_time or activity.end_time then %>
+	      <tr>
+	        <td><%= activity.start_time.strftime("%Y-%m-%d %H:%M") if activity.start_time %></td>
+	        <td><%= activity.end_time.strftime("%Y-%m-%d %H:%M") if activity.end_time %></td>
+	        <td><%= link_to activity.batch_id, batch_detail_result_path(activity.batch_id) %></td>
+	        <td><%= activity.activity_type %></td>
+	        <td><%= '%.2f' % activity.volume if activity.volume %></td>
+	        <td><%= activity.shipper %></td>
+			<td><%= activity.nomination_name %></td>
+	      </tr>
+	  <% end %>
+	<% end %>
+  </tbody>
+
+</table>
