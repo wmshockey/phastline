@@ -93,6 +93,7 @@ class Pipeline < ActiveRecord::Base
     end
     if number_of_units == 0 then
       self.errors.add(:base, "Pipeline has no pumping units")
+      logger.error("Pipeline has no pumping units")
     end
     if self.errors.empty? then
       statar[0...-1].each do |i|

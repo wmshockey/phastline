@@ -53,69 +53,83 @@ class Simulation < ActiveRecord::Base
         @statar = @pipeline.get_all_stations(@volmar)
         @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
         data_integrity_checks(@pipeline)
-        if self.errors.empty? then          
-  #       Initialize the Batch Sequence with prior activities
-          @btsqar, $initial_timestamp = @schedule.initialize_batch_sequence(@prior_activities, @statar)
-          $timestamp = $initial_timestamp
-  #       Add the new batches from the nominations onto the front end of the existing batch sequence
-          @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @nomination.name, @shipments, @statar)
-  #       Set initial positioning of batches in the line (linefill)
-          initial_batch_positioning(@statar, @btsqar, @volmar)
-          $step = 1; stepdone = false
-          @stepar = Array.new
-  #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
-          while not stepdone
-            @lfill = linefill(@statar, @btsqar, @volmar)
-            @viscar = visc_profile(@lfill, @tempar)
-            @densar = dens_profile(@lfill, @tempar)
-            @slossar = static_loss(@densar, @elevar)
-            @minpressar = min_press(@lfill)
-            @suctar = suct_calc(@lfill)
-            @ratear = calc_rate_ratios(@statar, @btsqar)
-            iter = 1; iterdone = false; flow = max_flowrate; new_flow = max_flowrate
-            viol = -9.0e9
-  #         Iterate on flowrate to find the maximum flow (capacity rate)
-            while not iterdone
-              prev_flow = flow
-              prev_viol = viol
-              flow = new_flow
-              @flowar = calc_flowrates(flow, ratear)
-              @headar = head_calc(@statar, @statcv, @flowar, @densar)
-              @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
-              steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
-  #           Adjust the flowrate to converge on the capacity flow rate
-              new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
-              iterdone = true if flow == max_flowrate and viol <= 0
-              if flow <= 0.0 and viol > 0 then
-                self.errors.add(:base, "Flowrate iterations cannot converge in step #{$step}")
-                iterdone = true
-              end
-              iter = iter + 1 if not iterdone
-            end
-  #         Shift batches into position for the next step, then save the step results
-            stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
-  #         Update the step records with the step duration time (time_shift)
-            steprecs.each {|r| r.step_time = time_shift}
-  #         Save the linefill in the results
-            steprecs.first.linefill = @lfill
-            @stepar = @stepar + steprecs
-            $step = $step + 1
-            if $step > 1000 then
-              self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
-              stepdone = true
-            end
-          end
-          $maxsteps = $step - 1
-  #       Clean up batch sequence and remove batches that had non activity in the simulation (e.g. prior schedule batches that were not intially in the line)
-          @schedule.clean_batch_sequence(@btsqar)
-  #       Save step results in database table for user viewing
-          save_results
+        if self.errors.any? then
+          raise "Errors occurred during processing of input data"
         end
+#       Initialize the Batch Sequence with prior activities
+        @btsqar, $initial_timestamp = @schedule.initialize_batch_sequence(@prior_activities, @statar)
+        if @schedule.errors.any?
+          self.errors.add(:base, @schedule.errors.full_messages)
+          raise "Errors occured during initialization of the batch sequence"
+        end
+        $timestamp = $initial_timestamp
+#       Add the new batches from the nominations onto the front end of the existing batch sequence
+        @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @nomination.name, @shipments, @statar)
+#       Set initial positioning of batches in the line (linefill)
+        initial_batch_positioning(@statar, @btsqar, @volmar)
+        $step = 1; stepdone = false
+        @stepar = Array.new
+#       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
+        while not stepdone
+          @lfill = linefill(@statar, @btsqar, @volmar)
+          @viscar = visc_profile(@lfill, @tempar)
+          @densar = dens_profile(@lfill, @tempar)
+          @slossar = static_loss(@densar, @elevar)
+          @minpressar = min_press(@lfill)
+          @suctar = suct_calc(@lfill)
+          @ratear = calc_rate_ratios(@statar, @btsqar)
+          iter = 1; iterdone = false; flow = max_flowrate; new_flow = max_flowrate
+          viol = -9.0e9
+#         Iterate on flowrate to find the maximum flow (capacity rate)
+          while not iterdone
+            prev_flow = flow
+            prev_viol = viol
+            flow = new_flow
+            @flowar = calc_flowrates(flow, ratear)
+            @headar = head_calc(@statar, @statcv, @flowar, @densar)
+            @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
+            steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
+#           Adjust the flowrate to converge on the capacity flow rate
+            new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
+            iterdone = true if flow == max_flowrate and viol <= 0
+            if flow <= 0.0 and viol > 0 then
+              self.errors.add(:base, "Flowrate iterations cannot converge in step #{$step}")
+              logger.error("Flowrate iterations cannot converge in step #{$step}")
+              raise "Error occurred in flowrate iterations"
+            end
+            iter = iter + 1 if not iterdone
+          end
+#         Shift batches into position for the next step, then save the step results
+          stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
+#         Update the step records with the step duration time (time_shift)
+          steprecs.each {|r| r.step_time = time_shift}
+#         Save the linefill in the results
+          steprecs.first.linefill = @lfill
+          @stepar = @stepar + steprecs
+          $step = $step + 1
+          if $step > 1000 then
+            self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
+            logger.error("Number of steps exceeds 1000.  Simulation stopped at step 1000")
+            raise "Error occurred - too many steps"
+          end
+        end
+        if self.errors.any?
+          raise "Errors occurred during step processing"
+        end
+        $maxsteps = $step - 1
+#       Clean up batch sequence and remove batches that had non activity in the simulation (e.g. prior schedule batches that were not intially in the line)
+        @schedule.clean_batch_sequence(@btsqar)
+#       Save step results in database table for user viewing
+        save_results
         if self.errors.empty? then          
           return true
         else 
-          return false
+          raise "Errors occurred during final cleanup and saving of results"
+          logger.error("Errors occurred during final cleanup and saving of results")
         end
+    rescue Exception => e
+      self.errors.add(:base, e.message)
+      return false
     end
 
     def define_all_constants
@@ -180,6 +194,23 @@ class Simulation < ActiveRecord::Base
       end
       if pipeline.temperatures.last.kmp > pipeline.stations.last.kmp then
         pipeline.errors.add(:base, "Pipeline temperatures are specified beyond last station on the line")
+      end
+#     Check to make sure prior schedule has at least one valid activity with an end time so that a start time can be determined for the simulation.
+      prior_schedule_ok = false
+      prior_sched_volume = 0.0
+      prior_activities.each do |a|
+        if a.end_time then
+          prior_schedule_ok = true
+        end
+        if a.activity_type == "INJECTION" or a.activity_type == "RECEIPT" then
+          prior_sched_volume = prior_sched_volume + a.volume
+        end         
+      end
+      if not prior_schedule_ok then
+        pipeline.errors.add(:base, "Prior Schedule does not have any activities with end times.  An end-time is needed so the simulation can determine it's start time")
+      end
+      if prior_sched_volume < @volmar.last.y then
+        pipeline.errors.add(:base, "Prior Schedule does not contain enough previous activity to completely fill the pipeline for the initial linefill")
       end
       if @pipeline.errors.any? then
         self.errors.add(:base, @pipeline.errors.full_messages)
@@ -455,10 +486,12 @@ class Simulation < ActiveRecord::Base
       end
       if upstream_vol <= 0.0000001 then
         self.errors.add(:base, "Failure of get_batch_split: #{$step} #{stn_ix} #{upstream_batch} #{upstream_vol} #{downstream_batch} #{downstream_vol}")
-        printf("Failure of get_batch_split: %5d  %3d  %3d  %8.2f  %3d  %8.2f \n", $step, stn_ix, upstream_batch, upstream_vol, downstream_batch, downstream_vol)
-        exit
+        logger.error("Failure of get_batch_split: #{$step} #{stn_ix} #{upstream_batch} #{upstream_vol} #{downstream_batch} #{downstream_vol}")
+        raise "Error occurred in get_batch_split method"
       end
       return upstream_batch, upstream_vol, downstream_batch, downstream_vol
+    rescue Exception => e
+      self.errors.add(:base, e.message)           
     end
 
     def calc_rate_ratios(statar, btsqar)
@@ -577,12 +610,15 @@ class Simulation < ActiveRecord::Base
         end
         if iter > 20 then
           self.errors.add(:base, "flowrate iterations stopped at 20.  Cannot converge on a flowrate in step #{$step}")
-          iterdone = true
+          logger.error("flowrate iterations stopped at 20.  Cannot converge on a flowrate in step #{$step}")
+          raise "Error occured in adjust_flow method"
         else
           iterdone = false
         end
       end
       return new_flow, max_viol, iterdone
+    rescue Exception => e
+      self.errors.add(:base, e.message)
     end
 
       
@@ -813,6 +849,7 @@ class Simulation < ActiveRecord::Base
           upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
           if upstream_vol < 0.0000001 then
             self.errors.add(:base, "step_calc error: upstream volume < 0.0000001  step:#{$step}  stn:#{stn_ix}  upstream_vol:#{upstream_vol}")
+            raise "Error occured in step_calc method"
           end
           upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
           upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
@@ -880,6 +917,8 @@ class Simulation < ActiveRecord::Base
                               disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp, [])
     end
     return steprecs
+  rescue Exception => e
+    self.errors.add(:base, e.message)
   end
 
 

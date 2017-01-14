@@ -10,8 +10,16 @@ class Schedule < ActiveRecord::Base
 
 
     def initialize_batch_sequence(prior_activities, statar)
-#     Populate batch sequence array with the activities specified in the prior schedule
+#     Get list of batches listed in the prior period schedule
       batch_list = prior_activities.map {|p| p.batch_id}.uniq
+#     Find list of batches that have already been delivered out of the line
+      prior_deliveries = prior_activities.select {|p| (p.activity_type == "DELIVERY" or p.activity_type == "LANDING") and !p.end_time.nil? }
+      remove_list = prior_deliveries.map {|p| p.batch_id}.uniq
+      batch_list.reject! {|p| remove_list.include?(p) }
+      if batch_list.empty?
+        raise "The prior schedule shows all batches as being delivered"
+      end        
+#     Proceed to populate the batch sequence array
       max_batches = batch_list.count
       max_stations = statar.count
       bs = Array.new(statar.count){Array.new(max_batches)}
@@ -19,10 +27,25 @@ class Schedule < ActiveRecord::Base
         batch_id = b
         batch_ix = batch_list.index(b)
         batch_activities = prior_activities.select {|p| p.batch_id == b}
-        start_rec = batch_activities.find {|b| b.activity_type == "INJECTION"}
-        end_rec = batch_activities.find {|b| b.activity_type == "DELIVERY"}
-        start_ix = statar.index {|s| s.name == start_rec.station}
-        end_ix = statar.index {|s| s.name == end_rec.station}
+        start_rec = batch_activities.find {|b| (b.activity_type == "INJECTION" or b.activity_type =="RECEIPT") }
+        end_rec = batch_activities.find {|b| (b.activity_type == "DELIVERY" or b.activity_type == "LANDING") }
+        if start_rec.nil? then
+          start_rec = end_rec.dup
+          start_ix = 0
+          end_ix = statar.index {|s| s.name == end_rec.station}
+          start_rec.station = statar[0].name
+          start_rec.activity_type = "INJECTION"
+        elsif end_rec.nil?
+          end_rec = start_rec.dup
+          start_ix = statar.index {|s| s.name == start_rec.station}
+          end_ix = max_stations-1
+          end_rec.station = statar[max_stations-1].name
+          end_rec.activity_type = "DELIVERY"
+          end_rec.volume = 0.0
+        else 
+          start_ix = statar.index {|s| s.name == start_rec.station}
+          end_ix = statar.index {|s| s.name == end_rec.station}
+        end
         batch_temp = batch_id.partition("-")
         commodity_id = batch_temp[0]
         batch_number = batch_temp[2].partition(" ")[0]
@@ -58,15 +81,17 @@ class Schedule < ActiveRecord::Base
 #     Find the initial starting time for the simulation.  This is taken to be the latest end time of the prior month's scheduled injections out of the first station.
       event_end_times = bs[0].map {|b| b.end_time}
       event_end_times.select! { |x| !x.nil? }
-      initial_start_time = event_end_times.max
-#     Null out the start and end times for all prior schedule activities since they will be re-simulated anyway if they are still in the line.
-      statar.each_with_index do |s, stn_ix|
-        bs[stn_ix].each do |b|
-          b.start_time = nil
-          b.end_time = nil
-        end
+      if event_end_times.nil?
+        self.errors.add(:base, "There are no activity end times in the prior schedule on which to base the simulation start time.  Will use default value of 2001-Jan-01 00:00")
+        logger.error("There are no activity end times in the prior schedule on which to base the simulation start time.  Will use default value of 2001-Jan-01 00:00")
+        initial_start_time = Datetime.new(2000,1,1)
+      else
+        initial_start_time = event_end_times.max
       end
-      return bs, initial_start_time
+      return bs, initial_start_time      
+    rescue Exception => e
+      logger.error(e.message)
+      self.errors.add(:base, e.message)
     end
 
 
