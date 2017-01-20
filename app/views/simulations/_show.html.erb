@@ -11,14 +11,17 @@
 		  <th>Max Batchsize</th>
 	 </tr>
   </thead>
+	<% pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
+	<% nomination = Nomination.find {|n| n.id == @simulation.nomination_id} %>
+	<% schedule = Schedule.find {|s| s.id == @simulation.schedule_id} %>
 
   <tbody>
       <tr>
         <td><%= @simulation.name %></td>
         <td><%= @simulation.description %></td>
-        <td><%= link_to @simulation.pipeline_name, Pipeline.find {|p| p.name == @simulation.pipeline_name} %></td>
-        <td><%= link_to @simulation.nomination_name, Nomination.find {|n| n.name == @simulation.nomination_name} %></td>
-        <td><%= link_to @simulation.schedule_name, Schedule.find {|s| s.name == @simulation.schedule_name} %></td>
+        <td><%= link_to pipeline.name, pipeline %></td>
+        <td><%= link_to nomination.name, nomination %></td>
+        <td><%= link_to schedule.name, schedule %></td>
         <td><%= @simulation.max_flowrate %></td>
         <td><%= @simulation.max_batchsize %></td>
       </tr>

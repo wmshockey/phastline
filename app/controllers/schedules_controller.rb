@@ -5,6 +5,7 @@ class SchedulesController < ApplicationController
   # GET /schedules.json
   def index
     @schedules = Schedule.all
+    @pipelines = Pipeline.all
   end
 
   # GET /schedules/1
@@ -68,10 +69,11 @@ class SchedulesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_schedule
       @schedule = Schedule.find(params[:id])
+      @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id }
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def schedule_params
-      params.require(:schedule).permit(:name, :description, :start_date, :period, :pipeline_name, :sched_type)
+      params.require(:schedule).permit(:name, :description, :start_date, :period, :pipeline_id, :sched_type)
     end
 end

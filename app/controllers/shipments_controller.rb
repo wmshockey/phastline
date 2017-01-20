@@ -16,7 +16,7 @@ class ShipmentsController < ApplicationController
   # GET /shipments/new
   def new
     @nomination = Nomination.find(params[:nomination_id])
-    @pipeline = Pipeline.find {|p| p.name == @nomination.pipeline_name}
+    @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id}
     @stations = @pipeline.stations
     @shipment = @nomination.shipments.build
   end
@@ -24,7 +24,7 @@ class ShipmentsController < ApplicationController
   # GET /shipments/1/edit
   def edit
     @nomination = Nomination.find(params[:nomination_id])
-    @pipeline = Pipeline.find {|p| p.name == @nomination.pipeline_name}
+    @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id}
     @stations = @pipeline.stations
   end
 
@@ -73,6 +73,7 @@ class ShipmentsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_shipment
       @nomination = Nomination.find(params[:nomination_id])
+      @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id}
       @shipment = @nomination.shipments.find(params[:id])
     end
 

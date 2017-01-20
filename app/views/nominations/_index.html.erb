@@ -15,7 +15,7 @@
       <tr>
         <td><%= link_to nomination.name, nomination_path(nomination) %></td>
         <td><%= nomination.description %></td>
-		<td><%= nomination.pipeline_name %></td>
+		<td><%= @pipelines.find {|p| p.id == nomination.pipeline_id}.name %></td>
 		<td><%= nomination.nom_date %></td>
 		<td><%= nomination.period %></td>
       </tr>

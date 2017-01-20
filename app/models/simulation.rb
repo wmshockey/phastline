@@ -23,8 +23,8 @@ class Simulation < ActiveRecord::Base
     attr_accessor :prior_activities
     has_many :results, dependent: :destroy
     validates :name, :presence => true
-    validates :pipeline_name, :presence => true
-    validates :nomination_name, :presence => true
+    validates :pipeline_id, :presence => true
+    validates :nomination_id, :presence => true
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
 
@@ -39,9 +39,9 @@ class Simulation < ActiveRecord::Base
         @pumpar = Pump.all
         @units = Unit.all
         Result.delete_all
-        @pipeline = @pipelines.detect{ |p| p.name == pipeline_name }
-        @schedule = @schedules.detect{|s| s.name == schedule_name}
-        @nomination = @nominations.detect{ |n| n.name == nomination_name }
+        @pipeline = @pipelines.detect{ |p| p.id == pipeline_id }
+        @schedule = @schedules.detect{|s| s.id == schedule_id}
+        @nomination = @nominations.detect{ |n| n.id == nomination_id }
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
         @prior_activities = @schedule.activities 

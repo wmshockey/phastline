@@ -36,13 +36,10 @@ Rails.application.routes.draw do
     resources :segments
     resources :stations do
       resources :units
+      resources :results
     end
     resources :elevations
     resources :temperatures
-  end
-  resources :stations do
-    resources :units
-    resources :results
   end
   
   # The priority is based upon order of creation: first created -> highest priority.

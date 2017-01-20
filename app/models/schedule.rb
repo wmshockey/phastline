@@ -5,7 +5,7 @@ class Schedule < ActiveRecord::Base
     validates :description, allow_blank: true, length: { maximum: 512 }
     validates :start_date, :presence => true
     validates :period, :presence => true, numericality: {:greather_than_or_equal_to => 0, :less_than => 366}
-    validates :pipeline_name, allow_blank: true, length: { maximum: 512 }
+    validates :pipeline_id, :presence => true
     validates :sched_type, :presence => true, inclusion: { in: %w(PRIOR PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
 
 

@@ -29,7 +29,7 @@
 	      <tr>
 	        <td><%= f.text_field :name %></td>
 	        <td><%= f.text_field :description %></td>
-			<td><%= f.select :pipeline_name, Pipeline.all.collect {|p| [p.name]} %>
+			<td><%= f.select :pipeline_id, Pipeline.all.collect {|p| [p.name, p.id]} %></td>
 			<td><%= f.date_select :nom_date %>
 			<td><%= f.text_field :period %>
 	      </tr>

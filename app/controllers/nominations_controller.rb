@@ -5,6 +5,7 @@ class NominationsController < ApplicationController
   # GET /nominations.json
   def index
     @nominations = Nomination.all
+    @pipelines = Pipeline.all
   end
 
   # GET /nominations/1
@@ -66,10 +67,11 @@ class NominationsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_nomination
       @nomination = Nomination.find(params[:id])
+      @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id }
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def nomination_params
-      params.require(:nomination).permit(:name, :description, :nom_date, :period, :pipeline_name)
+      params.require(:nomination).permit(:name, :description, :nom_date, :period, :pipeline_id)
     end
 end

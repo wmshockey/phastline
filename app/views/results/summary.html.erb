@@ -1,7 +1,7 @@
 <%= render 'top' %>
 
-<% @pipeline = Pipeline.find {|s| s.name == @simulation.pipeline_name} %>
-<% @nomination = Nomination.find {|s| s.name == @simulation.nomination_name} %>
+<% @pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
+<% @nomination = Nomination.find {|n| n.name == @simulation.nomination_id} %>
 
 <h2>Simulation Average Summary Results - total simulation time: <%= (($timestamp - $initial_timestamp)/3600.0).round(2).to_s %> hours</h2>
 <table style="width:1200px" %>

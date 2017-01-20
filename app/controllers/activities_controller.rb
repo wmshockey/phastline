@@ -16,7 +16,7 @@ class ActivitiesController < ApplicationController
   # GET /activities/new
   def new
     @schedule = Schedule.find(params[:schedule_id])
-    @pipeline = Pipeline.find {|p| p.name == @schedule.pipeline_name}
+    @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id}
     @stations = @pipeline.stations
     @activity = @schedule.activities.build
   end
@@ -25,7 +25,7 @@ class ActivitiesController < ApplicationController
   # GET /activities/1/edit
   def edit
     @schedule = Schedule.find(params[:schedule_id])
-    @pipeline = Pipeline.find {|p| p.name == @schedule.pipeline_name}
+    @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id}
     @stations = @pipeline.stations
   end
 
@@ -76,6 +76,7 @@ class ActivitiesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_activity
       @schedule = Schedule.find(params[:schedule_id])
+      @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id}
       @activity = Activity.find(params[:id])
     end
 

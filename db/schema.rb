@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170110145402) do
+ActiveRecord::Schema.define(version: 20170118210401) do
 
   create_table "activities", force: :cascade do |t|
     t.string   "batch_id",        limit: 255
@@ -26,6 +26,8 @@ ActiveRecord::Schema.define(version: 20170110145402) do
     t.integer  "schedule_id",     limit: 4
     t.string   "station",         limit: 255
   end
+
+  add_index "activities", ["schedule_id"], name: "index_activities_on_schedule_id", using: :btree
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -64,13 +66,13 @@ ActiveRecord::Schema.define(version: 20170110145402) do
   add_index "headpoints", ["pump_id"], name: "index_headpoints_on_pump_id", using: :btree
 
   create_table "nominations", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.string   "description",   limit: 255
+    t.string   "name",        limit: 255
+    t.string   "description", limit: 255
     t.date     "nom_date"
-    t.float    "period",        limit: 24
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.string   "pipeline_name", limit: 255
+    t.float    "period",      limit: 24
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "pipeline_id", limit: 4
   end
 
   create_table "pipelines", force: :cascade do |t|
@@ -129,15 +131,17 @@ ActiveRecord::Schema.define(version: 20170110145402) do
     t.text     "linefill",               limit: 65535
   end
 
+  add_index "results", ["simulation_id"], name: "index_results_on_simulation_id", using: :btree
+
   create_table "schedules", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.text     "description",   limit: 65535
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
     t.date     "start_date"
-    t.integer  "period",        limit: 4
-    t.string   "pipeline_name", limit: 255
-    t.string   "sched_type",    limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.integer  "period",      limit: 4
+    t.string   "sched_type",  limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "pipeline_id", limit: 4
   end
 
   create_table "segments", force: :cascade do |t|
@@ -167,15 +171,15 @@ ActiveRecord::Schema.define(version: 20170110145402) do
   add_index "shipments", ["nomination_id"], name: "index_shipments_on_nomination_id", using: :btree
 
   create_table "simulations", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.string   "description",     limit: 255
-    t.string   "pipeline_name",   limit: 255
-    t.float    "max_flowrate",    limit: 24
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.string   "nomination_name", limit: 255
-    t.float    "max_batchsize",   limit: 24
-    t.string   "schedule_name",   limit: 255
+    t.string   "name",          limit: 255
+    t.string   "description",   limit: 255
+    t.float    "max_flowrate",  limit: 24
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.float    "max_batchsize", limit: 24
+    t.integer  "pipeline_id",   limit: 4
+    t.integer  "schedule_id",   limit: 4
+    t.integer  "nomination_id", limit: 4
   end
 
   create_table "stations", force: :cascade do |t|
