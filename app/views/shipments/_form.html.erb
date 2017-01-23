@@ -15,7 +15,7 @@
 	<% end %>
 	</p>
 
-	<table class="fixed", style="width: 1200px;">
+	<table>
 	  <thead>
 	    <tr>
 		  <th>Start Location</th>
@@ -31,7 +31,7 @@
 			<td><%= f.select :start_location, @stations.all.collect {|s| [s.name]} %></td>
 			<td><%= f.select :end_location, @stations.all.collect {|s| [s.name]} %></td>
 			<td><%= f.text_field :shipper %></td>
-			<td><%= f.select :commodity_id, Commodity.all.collect {|c| [c.commodity_id]} %></td>
+			<td><%= f.select :commodity_id, current_user.commodities.all.collect {|c| [c.commodity_id]} %></td>
 			<td><%= f.number_field :volume,  :step => "any"  %></td>
 	      </tr>
 	  </tbody>

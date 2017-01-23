@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
 <% simulation_id = @results.first.simulation_id %>
 <% @simulation = Simulation.find {|s| s.id == simulation_id} %>
 <%= render 'simulations/show' %>

@@ -1,5 +1,4 @@
 <% if object.errors.any? %>
-  <p class="alert alert-error">Simulation Failed!</p>
   <ul>
     <% object.errors.each do |n, msg| %>
       <li class="error"><%= msg %></li>

@@ -4,7 +4,7 @@
 <% @nomination = Nomination.find {|n| n.name == @simulation.nomination_id} %>
 
 <h2>Simulation Average Summary Results - total simulation time: <%= (($timestamp - $initial_timestamp)/3600.0).round(2).to_s %> hours</h2>
-<table style="width:1200px" %>
+<table>
 	<thead>
 		<tr>
 			<th>Station</th>
@@ -26,7 +26,7 @@
 		    <% station_id = s.station_id %>
 		    <% station = Station.find {|i| i.id == station_id} %>
 			<tr>
-				<td><%= link_to s.stat, station_detail_result_path(s.station_id) %></td>
+				<td><%= link_to s.stat, station_detail_result_path(:id => @sim_id, :station_id => s.station_id) %></td>
 				<td><%= '%8.2f'% station.kmp %></td>
 				<td><%= '%8.1f'% s.flow %></td>
 				<td><%= '%10.0f'% s.pumped_volume %></td>

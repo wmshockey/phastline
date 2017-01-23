@@ -1,5 +1,6 @@
 class Schedule < ActiveRecord::Base
     belongs_to :simulation
+    belongs_to :pipeline
     has_many :activities, dependent: :destroy
     validates :name, :presence => true
     validates :description, allow_blank: true, length: { maximum: 512 }

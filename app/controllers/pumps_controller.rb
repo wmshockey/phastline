@@ -1,10 +1,11 @@
 class PumpsController < ApplicationController
   before_action :set_pump, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!
 
   # GET /pumps
   # GET /pumps.json
   def index
-    @pumps = Pump.all
+    @pumps = current_user.pumps.all
   end
 
   # GET /pumps/1
@@ -14,8 +15,8 @@ class PumpsController < ApplicationController
 
   # GET /pumps/new
   def new
-    @pumps = Pump.all
-    @pump = Pump.new
+    @pumps = current_user.pumps.all
+    @pump = current_user.pumps.build
   end
 
   # GET /pumps/1/edit
@@ -25,7 +26,7 @@ class PumpsController < ApplicationController
   # POST /pumps
   # POST /pumps.json
   def create
-    @pump = Pump.new(pump_params)
+    @pump = current_user.pumps.build(pump_params)
 
     respond_to do |format|
       if @pump.save
@@ -65,7 +66,7 @@ class PumpsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_pump
-      @pumps = Pump.all     
+      @pumps = current_user.pumps.all     
       @pump = Pump.find(params[:id])
     end
 

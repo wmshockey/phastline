@@ -13,7 +13,7 @@
     </tr>
   </thead>
 
-  <% @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id} %>
+  <% @pipeline = current_user.pipelines.find {|p| p.id == @schedule.pipeline_id} %>
   <% if @pipeline.nil? then %>
 	<strong><%= "Warning: cannot find pipeline with id: #{@schedule.pipeline_id.to_s}" %></strong>
   <% else %>
@@ -37,7 +37,7 @@
 		        <td><%= activity.station %></td>
 		        <td><%= activity.volume %></td>
 		        <td><%= activity.shipper %></td>
-		        <td><%= link_to activity.nomination_name, Nomination.find {|n| n.name == activity.nomination_name} %></td>
+		        <td><%= link_to activity.nomination_name, current_user.nominations.find {|n| n.name == activity.nomination_name} %></td>
 		      </tr>
 			<% end %>
 		<% end %>

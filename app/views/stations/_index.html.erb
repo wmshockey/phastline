@@ -1,19 +1,22 @@
 <h2>Stations</h2>Select a station to view its pump units
-<table  class="fixed", style="width: 500px;">
+<table>
   <thead>
    <tr>
 	  <th>Distance (kmp)</th>
       <th>Name</th>
+	  <th>Number of Pumping Units</th>
     </tr>
   </thead>
 
   <tbody>
 	<% @pipeline.stations.order(kmp: :asc).each do |station| %>
       <tr>
+		<% number_of_units = station.units.count %>
 		<td><%= link_to station.kmp, pipeline_station_path(station.pipeline_id, station.id) %></td>
         <td><%= link_to station.name, pipeline_station_path(station.pipeline_id, station.id) %></td>
+		<td><%= link_to number_of_units, pipeline_station_path(station.pipeline_id, station.id) %>
       </tr>
 	<% end %>
-	<tr><td colspan="2"><%= link_to 'Add Station', new_pipeline_station_path(@pipeline) %></td></tr>
+	<tr><td colspan="3"><%= link_to 'Add Station', new_pipeline_station_path(@pipeline) %></td></tr>
   </tbody>
 </table>

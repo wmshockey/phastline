@@ -20,7 +20,7 @@
 	    <% stn_ix = 0 %>
 		<tr>
 		  <% step = @results[steprec].step %>
-		  <td><%= link_to step.to_s, station_step_detail_result_path(step) %></td>
+		  <td><%= link_to step.to_s, station_step_detail_result_path(:id => @sim_id, :step => step) %></td>
 		  <td><%= @results[steprec].timestamp.strftime("%d-%m-%Y %H:%M") %></td>
 		  <td><%= @results[steprec].step_time.round(2) %> hrs</td>
 	      <% while stn_ix < num_stations %>

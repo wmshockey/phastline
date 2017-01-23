@@ -1,3 +1,4 @@
+<h2>Headpoint</h2>
 <%= form_for([@pump, @headpoint]) do |f| %>
   <% head_units = @pump.head_units %>
   <% flow_units = @pump.flow_units %>
@@ -15,7 +16,7 @@
   <% end %>
   </p>
 
-<table class="fixed", style="width: 500px;">
+<table>
   <thead>
     <tr>
 	  <th>Flowrate (<%= flow_units %>)</th>

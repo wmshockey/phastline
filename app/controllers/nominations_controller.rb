@@ -4,8 +4,8 @@ class NominationsController < ApplicationController
   # GET /nominations
   # GET /nominations.json
   def index
-    @nominations = Nomination.all
-    @pipelines = Pipeline.all
+    @pipelines = current_user.pipelines.all
+    @nominations = current_user.nominations.all
   end
 
   # GET /nominations/1
@@ -15,7 +15,8 @@ class NominationsController < ApplicationController
 
   # GET /nominations/new
   def new
-    @nominations = Nomination.all
+    @pipelines = current_user.pipelines.all
+    @nominations = current_user.nominations.all
     @nomination = Nomination.new
   end
 

@@ -14,7 +14,7 @@
 	<% end %>
 	</p>
 
-	<table class="fixed", style="width: 860px;">
+	<table>
 	  <thead>
 	    <tr>
 		  <th>Row</th>
@@ -27,7 +27,7 @@
 	      <tr>
 			<td><%= f.number_field :unit_row,  :step => 1 %></td>
 	        <td><%= f.number_field :unit_column, :step => 1 %></td>
-			<td><%= f.select :pump_id, Pump.all.collect {|p| [p.pump_id]} %></td>
+			<td><%= f.select :pump_id, current_user.pumps.all.collect {|p| [p.pump_id]} %></td>
 	      </tr>
 	  </tbody>
 	</table>

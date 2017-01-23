@@ -19,7 +19,7 @@
   <tbody>
     <% @pumps.each do |pump| %>
       <tr>
-        <td><%= link_to pump.pump_id, Pump.find {|p| p.pump_id == pump.pump_id} %></td>
+        <td><%= link_to pump.pump_id, current_user.pumps.find {|p| p.pump_id == pump.pump_id} %></td>
         <td><%= pump.description %></td>
 		<td><%= pump.flow_units %></td>
         <td><%= pump.head_units %></td>

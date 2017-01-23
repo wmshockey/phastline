@@ -1,4 +1,5 @@
 class Commodity < ActiveRecord::Base
+    belongs_to :user
     before_save :coefficient_calc
     validates :commodity_id, :presence => true
     validates :temp1, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 60}

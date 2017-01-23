@@ -1,10 +1,11 @@
 class SimulationsController < ApplicationController
   before_action :set_simulation, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!
 
   # GET /simulations
   # GET /simulations.json
   def index
-    @simulations = Simulation.all
+    @simulations = current_user.simulations.all
   end
 
   # GET /simulations/1
@@ -14,8 +15,8 @@ class SimulationsController < ApplicationController
 
   # GET /simulations/new
   def new
-    @simulations = Simulation.all
-    @simulation = Simulation.new
+    @simulations = current_user.simulations.all
+    @simulation = current_user.simulations.build
   end
 
   # GET /simulations/1/edit
@@ -25,13 +26,19 @@ class SimulationsController < ApplicationController
   # GET /simulations/1/run
   def run
     @simulation = Simulation.find(params[:id])
+    pipeline = current_user.pipelines.find{|p| p.id == @simulation.pipeline_id}
+    schedule = current_user.schedules.find{|s| s.id == @simulation.schedule_id}
+    nomination = current_user.nominations.find{|n| n.id == @simulation.nomination_id}
+    commodities = current_user.commodities
+    units = pipeline.units
+    pumpar = current_user.pumps
     respond_to do |format|
-      if @simulation.run
-        flash.notice = "Simulation ran successfully."
+      if @simulation.run(pipeline, schedule, nomination, commodities, units, pumpar)
+        flash[:success] = "Simulation ran successfully."
         format.html { render :run, status: :ok, location: @simulation }
         format.json { render :run, status: :ok, location: @simulation }
       else
-        flash.notice = "Simulation run failed!"
+        flash[:error] = "Simulation run failed."
         format.html { render :run, notice: 'Simulation run failed.' }
         format.json { render json: @simulation.errors, status: :unprocessable_entity }
       end
@@ -41,8 +48,8 @@ class SimulationsController < ApplicationController
   # POST /simulations
   # POST /simulations.json
   def create
-    @simulations = Simulation.all
-    @simulation = Simulation.new(simulation_params)
+    @simulations = current_user.simulations.all
+    @simulation = current_user.simulations.build(simulation_params)
     respond_to do |format|
       if @simulation.save
         format.html { redirect_to simulations_path, notice: 'Simulation was successfully created.' }
@@ -81,7 +88,7 @@ class SimulationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_simulation
-      @simulations = Simulation.all
+      @simulations = current_user.simulations.all
       @simulation = Simulation.find(params[:id])
     end
 

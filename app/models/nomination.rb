@@ -1,4 +1,5 @@
 class Nomination < ActiveRecord::Base
+    belongs_to :pipeline
     has_many :shipments, dependent: :destroy
     validates :name, :presence => true
     validates :nom_date, :presence => true

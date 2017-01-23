@@ -38,7 +38,7 @@
 			<td><%= f.select :station, @stations.all.collect {|s| [s.name]} %></td>
 			<td><%= f.number_field :volume, :step => "any" %></td>
 			<td><%= f.text_field :shipper %></td>
-			<td><%= f.select :nomination_name, Nomination.all.collect {|n| [n.name]} %></td>
+			<td><%= f.select :nomination_name, current_user.nominations.all.collect {|n| [n.name]} %></td>
 	      </tr>
 	  </tbody>
 	</table>

@@ -1,5 +1,5 @@
 <h2>Pump Units</h2>
-<table class="fixed", style="width: 860px;">
+<table>
   <thead>
     <tr>
       <th>ROW</th>
@@ -15,7 +15,13 @@
 		<% unit_col_string = unit.unit_column.to_s.rjust(2, "0") %>
         <td><%= link_to unit_row_string, pipeline_station_unit_path(@pipeline, @station, unit) %></td>
         <td><%= unit_col_string %></td>
-		<td><%= link_to unit.pump_id, Pump.find {|p| p.pump_id == unit.pump_id} %>
+		<% pump = current_user.pumps.find {|p| p.pump_id == unit.pump_id} %>
+		<% if !pump.nil? then %>
+		    <td><%= link_to unit.pump_id,  pump %>
+		<% else %>
+			<td><%= "No data for pump #{unit.pump_id}" %></td>
+		    <% flash[:error] = "Pump #{unit.pump_id} is missing data" %>
+		<% end %>
       </tr>
     <% end %>
 	<td colspan="3"><%= link_to 'Add Pump Unit', new_pipeline_station_unit_path(@pipeline, @station) %></td>

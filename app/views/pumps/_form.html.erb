@@ -13,40 +13,19 @@
     </div>
   <% end %>
   </p>
-
 	<table>
-		<thead>
-	    <tr>
-	      <th>Pump</th>
-	      <th>Description</th>
-	      <th>Flow<br>units</th>
-	      <th>Head<br>units</th>
-	      <th>Pressure<br>units</th>
-	      <th>Minimum<br>suction</th>
-	      <th>Stages</th>
-	      <th>Impeller<br>diameter</th>
-		  <th>Efficiency<br>Correction<br>Factor</th>
-		  <th>Capacity<br>Correction<br>Factor</th>
-		  <th>Head<br>Correction<br>Factor</th>
-	    </tr>
-	  </thead>
-		
-		
-		
 	  <tbody>
-		<tr>
-			<td><%= f.text_field :pump_id, :autofocus => true %></td>
-	        <td><%= f.text_field :description %>
-		    <td><%= f.select :flow_units, ["gallons/min", "m3/hr", "m3/day", "barrels/hr", "barrels/day"] %></td>
-			<td><%= f.select :head_units, ["meters", "feet"] %></td>
-			<td><%= f.select :pressure_units, ["kpa", "psi"] %></td>
-			<td><%= f.text_field :minimum_suction %></td>
-			<td><%= f.number_field :stages %></td>
-			<td><%= f.number_field :impeller_diameter,  :step => "any"  %></td>
-			<td><%= f.number_field :efficiency_correction_factor ,  :step => "any" %></td>
-			<td> <%= f.number_field :capacity_correction_factor,  :step => "any"  %></td>
-			<td><%= f.number_field :head_correction_factor,  :step => "any"  %></td>
-		</tr>
+			<tr><td><%= f.label "Pump ID" %></td><td><%= f.text_field :pump_id, :autofocus => true %></td></tr>
+	        <tr><td><%= f.label "Description" %></td><td><%= f.text_field :description %></tr>
+		    <tr><td><%= f.label "Flow units" %></td><td><%= f.select :flow_units, ["gallons/min", "m3/hr", "m3/day", "barrels/hr", "barrels/day"] %></td></tr>
+			<tr><td><%= f.label "Head units" %></td><td><%= f.select :head_units, ["meters", "feet"] %></td></tr>
+			<tr><td><%= f.label "Pressure units" %></td><td><%= f.select :pressure_units, ["kpa", "psi"] %></td></tr>
+			<tr><td><%= f.label "Minimum suction" %></td><td><%= f.text_field :minimum_suction %></td></tr>
+			<tr><td><%= f.label "Stages" %></td><td><%= f.number_field :stages %></td></tr>
+			<tr><td><%= f.label "Impeller diameter" %></td><td><%= f.number_field :impeller_diameter,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Efficiency Correction Factor" %></td><td><%= f.number_field :efficiency_correction_factor ,  :step => "any" %></td></tr>
+			<tr><td><%= f.label "Capacity Correction Factor" %></td><td> <%= f.number_field :capacity_correction_factor,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Head Correction Factor" %></td><td><%= f.number_field :head_correction_factor,  :step => "any"  %></td></tr>
 	  </tbody>
 	</table>
   <div class="actions">

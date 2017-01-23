@@ -10,4 +10,3 @@ class Activity < ActiveRecord::Base
   validates :nomination_name, length: { maximum: 15 }, allow_blank: true
   default_scope { order('start_time ASC') }
 end
-

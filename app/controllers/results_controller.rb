@@ -10,58 +10,66 @@ class ResultsController < ApplicationController
   # GET /results
   # GET /results.json
   def summary
-    @results = Result.all
     @simulation = Simulation.find(params[:id])
+    @sim_id = params[:id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id}
     @summary_results = @simulation.summary_results_calc(@results)
   end
   
   def step_detail
-    step = params[:id]
-    @step = step.to_i
-    @results = Result.all
+    @sim_id = params[:id].to_i
+    @step = params[:step].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id}
   end
   
   def station_detail
-    @station = Station.find(params[:id])
-    @results = Result.select {|r| r.station_id == @station.id}
+    @sim_id = params[:id].to_i
+    @station_id = params[:station_id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.station_id == @station_id}
   end
 
   def station_step_detail
-    step = params[:id]
-    @step = step.to_i
-    @results = Result.select {|r| r.step == @step}
+    @sim_id = params[:id].to_i
+    @step = params[:step].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == @step}
   end
 
   def station_curves
-    @results = Result.select {|r| r.step == 1}
+    @sim_id = params[:id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
 
   def step_flowrates
-    @results = Result.all
+    @sim_id = params[:id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id}
     @stations = @results.map {|s| s.stat}.uniq
   end
 
   def batch_sequence
-    @results = Result.select {|r| r.step == 1}
+    @sim_id = params[:id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
 
   def station_schedule
-    @results = Result.select {|r| r.step == 1 and r.stat == params[:id]}
+    @sim_id = params[:id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1 and r.stat == params[:stat]}
   end
   
   def batch_detail
-    @batch = params[:id]
-    @results = Result.select {|r| r.step == 1}
+    @sim_id = params[:id].to_i
+    @batch = params[:batch]
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
   
   def power
-    @results = Result.all
+    @sim_id = params[:id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id}
   end
   
   def step_linefill
-    step = params[:id]
-    @step = step.to_i
-    @results = Result.all
+    @sim_id = params[:id].to_i
+    @step = params[:step].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id}
   end
 
   # GET /results/1

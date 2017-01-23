@@ -1,7 +1,7 @@
 <%= render 'top' %>
 
 <h2>Station Curves</h2>
-<table style="width:800px">
+<table>
 	<tbody>
 		<% @results.each do |r| %>
 			<% station_name = r.stat %>
@@ -12,7 +12,7 @@
 					<% if row_units.size > 0 then %>
 						<br><%= "row #{row}: " %>
 						<% row_units.each do |ru| %>
-							<%= " -> " %><%= link_to ru.pump_id, Pump.find {|p| p.pump_id == ru.pump_id} %>
+							<%= " -> " %><%= link_to ru.pump_id, current_user.pumps.find {|p| p.pump_id == ru.pump_id} %>
 						<% end %>
 					<% end %>
 				<% end %>

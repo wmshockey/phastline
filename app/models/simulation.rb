@@ -21,27 +21,25 @@ class Simulation < ActiveRecord::Base
     attr_accessor :statcv
     attr_accessor :summary_results
     attr_accessor :prior_activities
+    belongs_to :user
     has_many :results, dependent: :destroy
     validates :name, :presence => true
     validates :pipeline_id, :presence => true
     validates :nomination_id, :presence => true
+    validates :schedule_id, :presence => true
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
 
-
 # Mainline driver code
-    def run
+    def run(pipeline, schedule, nomination, commodities, units, pumpar)
         define_all_constants
-        @pipelines = Pipeline.all
-        @nominations = Nomination.all
-        @schedules = Schedule.all
-        @commodities = Commodity.all
-        @pumpar = Pump.all
-        @units = Unit.all
-        Result.delete_all
-        @pipeline = @pipelines.detect{ |p| p.id == pipeline_id }
-        @schedule = @schedules.detect{|s| s.id == schedule_id}
-        @nomination = @nominations.detect{ |n| n.id == nomination_id }
+        @pipeline = pipeline
+        @schedule = schedule
+        @nomination = nomination
+        @commodities = commodities
+        @pumpar = pumpar
+        @units = units
+        Result.destroy_all(simulation_id: id)
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
         @prior_activities = @schedule.activities 
@@ -51,7 +49,8 @@ class Simulation < ActiveRecord::Base
         @maxpressar = @pipeline.get_all_maxpress
         @elevar = @pipeline.get_all_elevations
         @statar = @pipeline.get_all_stations(@volmar)
-        @statcv = @pipeline.get_station_curves(@statar, @pumpar)     #Get the combined station curves
+#       Get the combined station curves
+        @statcv = @pipeline.get_station_curves(@statar, @units, @pumpar)
         data_integrity_checks(@pipeline)
         if self.errors.any? then
           raise "Errors occurred during processing of input data"
@@ -129,6 +128,7 @@ class Simulation < ActiveRecord::Base
         end
     rescue Exception => e
       self.errors.add(:base, e.message)
+      self.errors.add(:base, e.backtrace)
       return false
     end
 
@@ -212,23 +212,64 @@ class Simulation < ActiveRecord::Base
       if prior_sched_volume < @volmar.last.y then
         pipeline.errors.add(:base, "Prior Schedule does not contain enough previous activity to completely fill the pipeline for the initial linefill")
       end
-      if @pipeline.errors.any? then
-        self.errors.add(:base, @pipeline.errors.full_messages)
-      end
 #     Check to ensure the stations listed for the pipeline, nomination and prior schedule all match
       pipeline_stations = @statar.map {|s| s.name}
       schedule_stations = (@prior_activities.map {|s| s.station}).uniq
       nomination_stations = (@shipments.map {|s| s.start_location} + @shipments.map {|t| t.end_location}).uniq
       schedule_stations.each do |stn|
         if not pipeline_stations.include? stn then
-          self.errors.add(:base, "Station #{stn} listed in the prior schedule #{@schedule.name} is not a station listed for pipeline #{@pipeline.name}")
+          pipeline.errors.add(:base, "Station #{stn} listed in the prior schedule #{@schedule.name} is not a station listed for pipeline #{@pipeline.name}")
         end
       end
       nomination_stations.each do |stn|
         if not pipeline_stations.include? stn then
-          self.errors.add(:base, "Station #{stn} listed in the nomination #{@nomination.name} is not a station listed for pipeline #{@pipeline.name}")
+          pipeline.errors.add(:base, "Station #{stn} listed in the nomination #{@nomination.name} is not a station listed for pipeline #{@pipeline.name}")
         end
       end
+#     Check to ensure that the batch-id's in the prior schedule all reference commodity id's that exist in the commodities table
+      prior_activities.each do |a|
+        batch_temp = a.batch_id.partition("-")
+        commodity_id = batch_temp[0]
+        batch_id_ok = false
+        if @commodities.any? {|c| c.commodity_id == commodity_id} then
+          batch_id_ok = true
+        else
+          pipeline.errors.add(:base, "#{a.activity_type} activity for batch #{a.batch_id} in the prior schedule refers to a commodity that is not in the commodities database")
+        end
+      end
+#     Check if there are any pumps on the whole line
+      number_of_units = 0
+      station_pumps = Array.new
+      statar[0...-1].each do |i|
+        station_units = Unit.select {|u| u.station_id == i.station_id}
+        station_pumps = station_pumps + station_units.map {|u| u.pump_id}
+        number_of_units = number_of_units + station_units.size
+      end
+      if number_of_units == 0 then
+        pipeline.errors.add(:base, "Pipeline has no pumping units")
+        logger.error("Pipeline has no pumping units")
+      end
+#     Check that each pump exists in the pump data table and has headpoint data for it
+      station_pumps.uniq!
+      station_pumps.each do |sp|
+        pumprec = @pumpar.find {|p| p.pump_id == sp}
+        if pumprec.nil? then
+          pipeline.errors.add(:base, "Pumping unit #{sp} does not have any pump data")
+          logger.error("Pumping unit #{sp} does not have any pump data")
+        else
+          headpoints = pumprec.headpoints
+          if headpoints.nil? then
+            pipeline.errors.add(:base, "Pumping unit #{p.pump_id} does not have a head curve")
+            logger.error("Pumping unit #{p.pump_id} does not have a head curve")
+          end
+        end
+      end
+#     If any errors encountered on the pipeline so far, add them to the simulation errors list
+      if @pipeline.errors.any? then
+        @pipeline.errors.each do |n, msg|
+          self.errors.add(:base, msg)
+        end
+      end    
     end
       
 

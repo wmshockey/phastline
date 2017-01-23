@@ -1,7 +1,7 @@
 <%= render 'schedules/show_one' %>
-<br>
-<%= render 'index' %>
 <%= render 'form' %>
 
 <%= link_to 'Show', schedule_activity_path(@activity.schedule_id, @activity.id) %> |
 <%= link_to 'Back', schedule_path(@schedule) %>
+
+<%= render 'index' %>

@@ -1,10 +1,11 @@
 class CommoditiesController < ApplicationController
   before_action :set_commodity, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!
 
   # GET /commodities
   # GET /commodities.json
   def index
-    @commodities = Commodity.all
+    @commodities = current_user.commodities.all
   end
 
   # GET /commodities/1
@@ -14,8 +15,8 @@ class CommoditiesController < ApplicationController
 
   # GET /commodities/new
   def new
-    @commodities = Commodity.all
-    @commodity = Commodity.new
+    @commodities = current_user.commodities.all
+    @commodity = current_user.commodities.build
   end
 
   # GET /commodities/1/edit
@@ -25,7 +26,7 @@ class CommoditiesController < ApplicationController
   # POST /commodities
   # POST /commodities.json
   def create
-    @commodity = Commodity.new(commodity_params)
+    @commodity = current_user.commodities.build(commodity_params)
 
     respond_to do |format|
       if @commodity.save
@@ -65,7 +66,7 @@ class CommoditiesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_commodity
-      @commodities = Commodity.all
+      @commodities = current_user.commodities.all
       @commodity = Commodity.find(params[:id])
     end
 

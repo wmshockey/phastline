@@ -1,7 +1,7 @@
 <%= render 'top' %>
 
 <% steprec = @results.find {|r| r.step == @step} %>
-<h2>Step Detail for Step: <%= @step %> @ <%= steprec.timestamp %> hours</h2>
+<h2>Step Detail for Step: <%= @step %> @ <%= steprec.timestamp.strftime("%Y-%m-%d %H:%M") %> hours</h2>
 
 <table>
   <thead>

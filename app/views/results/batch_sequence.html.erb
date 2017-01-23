@@ -39,7 +39,7 @@
 	    <td>Batch</td>
 	    <td>Nom</td>
 	    <% while stn_ix < num_stations %>
-	      <td colspan="3"> <%= link_to stations[stn_ix], station_schedule_result_path(stations[stn_ix]) %> </td>
+	      <td colspan="3"> <%= link_to stations[stn_ix], station_schedule_result_path(:id => @sim_id, :stat => stations[stn_ix]) %> </td>
 		  <% stn_ix = stn_ix + 1 %>
 		<% end %>
 	  </tr>
@@ -60,7 +60,7 @@
 	    <% batch = batch_order[btix][0] %>
 		<tr>
 		  <% batch_id = btsqar[stn_ix][batch].batch_id %>
-		  <td><%= link_to batch_id, batch_detail_result_path(batch_id) %></td>
+		  <td><%= link_to batch_id, batch_detail_result_path(:id => @sim_id, :batch => batch_id) %></td>
 		  <td><%= btsqar[stn_ix][batch].nomination_name %></td>
 	      <% while stn_ix < num_stations %>
 			<% if btsqar[stn_ix][batch].activity_type == "DELIVERY" or btsqar[stn_ix][batch].activity_type == "LANDING" then %>

@@ -1,10 +1,11 @@
 class PipelinesController < ApplicationController
   before_action :set_pipeline, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!
 
   # GET /pipelines
   # GET /pipelines.json
   def index
-    @pipelines = Pipeline.all
+    @pipelines = current_user.pipelines.all
   end
 
   # GET /pipelines/1
@@ -14,8 +15,8 @@ class PipelinesController < ApplicationController
 
   # GET /pipelines/new
   def new
-    @pipelines = Pipeline.all
-    @pipeline = Pipeline.new
+    @pipelines = current_user.pipelines.all
+    @pipeline = current_user.pipelines.build
   end
 
   # GET /pipelines/1/edit
@@ -25,7 +26,7 @@ class PipelinesController < ApplicationController
   # POST /pipelines
   # POST /pipelines.json
   def create
-    @pipeline = Pipeline.new(pipeline_params)
+    @pipeline = current_user.pipelines.build(pipeline_params)
     respond_to do |format|
       if @pipeline.save
         format.html { redirect_to @pipeline, notice: 'Pipeline was successfully created.' }
@@ -64,7 +65,7 @@ class PipelinesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_pipeline
-      @pipelines = Pipeline.all
+      @pipelines = current_user.pipelines.all
       @pipeline = Pipeline.find(params[:id])
     end
 

@@ -16,7 +16,7 @@
 	 <% end %>
 	 </p>
 
-	<table class="fixed", style="width: 600px;">
+	<table>
 		<thead>
 			<tr>
 				<th>Pipeline Simulation</th>
@@ -31,13 +31,13 @@
 				<td><strong>Description: </strong></td><td><%= f.text_field :description %></td>
 			</tr>
 			<tr>
-				<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id , Pipeline.all.collect {|p| [p.name, p.id]} %></td>
+				<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id , current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>
 			</tr>
 			<tr>
-				<td><strong>Nomination: </strong></td><td><%= f.select :nomination_id , Nomination.all.collect {|n| [n.name, n.id]} %></td>
+				<td><strong>Nomination: </strong></td><td><%= f.select :nomination_id , current_user.nominations.all.collect {|n| [n.name, n.id]} %></td>
 			</tr>
 			<tr>
-				<td><strong>Prior Schedule: </strong></td><td><%= f.select :schedule_id , Schedule.all.collect {|s| [s.name, s.id]} %></td>
+				<td><strong>Prior Schedule: </strong></td><td><%= f.select :schedule_id , current_user.schedules.all.collect {|s| [s.name, s.id]} %></td>
 			</tr>
 			<tr>
 				<td><strong>Max Flowrate: </strong></td><td><%= f.number_field :max_flowrate, :step => "any"  %></td>

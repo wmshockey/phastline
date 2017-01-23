@@ -1,5 +1,5 @@
 <h2>Shipments</h2>
-<table class="fixed", style="width: 1200px;">
+<table>
   <thead>
    <tr>
 	  <th>Start Location</th>
@@ -16,7 +16,7 @@
 		<td><%= link_to shipment.start_location, nomination_shipment_path(shipment.nomination_id, shipment.id) %></td>
         <td><%= shipment.end_location %></td>
 		<td><%= shipment.shipper %></td>
-		<td><%= link_to shipment.commodity_id, Commodity.find {|c| c.commodity_id == shipment.commodity_id} %></td>
+		<td><%= link_to shipment.commodity_id, current_user.commodities.find {|c| c.commodity_id == shipment.commodity_id} %></td>
 		<td><%= shipment.volume %></td>
       </tr>
 	<% end %>

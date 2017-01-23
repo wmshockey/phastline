@@ -15,19 +15,19 @@
 
 <h2>Linefill for step <%= @step.to_s %><%= "......" %>
 <% if @step == 1 then %>
-	<%= link_to "Prev", step_linefill_result_path($maxsteps) %>
+	<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => $maxsteps) %>
 <% else %>
-	<%= link_to "Prev", step_linefill_result_path(@step-1) %>
+	<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => @step-1) %>
 <% end %>
 <%= " | " %>
 <% if @step == $maxsteps %>
-	 <%= link_to "Next", step_linefill_result_path(1) %>
+	 <%= link_to "Next", step_linefill_result_path(:id => @sim_id, :step => 1) %>
 <% else %>
-	<%= link_to "Next", step_linefill_result_path(@step+1) %>
+	<%= link_to "Next", step_linefill_result_path(:id => @sim_id, :step => @step+1) %>
 <% end %>
 </h2>
 
-<table  style="width:1200px">
+<table>
   <thead>
    <tr>
       <th>Upstream Station</th>
@@ -47,7 +47,7 @@
 		<td style="width: 25%;"><%= i.stat %></td>
 		<td style="width: 25%;"><%= '%8.2f'% i.kmp %></td>
 		<td style="width: 25%;"><%= batch_id %></td>
-		<td style="width: 25%;"><%= '%20.12f'% i.batch_vol %></td>
+		<td style="width: 25%;"><%= '%20.2f'% i.batch_vol %></td>
 	  </tr>
 	<% end %>
 

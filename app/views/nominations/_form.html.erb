@@ -14,7 +14,7 @@
   <% end %>
   </p>
 
-	<table class="fixed", style="width: 1200px;">
+	<table>
 	  <thead>
 	    <tr>
 	      <th>Nomination Name</th>
@@ -29,7 +29,7 @@
 	      <tr>
 	        <td><%= f.text_field :name %></td>
 	        <td><%= f.text_field :description %></td>
-			<td><%= f.select :pipeline_id, Pipeline.all.collect {|p| [p.name, p.id]} %></td>
+			<td><%= f.select :pipeline_id, current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>
 			<td><%= f.date_select :nom_date %>
 			<td><%= f.text_field :period %>
 	      </tr>

@@ -1,16 +1,15 @@
 <p id="notice"><%= notice %></p>
 <%= render 'pumps/show_one' %>
-<%= render 'index' %>
+
 <% head_units = @pump.head_units %>
 <% flow_units = @pump.flow_units %>
 
 <h2>Headpoint</h2>
-<table class="fixed", style="width: 500px;">
+<table>
   <thead>
     <tr>
 	  <th>Flowrate (<%= flow_units %>)</th>
       <th>Head (<%= head_units %>)</th>
-      <th></th>
     </tr>
   </thead>
 
@@ -18,12 +17,12 @@
       <tr>
 		<td><%= @headpoint.flow %></td>
         <td><%= @headpoint.head %></td>
-        <td></td>
       </tr>
   </tbody>
 </table>
 
-
 <%= link_to 'Edit', edit_pump_headpoint_path(@headpoint.pump_id, @headpoint.id) %> |
 <%= link_to 'Delete', pump_headpoint_path(@headpoint.pump_id, @headpoint.id), method: :delete, data: { confirm: 'Are you sure?' } %> |
 <%= link_to 'Back', pump_path(@pump) %>
+
+<%= render 'index' %>

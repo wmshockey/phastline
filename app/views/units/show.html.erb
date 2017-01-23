@@ -1,18 +1,14 @@
 <p id="notice"><%= notice %></p>
 <%= render 'pipelines/show_one' %>
-<br>
 <%= render 'stations/show_one' %>
-<br>
-<%= render 'index' %>
 
 <h2>Pump Unit</h2>
-<table class="fixed", style="width: 860px;">
+<table>
   <thead>
     <tr>
 	  <th>Row</th>
       <th>Column</th>
 	  <th>Pump ID</th>
-	  <th></th>
     </tr>
   </thead>
 
@@ -21,7 +17,6 @@
 		<td><%= @unit.unit_row %></td>
         <td><%= @unit.unit_column %></td>
 		<td><%= @unit.pump_id %></td>
-		<td></td>
       </tr>
   </tbody>
 </table>
@@ -29,3 +24,5 @@
 <%= link_to 'Edit', edit_pipeline_station_unit_path(@pipeline, @station, @unit) %> |
 <%= link_to 'Delete', pipeline_station_unit_path(@pipeline, @station, @unit), method: :delete, data: { confirm: 'Are you sure?' } %> |
 <%= link_to 'Back', pipeline_station_path(@pipeline, @station) %>
+
+<%= render 'index' %>

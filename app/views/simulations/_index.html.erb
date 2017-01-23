@@ -1,5 +1,5 @@
 <h2>Simulations</h2>
-<table class="fixed", style="width: 1200px;">
+<table>
   <thead>
    <tr>
       <th>Name</th>
@@ -15,14 +15,26 @@
   <tbody>
 	<% @simulations.order(name: :asc).each do |simulation| %>
       <tr>
-		<% pipeline = Pipeline.find {|p| p.id == simulation.pipeline_id} %>
-		<% nomination = Nomination.find {|n| n.id == simulation.nomination_id} %>
-		<% schedule = Schedule.find {|s| s.id == simulation.schedule_id} %>
+		<% pipeline = current_user.pipelines.find {|p| p.id == simulation.pipeline_id} %>
+		<% nomination = current_user.nominations.find {|n| n.id == simulation.nomination_id} %>
+		<% schedule = current_user.schedules.find {|s| s.id == simulation.schedule_id} %>
         <td><%= link_to simulation.name, simulation_path(simulation) %></td>
-        <td><%= simulation.description %></td>
-        <td><%= link_to pipeline.name, pipeline %></td>
-        <td><%= link_to nomination.name, nomination %></td>
-        <td><%= link_to schedule.name, schedule %></td>
+		<td><%= simulation.description %></td>
+		<% if pipeline then %>
+        	<td><%= link_to pipeline.name, pipeline %></td>
+		<% else %>
+			<td><%= "Pipeline missing" %></td>
+		<% end %>
+		<% if nomination then %>
+        	<td><%= link_to nomination.name, nomination %></td>
+		<% else %>
+			<td><%= "Nomination missing " %></td>
+		<% end %>
+		<% if schedule then %>
+        	<td><%= link_to schedule.name, schedule %></td>
+		<% else %>
+			<td><%= "Schedule missing" %></td>
+		<% end %>
         <td><%= simulation.max_flowrate %></td>
         <td><%= simulation.max_batchsize %></td>
       </tr>

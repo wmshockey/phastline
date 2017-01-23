@@ -1,10 +1,9 @@
 <p id="notice"><%= notice %></p>
 
 <%= render 'nominations/show_one' %>
-<br>
-<%= render 'index' %>
+
 <h2>Shipment</h2>
-<table class="fixed", style="width: 1200px;">
+<table>
   <thead>
     <tr>
 	  <th>Start Location</th>
@@ -29,3 +28,5 @@
 <%= link_to 'Edit', edit_nomination_shipment_path(@shipment.nomination_id, @shipment.id) %> |
 <%= link_to 'Delete', nomination_shipment_path(@shipment.nomination_id, @shipment.id), method: :delete, data: { confirm: 'Are you sure you want to delete this shipment?' } %> |
 <%= link_to 'Back', nomination_path(@nomination) %>
+
+<%= render 'index' %>
