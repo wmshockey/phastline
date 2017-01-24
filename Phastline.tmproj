@@ -49,6 +49,34 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>app/assets/images/bg.jpg</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/assets/images/pipe-background.jpg</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>app/assets/javascripts/activities.coffee</key>
 		<dict>
 			<key>caret</key>
@@ -264,30 +292,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>81</integer>
+				<integer>56</integer>
 				<key>line</key>
-				<integer>17</integer>
+				<integer>29</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>50</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>77</integer>
-				<key>line</key>
-				<integer>17</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>81</integer>
-				<key>line</key>
-				<integer>17</integer>
-			</dict>
+			<integer>10</integer>
 		</dict>
 		<key>app/assets/stylesheets/pumps.scss</key>
 		<dict>
@@ -378,9 +390,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>34</integer>
+				<integer>20</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>7</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -437,6 +449,20 @@
 				<integer>43</integer>
 				<key>line</key>
 				<integer>17</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/controllers/pages_controller.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>45</integer>
+				<key>line</key>
+				<integer>2</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -1213,6 +1239,20 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>app/views/devise/sessions/new.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>35</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>app/views/devise/shared/_links.html.erb</key>
 		<dict>
 			<key>caret</key>
@@ -1386,9 +1426,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>9</integer>
+				<integer>121</integer>
 				<key>line</key>
-				<integer>31</integer>
+				<integer>24</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -1414,14 +1454,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>69</integer>
 				<key>line</key>
-				<integer>1</integer>
+				<integer>22</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>17</integer>
+				<key>line</key>
+				<integer>22</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>69</integer>
+				<key>line</key>
+				<integer>22</integer>
+			</dict>
 		</dict>
 		<key>app/views/nominations/_show_one.html.erb</key>
 		<dict>
@@ -1515,6 +1571,48 @@
 				<integer>85</integer>
 				<key>line</key>
 				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/views/pages/about.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>146</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/views/pages/help.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>18</integer>
+				<key>line</key>
+				<integer>2</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/views/pages/home.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>37</integer>
+				<key>line</key>
+				<integer>6</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -1808,14 +1906,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>25</integer>
+				<integer>10</integer>
 				<key>line</key>
-				<integer>29</integer>
+				<integer>41</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>28</integer>
 		</dict>
 		<key>app/views/results/index.html.erb</key>
 		<dict>
@@ -1994,12 +2092,12 @@
 				<key>column</key>
 				<integer>11</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>51</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>10</integer>
 		</dict>
 		<key>app/views/results/step_flowrates.html.erb</key>
 		<dict>
@@ -2034,14 +2132,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>78</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>13</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>78</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
 		</dict>
 		<key>app/views/schedules/_form.html.erb</key>
 		<dict>
@@ -2822,7 +2936,7 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>43</integer>
+				<integer>2</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -2848,14 +2962,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>51</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>287</integer>
+				<integer>354</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>254</integer>
+			<integer>301</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>354</integer>
+			</dict>
 		</dict>
 		<key>db/migrate/20160318143858_create_segments.rb</key>
 		<dict>
@@ -3542,14 +3672,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>57</integer>
+				<integer>51</integer>
 				<key>line</key>
-				<integer>293</integer>
+				<integer>336</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>264</integer>
+			<integer>189</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -3558,6 +3688,13 @@
 		<string>app/views/simulations/debug_output.html.erb</string>
 		<string>app/views/results/step_linefill.html.erb</string>
 		<string>app/views/results/summary.html.erb</string>
+		<string>app/views/devise/sessions/new.html.erb</string>
+		<string>app/views/devise/registrations/new.html.erb</string>
+		<string>app/views/pages/home.html.erb</string>
+		<string>app/views/pages/about.html.erb</string>
+		<string>app/views/pages/help.html.erb</string>
+		<string>app/controllers/pages_controller.rb</string>
+		<string>config/routes.rb</string>
 		<string>app/views/activities/edit.html.erb</string>
 		<string>app/views/commodities/edit.html.erb</string>
 		<string>app/views/commodities/show.html.erb</string>
@@ -3662,7 +3799,11 @@
 		<string>app/controllers/pipelines_controller.rb</string>
 		<string>app/controllers/stations_controller.rb</string>
 		<string>app/views/layouts/application.html.erb</string>
+		<string>app/assets/images/pipe-background.jpg</string>
 		<string>app/assets/stylesheets/pipelines.scss</string>
+		<string>app/assets/images/bg.jpg</string>
+		<string>app/assets/stylesheets/activities.scss</string>
+		<string>app/controllers/application_controller.rb</string>
 		<string>app/views/shared/_error_messages.html.erb</string>
 		<string>app/models/pipeline.rb</string>
 		<string>app/models/user.rb</string>
@@ -3676,6 +3817,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{531, 226}, {1511, 1003}}</string>
+	<string>{{420, 346}, {1995, 1003}}</string>
 </dict>
 </plist>

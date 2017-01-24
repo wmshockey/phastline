@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Phastline Pipeline Hydraulics Application Software Tool </title>
+  <title>Phastware Pipeline Hydraulics Application Software Tools </title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 </head>
 
 <div class="container">
-
 	<% if !success.nil? %>
 	  <p class = "success"><%= success %></p>
 	<% end %>
@@ -21,31 +20,34 @@
 	<% if !error.nil? %>
 	  <p class="error"><%= error %></p>
 	<% end %>
-	<% if !@simulation.nil? %>
-	  <%= render 'shared/error_messages', :object => @simulation %>
-	<% end %>
 
 <body>
-	<div><h1 class="span-6 top">Phastline</h1></div><div><h1 class="span-11 top"><p>A pipeline hydraulics simulation application from &copy;Phastware</p></h1></div>
-	<% if current_user %>
-		<div class="span-5"><%= "User: " + current_user.email %></div>
-	<% end %>
-	<nav class="span-24 loud large">
-		<% if user_signed_in? %>
+	<div><h1 class="span-6 top">Phastware</div> </h1><div><h1 class="span-17 top"><p>&copy; 2017 Seraphim Consulting Company.  All Rights Reserved.</p></h1></div>
+	<% if user_signed_in? %>
+    	<div class="span-12 pull-6 large">Phastline Application </div> <div class="span-12 large push-6"><%= "User: " + current_user.email %></div>
+	    <nav class="span-24 large loud">
 			<div class="span-3"><%= link_to 'Simulations', simulations_path %></div>
 			<div class="span-2"><%= link_to 'Pipelines', pipelines_path %></div>
 			<div class="span-3"><%= link_to 'Nominations', nominations_path %></div>
 			<div class="span-3"><%= link_to 'Schedules', schedules_path %></div>
 			<div class="span-3"><%= link_to 'Commodities', commodities_path %></div>
 			<div class="span-2"><%= link_to 'Pumps', pumps_path %></div>
-			<div class="span-2"><%= link_to 'About', root_path %></div>
-			<div class="span-2"><%= link_to 'Help', root_path %></div>
-			<div class="span-2"><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></div>
-		<% end %>
-	</nav>
-	<div class="span-24">
-		<%= yield %>
-	</div>
+			<div class="span-2"><%= link_to 'About', '/pages/about' %></div>
+			<div class="span-2"><%= link_to 'Help', '/pages/help' %></div>
+			<div class="span-3 last"><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></div>
+	    </nav>
+	<% end %>
+    <div class="span-24">
+	  <%= yield %>
+    </div>
 </body>
+
 </div>
+
+<div class="container">
+<% if !@simulation.nil? %>
+  <%= render 'shared/error_messages', :object => @simulation %>
+<% end %>
+</div>
+
 </html>

@@ -25,11 +25,7 @@
 	  <th>Pumped<br>Volume</th>
 	  <th>Upstream<br>Batch</th>
 	  <th>Downstream<br> Batch</th>
-	  <th>Holding</th>
-	  <th>Suction</th>
-	  <th>Head</th>
-	  <th>Case</th>
-	  <th>Discharge</th>
+	  <th>Pressures(kpa):<br>Holding<br>Suction<br>Head<br>Case<br>Discharge</th>
 	  <th>Static<br>Loss</th>
 	  <th>Dynamic<br>Loss</th>
 	  <th>Min Press<br>Violation</th>
@@ -50,10 +46,10 @@
 		<td><%= i.upstream_batch %></td>
 		<td><%= i.downstream_batch %></td>
 		<td><%= '%.2f'% i.hold %>
-		<td><%= '%.2f'% i.suct %>
-        <td><%= '%.2f'% i.head %></td>
-        <td><%= '%.2f'% i.casep %></td>
-        <td><%= '%.2f'% i.disc %></td>
+		<br><%= '%.2f'% i.suct %>
+        <br><%= '%.2f'% i.head %>
+        <br><%= '%.2f'% i.casep %>
+        <br><%= '%.2f'% i.disc %></td>
 		<td><%= '%.2f'% i.total_static_loss %></td>
 		<td><%= '%.2f'% i.total_dynamic_loss %></td>
 		<td><%= '%.2f'% i.min_pressure_violation%></td>

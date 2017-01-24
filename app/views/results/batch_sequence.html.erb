@@ -39,7 +39,7 @@
 	    <td>Batch</td>
 	    <td>Nom</td>
 	    <% while stn_ix < num_stations %>
-	      <td colspan="3"> <%= link_to stations[stn_ix], station_schedule_result_path(:id => @sim_id, :stat => stations[stn_ix]) %> </td>
+	      <td> <%= link_to stations[stn_ix], station_schedule_result_path(:id => @sim_id, :stat => stations[stn_ix]) %> </td>
 		  <% stn_ix = stn_ix + 1 %>
 		<% end %>
 	  </tr>
@@ -48,9 +48,7 @@
 		 <td></td>
 		 <% stn_ix = 0 %>
 		 <% while stn_ix < num_stations %>
-			 <td>Start</td>
-			 <td>End</td>
-		     <td>Event</td>
+			 <td>Event<br>Volume<br>Start<br>End</td>
 			 <% stn_ix = stn_ix + 1 %>
 		  <% end %>
 	  </tr>
@@ -69,12 +67,11 @@
 				<% volume = btsqar[stn_ix][batch].volume %>
 			<% end %>
 			<% if (volume > 0) and (btsqar[stn_ix][batch].start_time or btsqar[stn_ix][batch].end_time) then %>
-			    <td><%= btsqar[stn_ix][batch].start_time.strftime('%m-%d %H:%M') if btsqar[stn_ix][batch].start_time %> </td>
-			    <td><%= btsqar[stn_ix][batch].end_time.strftime('%m-%d %H:%M') if btsqar[stn_ix][batch].end_time %> </td>
-			    <td><%= btsqar[stn_ix][batch].activity_type %> <%= volume %> </td>
+		        <td><%= btsqar[stn_ix][batch].activity_type %>
+				<br><%= volume %>
+			    <br><%= "Start-" + btsqar[stn_ix][batch].start_time.strftime('%m-%d %H:%M') if btsqar[stn_ix][batch].start_time %>
+			    <br><%= "End---" + btsqar[stn_ix][batch].end_time.strftime('%m-%d %H:%M') if btsqar[stn_ix][batch].end_time %> </td>
 			<% else %>
-				<td></td>
-				<td></td>
 				<td></td>
 			<% end %>
 		    <% stn_ix = stn_ix + 1 %>

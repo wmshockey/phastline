@@ -316,3 +316,39 @@ Activity.create(schedule_id: schedule.id, batch_id: '63E-00200', start_time: Dat
 
 Simulation.create(user_id: 2, name: 'Line 1 Benchmark', description: 'Line 1 Benchmark Test from Nov 25th', max_flowrate: 600.0, max_batchsize: 10000.0, pipeline_id: pipeline.id, nomination_id: nomination.id, schedule_id: schedule.id)
 
+pipeline = Pipeline.create(user_id: 2, name: 'Small Pipeline', description: 'A small pipeline for testing purposes.')
+
+station = Station.create(pipeline_id: pipeline.id, kmp: 0.0, name: 'Tim')
+Unit.create(station_id: station.id, pump_id: 'B-23674A', unit_row: 1, unit_column: 1)
+Unit.create(station_id: station.id, pump_id: 'B-C-3712', unit_row: 1, unit_column: 2)
+Unit.create(station_id: station.id, pump_id: 'BJTC4102', unit_row: 1, unit_column: 3)
+
+station= Station.create(pipeline_id: pipeline.id, kmp: 50.0, name: 'Buck City')
+Unit.create(station_id: station.id, pump_id: 'B-24324A', unit_row: 1, unit_column: 1)
+Unit.create(station_id: station.id, pump_id: 'B-33118A', unit_row: 1, unit_column: 2)
+Unit.create(station_id: station.id, pump_id: 'B-C-3692', unit_row: 1, unit_column: 3)
+
+station = Station.create(pipeline_id: pipeline.id, kmp: 120.0, name: 'Two Town')
+
+Segment.create(pipeline_id: pipeline.id, kmp: 0.0, diameter: 0.5, thickness: 0.05, roughness: 0.0000038100, mawp: 20000.0)
+Segment.create(pipeline_id: pipeline.id, kmp: 120.0, diameter: 0.5, thickness: 0.05, roughness: 0.0000038100, mawp: 20000.0)
+
+Elevation.create(pipeline_id: pipeline.id, kmp: 0.0, elevation: 400.0)
+Elevation.create(pipeline_id: pipeline.id, kmp: 120.0, elevation: 350.0)
+
+Temperature.create(pipeline_id: pipeline.id, kmp: 0.0, temperature: 5.0)
+Temperature.create(pipeline_id: pipeline.id, kmp: 60.0, temperature: 7.0)
+Temperature.create(pipeline_id: pipeline.id, kmp: 100.0, temperature: 10.0)
+
+nomination = Nomination.create(pipeline_id: pipeline.id, name: 'Small Nom', description: 'Testing', nom_date: DateTime.strptime("2016-12-01 07:00", "%Y-%m-%d %H:%M"), period: 31.0)
+Shipment.create(nomination_id: nomination.id, start_location: 'Tim', end_location: 'Two Town', shipper: 'SHELL', commodity_id: 'BR', volume: 100000.0)
+Shipment.create(nomination_id: nomination.id, start_location: 'Tim', end_location: 'Two Town', shipper: 'IOL', commodity_id: 'SYN', volume: 50000.0)
+
+schedule = Schedule.create(pipeline_id: pipeline.id, name: 'Small Sched 1', description: 'Test initial schedule for Small Pipeline', start_date: DateTime.strptime("2017-01-01 07:00", "%Y-%m-%d %H:%M"), period: 31, sched_type: "PRIOR")
+Activity.create(schedule_id: schedule.id, batch_id: 'CRW-00001', start_time: DateTime.strptime("2016-12-01 09:30", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-02 04:00", "%Y-%m-%d %H:%M"), activity_type: 'INJECTION', station: 'Tim', volume: 5000.0, shipper: '', nomination_name: '2016-11')
+Activity.create(schedule_id: schedule.id, batch_id: 'BR-00002', start_time: DateTime.strptime("2016-12-02 04:00", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-15 23:00", "%Y-%m-%d %H:%M"), activity_type: 'INJECTION', station: 'Tim', volume: 200000.0, shipper: '', nomination_name: '2016-11')
+Activity.create(schedule_id: schedule.id, batch_id: 'CRW-00001', start_time: DateTime.strptime("2016-12-18 10:30", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-19 13:00", "%Y-%m-%d %H:%M"), activity_type: 'DELIVERY', station: 'Two Town', volume: 0.0, shipper: '', nomination_name: '2016-11')
+Activity.create(schedule_id: schedule.id, batch_id: 'BR-00002', start_time: DateTime.strptime("2016-12-19 13:00", "%Y-%m-%d %H:%M"), end_time: nil, activity_type: 'DELIVERY', station: 'Two Town', volume: 0.0, shipper: '', nomination_name: '2016-11')
+
+Simulation.create(user_id: 2, name: 'Small Sim', description: 'Testing', max_flowrate: 2000.0, max_batchsize: 10000.0, pipeline_id: pipeline.id, nomination_id: nomination.id, schedule_id: schedule.id)
+
