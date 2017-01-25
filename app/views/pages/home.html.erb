@@ -1,10 +1,14 @@
+<title>Phastware Pipeline Hydraulics Application Software</title>
+
 <h1>Welcome to phastware.com</h1>
 
-Phastware is a suite of pipeline hydraulics simulation and modelling software tools for pipeline operators, engineers or analysts.  Phastware is an acronym for "Pipeline Hydraulics Application Software Tools".  It was developed by the Seraphim Consulting company based out of Calgary, AB, Canada and is based on the extensive experience of individuals who have worked in the pipeline industry over many decades.
+<div class="span-24">Phastware is a suite of pipeline hydraulics simulation and modelling software tools for pipeline operators, engineers or analysts.  Phastware is an acronym for "Pipeline Hydraulics Application Software Tools".  It was developed by the Seraphim Consulting company based out of Calgary, AB, Canada.  The software is currently in development and testing phase only so is not available to the general public yet but if you are interested, please let me know via email at <%= mail_to "wmshockey@gmail.com" %> and I will update you when it is available general for use.  Thank-you.</div>
 
-<h3>Sign in or Sign up to run the Phastline application here: <%= link_to 'Phastline', user_session_path %></h3>
+<h3 class="span-3"><%= link_to 'Phastline', user_session_path %></h3>  <h3 class="span-20">Sign in or Sign up to run the Phastline application</h3>
 
-<h3>View the help documentation for Phastline here: <%= link_to 'Help', "/pages/help" %></h3>
+<h3 class="span-3"><%= link_to 'Info', "/pages/help" %></h3>  <h3 class="span-20">View documentation on the Phastline application</h3>
+
+<h3 class="span-3"> <%= link_to 'JIRA', "https://phastware.atlassian.net/login?" %>  <h3 class="span-20">Sign in to JIRA to record new Phastline features, issues, bugs, etc.</h3>
 
 
-
+<%= image_tag "pipeline_pic.jpg", alt: "Pipeline View", height: '780', width: '950'%>
