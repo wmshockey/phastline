@@ -27,6 +27,7 @@ class PumpsController < ApplicationController
   # POST /pumps.json
   def create
     @pump = current_user.pumps.build(pump_params)
+    @pumps = current_user.pumps.all
 
     respond_to do |format|
       if @pump.save

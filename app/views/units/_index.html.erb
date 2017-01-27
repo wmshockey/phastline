@@ -10,19 +10,21 @@
 
   <tbody>
     <% @units.each do |unit| %>
-      <tr>
-	    <% unit_row_string = unit.unit_row.to_s.rjust(2, "0") %>
-		<% unit_col_string = unit.unit_column.to_s.rjust(2, "0") %>
-        <td><%= link_to unit_row_string, pipeline_station_unit_path(@pipeline, @station, unit) %></td>
-        <td><%= unit_col_string %></td>
-		<% pump = current_user.pumps.find {|p| p.pump_id == unit.pump_id} %>
-		<% if !pump.nil? then %>
-		    <td><%= link_to unit.pump_id,  pump %>
-		<% else %>
-			<td><%= "No data for pump #{unit.pump_id}" %></td>
-		    <% flash[:error] = "Pump #{unit.pump_id} is missing data" %>
-		<% end %>
-      </tr>
+	  <% if !unit.errors.any? %>
+	      <tr>
+		    <% unit_row_string = unit.unit_row.to_s.rjust(2, "0") %>
+			<% unit_col_string = unit.unit_column.to_s.rjust(2, "0") %>
+	        <td><%= link_to unit_row_string, pipeline_station_unit_path(@pipeline, @station, unit) %></td>
+	        <td><%= unit_col_string %></td>
+			<% pump = current_user.pumps.find {|p| p.pump_id == unit.pump_id} %>
+			<% if !pump.nil? then %>
+			    <td><%= link_to unit.pump_id,  pump %>
+			<% else %>
+				<td><%= "No data for pump #{unit.pump_id}" %></td>
+			    <% flash[:error] = "Pump #{unit.pump_id} is missing data" %>
+			<% end %>
+	      </tr>
+	  <% end %>
     <% end %>
 	<td colspan="3"><%= link_to 'Add Pump Unit', new_pipeline_station_unit_path(@pipeline, @station) %></td>
   </tbody>

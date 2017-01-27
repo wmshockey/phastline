@@ -38,6 +38,7 @@ class UnitsController < ApplicationController
   def create
     @pipeline = Pipeline.find(params[:pipeline_id])
     @station = Station.find(params[:station_id])
+    @units = @station.units.all
     @unit = @station.units.new(unit_params)
     respond_to do |format|
       if @unit.save

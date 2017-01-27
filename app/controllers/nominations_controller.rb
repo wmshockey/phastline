@@ -28,6 +28,8 @@ class NominationsController < ApplicationController
   # POST /nominations.json
   def create
     @nomination = Nomination.new(nomination_params)
+    @pipelines = current_user.pipelines.all
+    @nominations = current_user.nominations.all
 
     respond_to do |format|
       if @nomination.save

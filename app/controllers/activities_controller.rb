@@ -4,7 +4,7 @@ class ActivitiesController < ApplicationController
   # GET /activities
   # GET /activities.json
   def index
-    @schedule = Schedule.find(params[:schedule_id])
+    @schedule = current_user.schedules.find(params[:schedule_id])
     @activities = @schedule.activities.all
   end
 
@@ -15,8 +15,8 @@ class ActivitiesController < ApplicationController
 
   # GET /activities/new
   def new
-    @schedule = Schedule.find(params[:schedule_id])
-    @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id}
+    @schedule = current_user.schedules.find(params[:schedule_id])
+    @pipeline = current_user.pipelines.find {|p| p.id == @schedule.pipeline_id}
     @stations = @pipeline.stations
     @activity = @schedule.activities.build
   end
@@ -33,6 +33,8 @@ class ActivitiesController < ApplicationController
   # POST /activities.json
   def create
     @schedule = Schedule.find(params[:schedule_id])
+    @pipeline = Pipeline.find{|p| p.id == @schedule.pipeline_id}
+    @stations = @pipeline.stations
     @activity = @schedule.activities.new(activity_params)
 
     respond_to do |format|

@@ -27,6 +27,7 @@ class PipelinesController < ApplicationController
   # POST /pipelines.json
   def create
     @pipeline = current_user.pipelines.build(pipeline_params)
+    @pipelines = current_user.pipelines.all
     respond_to do |format|
       if @pipeline.save
         format.html { redirect_to @pipeline, notice: 'Pipeline was successfully created.' }

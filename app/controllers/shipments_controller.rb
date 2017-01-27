@@ -4,7 +4,7 @@ class ShipmentsController < ApplicationController
   # GET /shipments
   # GET /shipments.json
   def index
-    @nomination = Nomination.find(params[:nomination_id])
+    @nomination = current_user.nominations.find(params[:nomination_id])
     @shipments = @nomination.shipments.all
   end
 
@@ -15,23 +15,26 @@ class ShipmentsController < ApplicationController
 
   # GET /shipments/new
   def new
-    @nomination = Nomination.find(params[:nomination_id])
-    @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id}
+    @nomination = current_user.nominations.find(params[:nomination_id])
+    @pipeline = current_user.pipelines.find {|p| p.id == @nomination.pipeline_id}
     @stations = @pipeline.stations
     @shipment = @nomination.shipments.build
   end
 
   # GET /shipments/1/edit
   def edit
-    @nomination = Nomination.find(params[:nomination_id])
-    @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id}
+    @nomination = current_user.nominations.find(params[:nomination_id])
+    @pipeline = current_user.pipelines.find {|p| p.id == @nomination.pipeline_id}
     @stations = @pipeline.stations
   end
 
   # POST /shipments
   # POST /shipments.json
   def create
-    @nomination = Nomination.find(params[:nomination_id])
+    @nomination = current_user.nominations.find(params[:nomination_id])
+    @pipeline = current_user.pipelines.find {|p| p.id == @nomination.pipeline_id}
+    @stations = @pipeline.stations
+    @shipments = @nomination.shipments.all
     @shipment = @nomination.shipments.new(shipment_params)    
 
     respond_to do |format|

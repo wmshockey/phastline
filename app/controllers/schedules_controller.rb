@@ -29,6 +29,8 @@ class SchedulesController < ApplicationController
   # POST /schedules
   # POST /schedules.json
   def create
+    @pipelines = current_user.pipelines.all
+    @schedules = current_user.schedules.all
     @schedule = Schedule.new(schedule_params)
 
     respond_to do |format|

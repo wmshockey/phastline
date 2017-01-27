@@ -9,10 +9,12 @@
 
   <tbody>
 	<% @pipelines.order(name: :asc).each do |pipeline| %>
-      <tr>
-        <td><%= link_to pipeline.name, pipeline_path(pipeline) %></td>
-        <td><%= pipeline.description %></td>
-      </tr>
+	  <% if !pipeline.errors.any? %>
+	      <tr>
+	        <td><%= link_to pipeline.name, pipeline_path(pipeline) %></td>
+	        <td><%= pipeline.description %></td>
+	      </tr>
+	  <% end %>
 	<% end %>
 	<td colspan="2"><%= link_to 'Add Pipeline', new_pipeline_path %></td>
   </tbody>

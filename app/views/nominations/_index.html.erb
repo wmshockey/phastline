@@ -12,13 +12,15 @@
 
   <tbody>
 	<% @nominations.order(name: :asc).each do |nomination| %>
-      <tr>
-        <td><%= link_to nomination.name, nomination_path(nomination) %></td>
-        <td><%= nomination.description %></td>
-		<td><%= @pipelines.find {|p| p.id == nomination.pipeline_id}.name %></td>
-		<td><%= nomination.nom_date %></td>
-		<td><%= nomination.period %></td>
-      </tr>
+	  <% if !nomination.errors.any? %>
+	      <tr>
+	        <td><%= link_to nomination.name, nomination_path(nomination) %></td>
+	        <td><%= nomination.description %></td>
+			<td><%= @pipelines.find {|p| p.id == nomination.pipeline_id}.name %></td>
+			<td><%= nomination.nom_date %></td>
+			<td><%= nomination.period %></td>
+	      </tr>
+	  <% end %>
 	<% end %>
 	<td colspan="5"><%= link_to 'Add Nomination', new_nomination_path %></td>
   </tbody>

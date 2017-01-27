@@ -16,17 +16,19 @@
 
   <tbody>
 	<% @commodities.order(commodity_id: :asc).each do |commodity| %>
-      <tr>
-		<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
-        <td><%= commodity.commodity_name %></td>
-        <td><%= commodity.temp1 %></td>
-        <td><%= commodity.visc1 %></td>
-        <td><%= commodity.temp2 %></td>
-        <td><%= commodity.visc2 %></td>
-        <td><%= commodity.density %></td>
-        <td><%= commodity.density_cf %></td>
-        <td><%= commodity.vapor %></td>
-      </tr>
+	    <% if !commodity.errors.any? %>
+	      <tr>
+			<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
+	        <td><%= commodity.commodity_name %></td>
+	        <td><%= commodity.temp1 %></td>
+	        <td><%= commodity.visc1 %></td>
+	        <td><%= commodity.temp2 %></td>
+	        <td><%= commodity.visc2 %></td>
+	        <td><%= commodity.density %></td>
+	        <td><%= commodity.density_cf %></td>
+	        <td><%= commodity.vapor %></td>
+	      </tr>
+		<% end %>
 	<% end %>
 	<td colspan="9"><%= link_to 'Add Commodity', new_commodity_path %></td>
   </tbody>

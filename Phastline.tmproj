@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>app/views/pages/help.html.erb</string>
+	<string>db/seeds.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -50,20 +50,6 @@
 			<integer>0</integer>
 		</dict>
 		<key>app/assets/images/bg.jpg</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>app/assets/images/pipe-background.jpg</key>
 		<dict>
 			<key>caret</key>
 			<dict>
@@ -292,7 +278,7 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>56</integer>
+				<integer>134</integer>
 				<key>line</key>
 				<integer>29</integer>
 			</dict>
@@ -411,7 +397,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>9</integer>
+			<integer>0</integer>
 		</dict>
 		<key>app/controllers/elevations_controller.rb</key>
 		<dict>
@@ -483,7 +469,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>8</integer>
+			<integer>0</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
@@ -511,7 +497,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>9</integer>
+			<integer>0</integer>
 		</dict>
 		<key>app/controllers/results_controller.rb</key>
 		<dict>
@@ -539,7 +525,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>11</integer>
+			<integer>0</integer>
 		</dict>
 		<key>app/controllers/segments_controller.rb</key>
 		<dict>
@@ -567,21 +553,37 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>11</integer>
+			<integer>0</integer>
 		</dict>
 		<key>app/controllers/simulations_controller.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>77</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>35</integer>
+				<integer>3</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>2</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>3</integer>
+			</dict>
 		</dict>
 		<key>app/controllers/stations_controller.rb</key>
 		<dict>
@@ -703,6 +705,20 @@
 				<integer>0</integer>
 				<key>line</key>
 				<integer>12</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/models/admin.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>76</integer>
+				<key>line</key>
+				<integer>4</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -835,7 +851,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>38</integer>
+			<integer>58</integer>
 		</dict>
 		<key>app/models/segment.rb</key>
 		<dict>
@@ -893,7 +909,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>81</integer>
+			<integer>284</integer>
 		</dict>
 		<key>app/models/station.rb</key>
 		<dict>
@@ -1211,6 +1227,34 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>app/views/devise/confirmations/new.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>app/views/devise/passwords/new.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>16</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>app/views/devise/registrations/edit.html.erb</key>
 		<dict>
 			<key>caret</key>
@@ -1244,9 +1288,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>35</integer>
+				<integer>23</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>14</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -1421,6 +1465,20 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>app/views/layouts/application.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>11</integer>
+				<key>line</key>
+				<integer>38</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>app/views/nominations/_form.html.erb</key>
 		<dict>
 			<key>caret</key>
@@ -1568,44 +1626,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>43</integer>
 				<key>line</key>
-				<integer>23</integer>
+				<integer>12</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>3</integer>
+			<integer>1</integer>
 		</dict>
 		<key>app/views/pages/home.html.erb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>85</integer>
+				<integer>27</integer>
 				<key>line</key>
 				<integer>13</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>13</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>85</integer>
-				<key>line</key>
-				<integer>13</integer>
-			</dict>
 		</dict>
 		<key>app/views/pipelines/_form.html.erb</key>
 		<dict>
@@ -2896,7 +2938,7 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>2</integer>
+				<integer>5</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -3602,30 +3644,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>40</integer>
+				<integer>23</integer>
 				<key>line</key>
-				<integer>185</integer>
+				<integer>179</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>152</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>176</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>40</integer>
-				<key>line</key>
-				<integer>185</integer>
-			</dict>
+			<integer>2</integer>
 		</dict>
 		<key>db/seeds.rb</key>
 		<dict>
@@ -3646,13 +3672,32 @@
 	<array>
 		<string>db/seeds.rb</string>
 		<string>app/views/pages/home.html.erb</string>
+		<string>config/routes.rb</string>
+		<string>app/views/devise/sessions/new.html.erb</string>
+		<string>app/views/devise/passwords/new.html.erb</string>
+		<string>app/views/devise/confirmations/new.html.erb</string>
+		<string>app/controllers/application_controller.rb</string>
+		<string>app/controllers/pipelines_controller.rb</string>
+		<string>app/controllers/commodities_controller.rb</string>
+		<string>app/views/layouts/application.html.erb</string>
+		<string>app/controllers/simulations_controller.rb</string>
+		<string>app/controllers/pumps_controller.rb</string>
+		<string>app/models/user.rb</string>
+		<string>app/views/devise/shared/_links.html.erb</string>
+		<string>app/assets/stylesheets/pipelines.scss</string>
 		<string>app/views/pages/help.html.erb</string>
+		<string>app/models/admin.rb</string>
+		<string>app/controllers/shipments_controller.rb</string>
+		<string>app/controllers/schedules_controller.rb</string>
+		<string>app/models/result.rb</string>
+		<string>app/models/schedule.rb</string>
+		<string>db/schema.rb</string>
 		<string>app/models/simulation.rb</string>
 		<string>app/models/pipeline.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{420, 346}, {1995, 1003}}</string>
+	<string>{{348, 107}, {1084, 1153}}</string>
 </dict>
 </plist>
