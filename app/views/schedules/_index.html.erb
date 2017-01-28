@@ -2,6 +2,9 @@
 <table>
   <thead>
    <tr>
+	  <% if current_user.admin? then %>
+		<th>User</th>
+	  <% end %>
       <th>Name</th>
 	  <th>Description</th>
 	  <th>Pipeline</th>
@@ -15,6 +18,12 @@
 	<% @schedules.order(name: :asc).each do |schedule| %>
 	  <% if !schedule.errors.any? %>
 	      <tr>
+			<% if current_user.admin? then %>
+				<% pipeline_id = schedule.pipeline_id %>
+				<% user_id = Pipeline.find(pipeline_id).user_id %>
+				<% user_email = User.find(user_id).email %>
+				<td><%= user_email %></td>
+			<% end %>
 	        <td><%= link_to schedule.name, schedule_path(schedule) %></td>
 	        <td><%= schedule.description %></td>
 	        <td><%= @pipelines.find {|p| p.id == schedule.pipeline_id}.name %></td>

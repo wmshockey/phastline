@@ -5,4 +5,5 @@ class Shipment < ActiveRecord::Base
     validates :shipper, :presence => true
     validates :commodity_id, :presence => true
     validates :volume, :presence => true, numericality: {:greater_than => 0} 
+    default_scope { order(nomination_id: :asc, start_location: :asc) }
 end

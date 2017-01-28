@@ -11,7 +11,8 @@
 	    <td>Timestamp</td>
 	    <td>Duration</td>
 	    <% while stn_ix <= num_stations - 1 %>
-	      <td> <%= @stations[stn_ix] %> </td>
+		  <% stat = (@results.find {|r| r.step == 1 and r.station_id == @stations[stn_ix]}).stat %>
+	      <td> <%= link_to stat, station_detail_result_path(:id => @sim_id, :station_id => @stations[stn_ix]) %> </td>
 		  <% stn_ix = stn_ix + 1 %>
 		<% end %>
 	  </tr>
@@ -20,7 +21,7 @@
 	    <% stn_ix = 0 %>
 		<tr>
 		  <% step = @results[steprec].step %>
-		  <td><%= link_to step.to_s, station_step_detail_result_path(:id => @sim_id, :step => step) %></td>
+		  <td><%= link_to step.to_s, step_detail_result_path(:id => @sim_id, :step => step) %></td>
 		  <td><%= @results[steprec].timestamp.strftime("%d-%m-%Y %H:%M") %></td>
 		  <td><%= @results[steprec].step_time.round(2) %> hrs</td>
 	      <% while stn_ix < num_stations %>

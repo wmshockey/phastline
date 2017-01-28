@@ -5,7 +5,11 @@ class PumpsController < ApplicationController
   # GET /pumps
   # GET /pumps.json
   def index
-    @pumps = current_user.pumps.all
+    if current_user.admin? then
+      @pumps = Pump.all
+    else
+      @pumps = current_user.pumps.all
+    end
   end
 
   # GET /pumps/1

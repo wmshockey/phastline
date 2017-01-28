@@ -2,6 +2,9 @@
 <table>
 	<thead>
     <tr>
+	  <% if current_user.admin? then %>
+		<th>User</th>
+	  <% end %>
       <th>Pump</th>
       <th>Description</th>
       <th>Flow<br>units</th>
@@ -16,6 +19,9 @@
     </tr>
   </thead>
   <tbody>
+		<% if current_user.admin? then %>
+			<td><%= (User.find {|u| u.id == @pump.user_id}).email %></td>
+		<% end %>
 		<td><%= @pump.pump_id %></td>
         <td><%= @pump.description %></td>
 	    <td><%= @pump.flow_units %></td>

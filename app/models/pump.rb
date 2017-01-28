@@ -1,4 +1,5 @@
 class Pump < ActiveRecord::Base
+  belongs_to :user
   has_many :headpoints, dependent: :destroy
   validates :pump_id, :presence => true
   validates :flow_units, :presence => true
@@ -9,4 +10,6 @@ class Pump < ActiveRecord::Base
   validates :efficiency_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
   validates :capacity_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
   validates :head_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
+  default_scope { order(user_id: :asc, pump_id: :asc) }
+  
 end

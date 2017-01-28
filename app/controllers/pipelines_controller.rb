@@ -5,7 +5,11 @@ class PipelinesController < ApplicationController
   # GET /pipelines
   # GET /pipelines.json
   def index
-    @pipelines = current_user.pipelines.all
+    if current_user.admin? then
+      @pipelines = Pipeline.all
+    else
+      @pipelines = current_user.pipelines.all
+    end
   end
 
   # GET /pipelines/1

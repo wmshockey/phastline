@@ -4,14 +4,19 @@ class SchedulesController < ApplicationController
   # GET /schedules
   # GET /schedules.json
   def index
-    @pipelines = current_user.pipelines.all
-    @schedules = current_user.schedules.all
+    if current_user.admin? then
+      @pipelines = Pipeline.all
+      @schedules = Schedule.all
+    else
+      @pipelines = current_user.pipelines.all
+      @schedules = current_user.schedules.all
+    end
   end
   
   # GET /schedules/1
   # GET /schedules/1.json
   def show
-        @activities = @schedule.activities.all
+    @activities = @schedule.activities.all
   end
 
   # GET /schedules/new

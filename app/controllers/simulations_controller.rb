@@ -5,7 +5,11 @@ class SimulationsController < ApplicationController
   # GET /simulations
   # GET /simulations.json
   def index
-    @simulations = current_user.simulations.all
+    if current_user.admin? then
+      @simulations = Simulation.all
+    else
+      @simulations = current_user.simulations.all
+    end
   end
 
   # GET /simulations/1
@@ -25,13 +29,24 @@ class SimulationsController < ApplicationController
 
   # GET /simulations/1/run
   def run
-    @simulation = Simulation.find(params[:id])
-    pipeline = current_user.pipelines.find{|p| p.id == @simulation.pipeline_id}
-    schedule = current_user.schedules.find{|s| s.id == @simulation.schedule_id}
-    nomination = current_user.nominations.find{|n| n.id == @simulation.nomination_id}
-    commodities = current_user.commodities
-    units = pipeline.units
-    pumpar = current_user.pumps
+    if current_user.admin? then 
+      @simulation = Simulation.find(params[:id])
+      sim_owner = User.find {|u| u.id == @simulation.user_id}
+      pipeline = Pipeline.find{|p| p.id == @simulation.pipeline_id}
+      schedule = Schedule.find{|s| s.id == @simulation.schedule_id}
+      nomination = Nomination.find{|n| n.id == @simulation.nomination_id}
+      commodities = sim_owner.commodities
+      units = pipeline.units
+      pumpar = sim_owner.pumps
+    else      
+      @simulation = current_user.simulations.find(params[:id])
+      pipeline = current_user.pipelines.find{|p| p.id == @simulation.pipeline_id}
+      schedule = current_user.schedules.find{|s| s.id == @simulation.schedule_id}
+      nomination = current_user.nominations.find{|n| n.id == @simulation.nomination_id}
+      commodities = current_user.commodities
+      units = pipeline.units
+      pumpar = current_user.pumps
+    end
     respond_to do |format|
       if @simulation.run(pipeline, schedule, nomination, commodities, units, pumpar)
         flash[:success] = "Simulation ran successfully."

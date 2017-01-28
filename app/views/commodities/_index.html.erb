@@ -2,6 +2,9 @@
 <table>
   <thead>
    <tr>
+	  <% if current_user.admin? then %>
+		<th>User</th>
+	  <% end %>
 	  <th>ID</th>
       <th>Name</th>
 	  <th>Temperature point 1 (deg C)</th>
@@ -18,6 +21,9 @@
 	<% @commodities.order(commodity_id: :asc).each do |commodity| %>
 	    <% if !commodity.errors.any? %>
 	      <tr>
+			<% if current_user.admin? then %>
+				<td><%= (User.find {|u| u.id == commodity.user_id}).email %></td>
+			<% end %>
 			<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
 	        <td><%= commodity.commodity_name %></td>
 	        <td><%= commodity.temp1 %></td>

@@ -5,5 +5,5 @@ class Station < ActiveRecord::Base
   validates :kmp, :presence => true, numericality: {:greater_than_or_equal_to => 0}
   validates :name, :presence => true
   validates :pipeline_id, :presence => true
-  default_scope { order('kmp ASC') }  
+  default_scope { order(pipeline_id: :asc, kmp: :asc) }
 end

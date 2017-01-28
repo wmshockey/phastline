@@ -4,8 +4,13 @@ class NominationsController < ApplicationController
   # GET /nominations
   # GET /nominations.json
   def index
-    @pipelines = current_user.pipelines.all
-    @nominations = current_user.nominations.all
+    if current_user.admin? then
+      @pipelines = Pipeline.all
+      @nominations = Nomination.all
+    else
+      @pipelines = current_user.pipelines.all
+      @nominations = current_user.nominations.all
+    end
   end
 
   # GET /nominations/1

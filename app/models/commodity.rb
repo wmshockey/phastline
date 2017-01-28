@@ -9,6 +9,7 @@ class Commodity < ActiveRecord::Base
     validates :density, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 2000}
     validates :density_cf, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 10} 
     validates :vapor, numericality: {:greater_than_or_equal_to => 0, :less_than => 10000}
+    default_scope { order(user_id: :asc, commodity_id: :asc) }
 
   def visccoef(temp1, visc1, temp2, visc2)
 # Purpose is to compute the A and B viscosity coefficients used in the ASTM method.

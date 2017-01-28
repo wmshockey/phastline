@@ -2,21 +2,32 @@
 <table>
   <thead>
 	<tr>
+		<% if current_user.admin? then %>
+			<th>User</th>
+		<% end %>
 	   <th>Name</th>
-		  <th>Description</th>
+	   <th>Description</th>
 	   <th>Pipeline</th>
-		  <th>Nomination</th>
-		  <th>Prior Schedule</th>
-		  <th>Max Flowrate</th>
-		  <th>Max Batchsize</th>
+	   <th>Nomination</th>
+	   <th>Prior Schedule</th>
+	   <th>Max Flowrate</th>
+	   <th>Max Batchsize</th>
 	 </tr>
   </thead>
-	<% pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
-	<% nomination = Nomination.find {|n| n.id == @simulation.nomination_id} %>
-	<% schedule = Schedule.find {|s| s.id == @simulation.schedule_id} %>
-
+	<% if current_user.admin? then %>
+		<% pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
+		<% nomination = Nomination.find {|n| n.id == @simulation.nomination_id} %>
+		<% schedule = Schedule.find {|s| s.id == @simulation.schedule_id} %>
+	<% else %>
+		<% pipeline = current_user.pipelines.find {|p| p.id == @simulation.pipeline_id} %>
+		<% nomination = current_user.nominations.find {|n| n.id == @simulation.nomination_id} %>
+		<% schedule = current_user.schedules.find {|s| s.id == @simulation.schedule_id} %>
+    <% end %>
   <tbody>
       <tr>
+		<% if current_user.admin? then %>
+			<td><%= (User.find {|u| u.id == @simulation.user_id}).email %></td>
+		<% end %>
         <td><%= @simulation.name %></td>
         <td><%= @simulation.description %></td>
 		<% if pipeline then %>

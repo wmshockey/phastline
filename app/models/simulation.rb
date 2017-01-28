@@ -28,11 +28,12 @@ class Simulation < ActiveRecord::Base
     validates :nomination_id, :presence => true
     validates :schedule_id, :presence => true
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
-    validates :max_batchsize, :presence => true, numericality: {:greater_than => 0, :less_than => 500000}
+    validates :max_batchsize, :presence => true, numericality: {:greater_than => 1000, :less_than => 500000}
+    default_scope { order(user_id: :asc, name: :asc) }    
 
 # Mainline driver code
     def run(pipeline, schedule, nomination, commodities, units, pumpar)
-        define_all_constants
+#        define_all_constants
         @pipeline = pipeline
         @schedule = schedule
         @nomination = nomination
@@ -128,33 +129,8 @@ class Simulation < ActiveRecord::Base
         end
     rescue Exception => e
       self.errors.add(:base, e.message)
-      self.errors.add(:base, e.backtrace)
+#      self.errors.add(:base, e.backtrace)
       return false
-    end
-
-    def define_all_constants
-#     Constants and conversion factors
-      $Gconstant = 0.00980652       # Gravitational constant (km/sec2)
-#     US to metric
-      $M3dy_m3hr = 0.04166666       #conversion from m3/dy to m3/hr
-      $Blhr_m3hr = 0.15898251       #conversion from bl/hr to m3/hr
-      $Bldy_m3hr = 0.00662427       #conversion from bl/dy to m3/hr
-      $Gpm_m3hr  = 0.2271253        #conversion from gpm   to m3/hr
-      $Bl_m3     = 0.15898251       #conversion from bl to m3
-      $Psig_kpa  = 6.8944           #conversion from psig to kpa
-      $Miles_km  = 1.60934          #conversion from miles to km
-      $In_m      = 0.0254           #conversion from in to m
-      $Ft_m      = 0.3048           #conversion from ft to m
-#     Metric to US
-      $M3hr_m3dy   = 24.0           #conversion from m3/hr to m3/dy
-      $M3hr_blhr   = 6.29           #conversion from m3/hr to bl/hr
-      $M3hr_bldy   = 150.960030     #conversion from m3/hr to bl/dy
-      $M3hr_gpm    = 4.40285604     #conversion from m3/hr to gpm
-      $M3_bl       = 6.29           #conversion from m3 to bl
-      $Kpa_psig    = 0.14504525     #conversion from kpa to psig
-      $Km_miles    = 0.62137274     #conversion from km to miles
-      $M_in        = 39.3700787     #conversion from m to in
-      $M_ft        = 3.28083989     #conversion from m to ft      
     end
 
     def data_integrity_checks(pipeline)
@@ -906,16 +882,24 @@ class Simulation < ActiveRecord::Base
         downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
         downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(2).to_s  
 #       Calculate the pressures for this station
-        suct = hold
+#       If full stream injection occurring at this station then set the suction to vapour pressure of commodity otherwise set it to the holding pressure
+        upstream_kmp = statar[up_stn_ix].kmp
+        upstream_flow = flowar.get_y(upstream_kmp)
+        if flow > 0 and upstream_flow == 0 then
+          suct = suctar.get_y(kmp)
+          pres = suct
+        else
+          suct = hold
+        end
         head = headar.get_y(kmp)
         pres = pres + head
 #       If the line is shut down downstream of this station then set the head to zero and the case to same as the holding pressure.
 #       If line is shut down, set the discharge to be what the pumps would have otherwise be putting out as line is still pressurized.
 #       When line is shut down, the pumps at the station are not running but the line downstream is still pressurized from the previous steps.
         if flow == 0 then
+          head = 0
           casep = hold
           disp = pres
-          head = 0
         else          
           casep = pres
           disp = casep

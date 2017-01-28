@@ -9,19 +9,13 @@
       <th>Step</th>
 	  <th>Flowrate</th>
 	  <th>Pumped<br>Volume</th>
-	  <th>Upstream<br>Batch</th>
-	  <th>Downstream<br> Batch</th>
+	  <th>Up<br>stream<br>Batch</th>
+	  <th>Down<br>stream<br>Batch</th>
 	  <th>Holding</th>
 	  <th>Suction</th>
 	  <th>Head</th>
 	  <th>Case</th>
 	  <th>Discharge</th>
-	  <th>Static<br>Loss</th>
-	  <th>Dynamic<br>Loss</th>
-	  <th>Min Press<br>Violation</th>
-	  <th>Max Press<br>Violation</th>
-	  <th>Min Pres<br>Point</th>
-	  <th>Max Pres<br>Point</th>
 	  <th>HHP<br>(KW)</th>
     </tr>
   </thead>
@@ -41,12 +35,6 @@
         <td><%= '%.2f'% i.head %></td>
         <td><%= '%.2f'% i.casep %></td>
         <td><%= '%.2f'% i.disc %></td>
-		<td><%= '%.2f'% i.total_static_loss %></td>
-		<td><%= '%.2f'% i.total_dynamic_loss %></td>
-		<td><%= '%.2f'% i.min_pressure_violation%></td>
-		<td><%= '%.2f'% i.max_pressure_violation%></td>
-		<td><%= '%.2f'% i.min_pressure_point%></td>
-		<td><%= '%.2f'% i.max_pressure_point%></td>
 		<td><%= '%.1f'% i.hhp %></td>
       </tr>
 	<% end %>

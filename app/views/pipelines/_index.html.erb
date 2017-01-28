@@ -2,6 +2,9 @@
 <table>
   <thead>
    <tr>
+	 <% if current_user.admin? then %>
+		<th>User</th>
+	 <% end %>
      <th>Name</th>
 	 <th>Description</th>
     </tr>
@@ -11,6 +14,9 @@
 	<% @pipelines.order(name: :asc).each do |pipeline| %>
 	  <% if !pipeline.errors.any? %>
 	      <tr>
+			<% if current_user.admin? then %>
+				<td><%= (User.find {|u| u.id == pipeline.user_id}).email %></td>
+			<% end %>
 	        <td><%= link_to pipeline.name, pipeline_path(pipeline) %></td>
 	        <td><%= pipeline.description %></td>
 	      </tr>

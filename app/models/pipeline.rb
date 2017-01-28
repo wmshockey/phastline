@@ -7,7 +7,8 @@ class Pipeline < ActiveRecord::Base
   has_many :schedules
   has_many :nominations
   has_many :units, through: :stations
-  validates :name, :presence => true  
+  validates :name, :presence => true
+  default_scope { order(user_id: :asc, name: :asc) }
 
   def get_volumes
 # Calculate the pipeline volumes to each kmp point into a profile array

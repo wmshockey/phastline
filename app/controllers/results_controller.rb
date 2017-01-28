@@ -30,8 +30,8 @@ class ResultsController < ApplicationController
 
   def station_step_detail
     @sim_id = params[:id].to_i
-    @step = params[:step].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == @step}
+    @station_id = params[:station_id].to_i
+    @results = Result.select {|r| r.simulation_id == @sim_id and r.station_id == @station_id}
   end
 
   def station_curves
@@ -42,7 +42,7 @@ class ResultsController < ApplicationController
   def step_flowrates
     @sim_id = params[:id].to_i
     @results = Result.select {|r| r.simulation_id == @sim_id}
-    @stations = @results.map {|s| s.stat}.uniq
+    @stations = @results.map {|s| s.station_id}.uniq
   end
 
   def batch_sequence

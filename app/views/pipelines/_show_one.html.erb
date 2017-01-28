@@ -2,6 +2,9 @@
 <table>
   <thead>
     <tr>
+	  <% if current_user.admin? then %>
+		<th>User</th>
+	  <% end %>
       <th>Pipeline Name</th>
 	  <th>Description</th>
     </tr>
@@ -9,6 +12,9 @@
 
   <tbody>
     <tr>
+	  <% if current_user.admin? then %>
+		<td><%= (User.find {|u| u.id == @pipeline.user_id}).email %></td>
+	  <% end %>
       <td><%= @pipeline.name %></td>
       <td><%= @pipeline.description %></td>
     </tr>

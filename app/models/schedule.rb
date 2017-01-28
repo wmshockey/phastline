@@ -8,7 +8,7 @@ class Schedule < ActiveRecord::Base
     validates :period, :presence => true, numericality: {:greather_than_or_equal_to => 0, :less_than => 366}
     validates :pipeline_id, :presence => true
     validates :sched_type, :presence => true, inclusion: { in: %w(PRIOR PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
-
+    default_scope { order(pipeline_id: :asc, name: :asc) }    
 
     def initialize_batch_sequence(prior_activities, statar)
 #     Get list of batches listed in the prior period schedule

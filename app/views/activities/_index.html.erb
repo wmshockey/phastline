@@ -13,7 +13,11 @@
     </tr>
   </thead>
 
-  <% @pipeline = current_user.pipelines.find {|p| p.id == @schedule.pipeline_id} %>
+  <% if current_user.admin? then %>
+	  <% @pipeline = Pipeline.find {|p| p.id == @schedule.pipeline_id} %>
+  <% else %>
+	  <% @pipeline = current_user.pipelines.find {|p| p.id == @schedule.pipeline_id} %>
+  <% end %>
   <% if @pipeline.nil? then %>
 	<strong><%= "Warning: cannot find pipeline with id: #{@schedule.pipeline_id.to_s}" %></strong>
   <% else %>

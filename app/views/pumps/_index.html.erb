@@ -2,6 +2,9 @@
 <table>
   <thead>
     <tr>
+	  <% if current_user.admin? then %>
+		<th>User</th>
+	  <% end %>
       <th>Name</th>
       <th>Description</th>
       <th>Flow<br>units</th>
@@ -20,6 +23,9 @@
     <% @pumps.each do |pump| %>
 	  <% if !pump.errors.any? %>
 	      <tr>
+			<% if current_user.admin? then %>
+				<td><%= (User.find {|u| u.id == pump.user_id}).email %></td>
+			<% end %>
 	        <td><%= link_to pump.pump_id, current_user.pumps.find {|p| p.pump_id == pump.pump_id} %></td>
 	        <td><%= pump.description %></td>
 			<td><%= pump.flow_units %></td>

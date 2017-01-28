@@ -4,16 +4,17 @@
   <% flow_units = @pump.flow_units %>
   <thead>
     <tr>
-      <th>Flow (<%= flow_units %>)</th>
-      <th>Head (<%= head_units %>)</th>
+      <th>Flow (m3/hr)</th>
+      <th>Head (meters)</th>
     </tr>
   </thead>
   <tbody>
     <% @pump.headpoints.order(flow: :asc).each do |headpoint| %>
 	  <% if !headpoint.id.nil? then %>
 	      <tr>
-	        <td><%= link_to headpoint.flow, pump_headpoint_path(headpoint.pump_id, headpoint.id) %></td>
-	        <td><%= headpoint.head %></td>
+			<% flow = headpoint.flow * $Gpm_m3hr %>
+	        <td><%= link_to flow.round(2), pump_headpoint_path(headpoint.pump_id, headpoint.id) %></td>
+	        <td><%= (headpoint.head * $Ft_m).round(2) %></td>
 	      </tr>
 	  <% end %>
 	<% end %>

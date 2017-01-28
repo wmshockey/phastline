@@ -2,6 +2,9 @@
 <table>
   <thead>
    <tr>
+	  <% if current_user.admin? then %>
+		<th>User</th>
+	  <% end %>
       <th>Name</th>
 	  <th>Description</th>
 	  <th>Pipeline</th>
@@ -14,6 +17,12 @@
 	<% @nominations.order(name: :asc).each do |nomination| %>
 	  <% if !nomination.errors.any? %>
 	      <tr>
+			<% if current_user.admin? then %>
+				<% pipeline_id = nomination.pipeline_id %>
+				<% user_id = Pipeline.find(pipeline_id).user_id %>
+				<% user_email = User.find(user_id).email %>
+				<td><%= user_email %></td>
+			<% end %>
 	        <td><%= link_to nomination.name, nomination_path(nomination) %></td>
 	        <td><%= nomination.description %></td>
 			<td><%= @pipelines.find {|p| p.id == nomination.pipeline_id}.name %></td>

@@ -5,7 +5,11 @@ class CommoditiesController < ApplicationController
   # GET /commodities
   # GET /commodities.json
   def index
-    @commodities = current_user.commodities.all
+    if current_user.admin? then
+      @commodities = Commodity.all
+    else
+      @commodities = current_user.commodities.all
+    end
   end
 
   # GET /commodities/1
