@@ -10,8 +10,9 @@
 	   <th>Pipeline</th>
 	   <th>Nomination</th>
 	   <th>Prior Schedule</th>
-	   <th>Max Flowrate</th>
-	   <th>Max Batchsize</th>
+	   <th>Max Flowrate (m3/hr)</th>
+	   <th>Max Batchsize (m3)</th>
+	   <th>Max Steptime (hrs)</th>
 	 </tr>
   </thead>
 	<% if current_user.admin? then %>
@@ -47,6 +48,7 @@
 		<% end %>
         <td><%= @simulation.max_flowrate %></td>
         <td><%= @simulation.max_batchsize %></td>
+		<td><%= @simulation.max_steptime %></td>
       </tr>
   </tbody>
 </table>

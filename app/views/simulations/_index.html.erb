@@ -10,8 +10,9 @@
       <th>Pipeline</th>
 	  <th>Nomination</th>
 	  <th>Prior Schedule</th>
-	  <th>Max Flowrate</th>
-	  <th>Max Batchsize</th>
+	  <th>Max Flowrate (m3/hr)</th>
+	  <th>Max Batchsize (m3)</th>
+	  <th>Max Steptime (hrs)</th>
     </tr>
   </thead>
 
@@ -47,9 +48,10 @@
 		<% end %>
         <td><%= simulation.max_flowrate %></td>
         <td><%= simulation.max_batchsize %></td>
+		<td><%= simulation.max_steptime %></td>
       </tr>
 	<% end %>
-	<td colspan="7"><%= link_to 'Add Simulation', new_simulation_path %></td>
+	<td colspan="8"><%= link_to 'Add Simulation', new_simulation_path %></td>
   </tbody>
 </table>
 

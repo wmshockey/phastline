@@ -29,6 +29,7 @@ class Simulation < ActiveRecord::Base
     validates :schedule_id, :presence => true
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 1000, :less_than => 500000}
+    validates :max_steptime, :presence => true, numericality: {:greater_than => 0, :less_than => 1000}
     default_scope { order(user_id: :asc, name: :asc) }    
 
 # Mainline driver code
@@ -388,32 +389,36 @@ class Simulation < ActiveRecord::Base
       end
       $timestamp = $timestamp + time_shift * 3600.0
       if not all_done then
-#       Record the end time of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
-#       Set the end_time of the event
-        btsqar[event_station][event_batch].end_time = $timestamp
-#       Set the start_time for the next batch in the sequence
-        if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-#       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
-        event_activity = btsqar[event_station][event_batch].activity_type
-        if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
-          all_done = true
-        else
-          btsqar[event_station][event_batch].start_time = $timestamp
-        end
-#       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
-        if event_station != statar.count - 1 then
-          while btsqar[event_station][event_batch].volume == 0
-            zero_volume_event_time = btsqar[event_station][event_batch].start_time
-            btsqar[event_station][event_batch].end_time = zero_volume_event_time
-            if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-    #       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
-            event_activity = btsqar[event_station][event_batch].activity_type
-            if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
-              all_done = true
-            else
-              btsqar[event_station][event_batch].start_time = zero_volume_event_time
+        if time_shift < max_steptime then
+  #       Record the end time of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
+  #       Set the end_time of the event
+          btsqar[event_station][event_batch].end_time = $timestamp
+  #       Set the start_time for the next batch in the sequence
+          if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
+  #       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
+          event_activity = btsqar[event_station][event_batch].activity_type
+          if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
+            all_done = true
+          else
+            btsqar[event_station][event_batch].start_time = $timestamp
+          end
+  #       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
+          if event_station != statar.count - 1 then
+            while btsqar[event_station][event_batch].volume == 0
+              zero_volume_event_time = btsqar[event_station][event_batch].start_time
+              btsqar[event_station][event_batch].end_time = zero_volume_event_time
+              if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
+      #       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
+              event_activity = btsqar[event_station][event_batch].activity_type
+              if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
+                all_done = true
+              else
+                btsqar[event_station][event_batch].start_time = zero_volume_event_time
+              end
             end
           end
+        else
+          time_shift = max_steptime
         end
 #       Update the pumped volumes for all stations to advance to the next step
         stn_ix = 0

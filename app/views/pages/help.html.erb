@@ -2,7 +2,9 @@
 
 <h2>General Overview</h2>
 
-<p>Phastline simulates the operation of a batched or single product liquid pipeline.  By providing the application with a physical description of the pipeline such as length, diameter, elevation, station location, pumps etc. and the type of product to be shipped, the application will calculate and report the pressures, flowrates, power, energy and the scheduled times of batches arriving or leaving the stations.  It takes the products to be shipped in the form of a nomination, breaks the volumes into batches and simulates the movement of those batches through the pipeline, taking into account intermediate injections and deliveries at stations along the line.  Batch injections will be scheduled out over the course of the simulation to evenly spread the volumes provided by each shipper.</p>
+<p><strong>Phastline is currently under development with an anticipated release date of sometime in 2017.  Please review the information below and if interested in using the application, get in touch with me at <%= mail_to "wmshockey@gmail.com" %> and I will keep you posted as to the earliest release date.  Thank-you.</strong></p>
+
+<p>Phastline simulates the operation of a batched or single product liquid pipeline.  By providing the application with a physical description of the pipeline such as length, diameter, elevation, station location, pumps etc. and the type of product to be shipped, the application will calculate and report the hydraulic gradients, pressures, flowrates, power, energy and the scheduled times of batches arriving or leaving the stations.  It takes the products to be shipped in the form of a nomination, breaks the volumes into batches and simulates the movement of those batches through the pipeline, taking into account intermediate injections and deliveries at stations along the line.  Batch injections will be scheduled out over the course of the simulation to evenly spread the volumes provided by each shipper.</p>
 
 <p>The maximum flowrate or capacity of the pipeline will be determined and the pressure profile at each step in time during the simulation will be calculated.  Pump curves will be combined at the stations to determine the discharge pressures and the Colebrook-White formula for line loss will be used to calculate the pressure losses between stations.  At no point will pressures exceed the maximum allowed pressure of the pipe or go below the vapour pressures of the fluids in the line.  Viscosity and density of the fluids will be corrected for temperature.  A report is provided that shows where the bottlenecks are located on the pipeline which are the points limiting the rate of flow.</p>
 
@@ -17,7 +19,9 @@
 
 <h4>Commodities</h4>
 <p>Commodities are the products that are shipped through the pipeline.  Each commodity will have an ID which is an abbreviation that is unique and that will be used to identify the batches in the pipeline.  Also, each commodity needs to have it's fluid properties recorded, which consists of:</p>
-<li>Commodity ID
+
+<ul>
+<li>Commodity ID</li>
 <li>viscosity at two different temperatures</li>
 <li>Density at one temperature and a density correction factor to calculate what it's density will be at other temperatures</li>
 <li>Vapour pressure of the fluid</li>
@@ -33,10 +37,13 @@
 
 <h4>Pipeline Segments</h4>
 Pipeline segments are sections of pipe that have the same physical properties, specifically:
+<ul>
 <li>Diameter</li>
 <li>Wall Thickness</li>
 <li>Roughness</li>
 <li>Maximum Allowable Working Pressure (MAWP)</li>
+</ul>
+
 <p>The roughness of a pipe refers to how smooth the inside wall of the pipe is and is measured in meters or inches so is an extremely small fractional number.  Obviously, the rougher the pipe, the more line loss there is along the pipe.  Typically the wider the wall thickness, the higher the MAWP.  Pipe segments are connected in series and their position in the line shown as the kilometer post at which the pipe segment starts.  The diameter of the pipe is the single most important factor in determining the flowing pressure loss in the pipe.  According to the Colebrook-White line loss formula, the pressure loss varies as the 5th power of the diameter.</p>
 
 <h4>Pipeline Stations</h4>
@@ -50,14 +57,17 @@ Pipeline segments are sections of pipe that have the same physical properties, s
 
 <h4>Nominations</h4>
 <p>A nomination is what a pipeline company typically receives from it's shipper customers on a monthly basis.  A nomination consist of the type of commodity the shipper wishes to move through the pipeline, a volume and the starting (receipt) and ending (delivery) locations over which the product will travel.  When nominations are received, the program will break the volumes up into smaller batches according to a user specified maximum batch size.  The program will then sequence the batches in the order in which they will be pumped over the month in a manner that evenly distributes the batch injections over that time period.  This is so that no one shipper is over taxed to provide all of it's nominated volume all at once to the pipeline.  Shipper's have supply and feeder pipeline facilities with limited capacity and this has to be taken into account.  A nomination typically corresponds to one calendar month pumping period and will consist of multiple shipments of different commodities from multiple shippers.  Each of the desired shipments is usually of a volume higher than what can be practically shipped down the line in one batch.  A nomination consists of shipments where each shipment will have the following data values:</p>
+<ul>
 <li>Start (Receipt) station</li>
 <li>End (Delivery) station</li>
 <li>Commodity type</li>
 <li>Volume</li>
 <li>Shipper</li>
+</ul>
 
 <h4>Prior Schedule</h4>
 <p>For the program to simulate the operation of the pipeline, it needs to know the initial state of the pipeline.  In particular, it needs to know what is existing inside the pipeline at the start of the simulation and what operations from the previous month are still in progress.  So when the program constructs a schedule to pump the batches associated with the new nomination and new shipments, it will do so by adding them on to the end of the previous period's schedule without violating what is currently under way from the previous period.  This sounds complicated but it is the reality when operating a pipeline and it is desired to simulate what will happen in the future month(s).  Fortunately, the schedule for past periods is usually readily available as it is a record of what actually happened in the previous month.  In the case where the user doesn't know the previous period's schedule, he/she can manually input a simple previous schedule consisting of a single batch that fills the entire line.  A schedule consists of "activities" which are detailed in the following way:</p>
+<ul>
 <li>Station (e.g Edmonton)</li>
 <li>Batch ID (e.g. CRW-01000)</li>
 <li>Start time</li>
@@ -65,25 +75,30 @@ Pipeline segments are sections of pipe that have the same physical properties, s
 <li>Activity Type (e.g. INJECTION, RECEIPT, LANDING, DELIVERY)</li>
 <li>Volume</li>
 <li>Shipper</li>
+</ul>
 
 <h3>Calculations and Processing</h3>
 
 <h4>Line pipe Modeling:</h4>
 <p>The program performs the following calculations to model pipe segments:</p>
+<ul>
 <li>Line pressure loss accounting for variations in elevation, pipe diameter, roughness and fluid viscosity and density.</li>
 <li>Viscosity and density changes computed using exact batch positions.</li>
 <li>Implicit form of Colebrook White friction factor formula.</li>
 <li>Darcy Weisbach flowing pressure loss formula.</li>
 <li>Line pressure is constrained to be below specified maximum allowable operating pressure at all points.  Excess pressure is throttled.</li>
 <li>Line pressure is set to vapour pressure at full stream injection points.</li>
+</ul>
 
 <h4>Station Modeling:</h4>
 <p>Stations are modeled as follows.  Note that not all stations have pumps and not all stations will have injection or delivery operations occurring at them.</p>
+<ul>
 <li>Series and parallel pump configurations may be specified</li>
 <li>Pump pressure is interpoated directly from the flow/head points specified in the pump characteristics table.</li>
 <li>An overall station curve is constructed that will yield the maximum pressure available at the station with all pump units turned on</li>
 <li>Injection or Receipt activities are simulated by shutting down the line upstream and allowing the new batch to enter the line at the station.</li>
 <li>Landing or Delivery activities are simulated by shutting down the line downstream and allowing the batch to leave the line at the station.</li>
+</ul>
 
 <h4>Pump Curve Combinations</h4>
 <p>Station curves are calculated by adding the pressures of all pumps on the same row at common flow rate values. If there is more than one row of pumps at a station (parallel operation) the flow rates of each row are added at common pressure values.<p>
@@ -108,17 +123,21 @@ head   = meters of head of water interpolated from curve<br>
 PS = G * dens * elev
 <br>
 where:
+<ul>
 <li>PS   = Static pressure loss (or gain) in kpa</li>
 <li>G    = Acceleration due to gravity (9.80652)</li>
 <li>dens = Density (kg/m3)</li>
 <li>elev = Elevation difference (meters)</li>
+</ul>
 <br>
 <strong>Dynamic Lineloss:</strong>
 Dynamic (or flowing) pressure loss refers to pressure lost along the line due to the internal friction of the fluid against the inside pipe wall.  This pressure is lost in the form of heat.  The calculation is actually a three step procedure:
 <br>
+<ul>
 <li>Compute Reynolds number</li>
 <li>Compute Friction Factor</li>
 <li>Compute Lineloss</li>
+</ul>
 <br>
 
 <strong>Reynolds number formula:</strong>
@@ -220,18 +239,22 @@ T   = Temperature at a point on the line<br>
 
 <p>The Phastline application is intended to be a training tool for someone interested in understanding how a batched liquid pipeline is designed and operated.  As a design tool, the user can evaluate different variations of pipe diameter, size, station spacing and pump installations to see how each change effects the overall pipeline capacity.  As an operational tool, the user can configure pipeline as it currently exists, then use current or forecasted nomination volumes to run through it to determine the power and energy usage which could ultimately determine the cost of operating the pipeline.  The schedule used by the simulation is displayed as output so could also be used as an example of a feasible schedule for operating the line with the new nominated volumes.</p>
 <p>The user is provided with sample set of data when they first sign-up to use the application.  This includes:</p>
+<ul>
 <li>Commodity properties for about 24 different commodities</li>
 <li>Pump data for about 12 different pumps</li>
 <li>Pipeline data for two different pipelines.  One example is for an actual pipeline operated by a large North American pipeline company.  The other is a simple fictional 3 station line with only a few nominated shipments.
 <li>Prior Schedule and Nomination data for each of the two sample pipelines provided.</li>
+</ul>
 
 <p>For running their own studies, a user would typically start out by setting up the input data for the pipeline they are interested in as follows.</p>
+<ul>
 <li>Create a Pipeline.  Enter the data points for where the stations are located on the line, where the segments are, what the elevations are and what temperatures are.</li>
 <li>Create a Prior Schedule.  Determine what the initial state of the pipeline is and enter that in the form of activities in the "prior schedule".  This could be as complex as the full reconciled schedule from a previous month or as simple as a single batch occupying the whole line.</li>
 <li>Create a Nomination and enter the shipments desired to be pumped through the line.</li>
 <li>Create a Simulation.  With the Pipeline, Prior Schedule and Nomination data finalized, the user would then create a new simulation.  Creating a new simulation is simply a matter of giving it a name and then specifying the Pipeline, Prior Schedule and Nomination to be used.</li>
 <li>The Maximum Flowrate is a constraint that is imposed on the simulation to make sure that at no point in time will the flowrate go higher than the value specified at any point on the line.  This value can be set to an arbitrarily high value so that the program will calculate and use the capacity flow rate for the line.</li>
 <li>The Maximum Batch size is used to break up the nominated shipments into batches.</li>
+</ul>
 
 <h4>Running a Simulation</h4>
 <p>Running a simulation is simply a matter of selecting it form the index list of simulations shown on the first screen in the application, then pressing the "Run Simulation" button.  The length of time the program takes to complete the simulation depends on how large the pipeline is (pipeline length and number of stations) and how large the nominated shipments are (large volumes mean large number of batches).  Simulations typically take from a few seconds to a few minutes.</p>
@@ -239,6 +262,7 @@ T   = Temperature at a point on the line<br>
 <h4>Viewing Output displays and reports</h4>
 When a simulation completes successfully, a menu will be shown on screen that allows the user to view the output results from a number of different perspectives.  He/she can look at the average summary results, the linefills at each step, the pressures at each station in each step, the total power and energy consumed, the schedule of batches through each station or the list of activities associated with each batch.
 <p>The current list of display available for viewing the simulation results are:</p>
+<ul>
 <li>Average Summary Results</li>
 <li>Batch Detail - shows all activities associated with a given batch</li>
 <li>Schedule - an overall summary of the entire pipeline schedule</li>
@@ -250,6 +274,7 @@ When a simulation completes successfully, a menu will be shown on screen that al
 <li>Step Detail - Flowrate, pressure and power for the pipeline shown step by step</li>
 <li>Step Flowrates - Flowrates across the line shown step by step</li>
 <li>Step Linefill - The linefill (batch positions) shown step by step</li>
+</ul>
 <br>
 <strong>Sample Display</strong><br>
 <%= image_tag "Sample Display.png", alt: "Sample Display" %>
