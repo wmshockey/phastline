@@ -247,13 +247,14 @@ T   = Temperature at a point on the line<br>
 </ul>
 
 <p>For running their own studies, a user would typically start out by setting up the input data for the pipeline they are interested in as follows.</p>
-<ul>
+<ol>
 <li>Create a Pipeline.  Enter the data points for where the stations are located on the line, where the segments are, what the elevations are and what temperatures are.</li>
 <li>Create a Prior Schedule.  Determine what the initial state of the pipeline is and enter that in the form of activities in the "prior schedule".  This could be as complex as the full reconciled schedule from a previous month or as simple as a single batch occupying the whole line.</li>
 <li>Create a Nomination and enter the shipments desired to be pumped through the line.</li>
 <li>Create a Simulation.  With the Pipeline, Prior Schedule and Nomination data finalized, the user would then create a new simulation.  Creating a new simulation is simply a matter of giving it a name and then specifying the Pipeline, Prior Schedule and Nomination to be used.</li>
 <li>The Maximum Flowrate is a constraint that is imposed on the simulation to make sure that at no point in time will the flowrate go higher than the value specified at any point on the line.  This value can be set to an arbitrarily high value so that the program will calculate and use the capacity flow rate for the line.</li>
 <li>The Maximum Batch size is used to break up the nominated shipments into batches.</li>
+<li>The Maximum Step Time is the upper limit to how long the duration of a time step is in performing the simulation.  Shorter a Max Step Time will mean greater precision in the hydraulic gradients but will take longer running time on the computer to complete the simulation.</li>
 </ul>
 
 <h4>Running a Simulation</h4>
