@@ -94,7 +94,7 @@ Pipeline segments are sections of pipe that have the same physical properties, s
 <p>Stations are modeled as follows.  Note that not all stations have pumps and not all stations will have injection or delivery operations occurring at them.</p>
 <ul>
 <li>Series and parallel pump configurations may be specified</li>
-<li>Pump pressure is interpoated directly from the flow/head points specified in the pump characteristics table.</li>
+<li>Pump pressure is interpolated directly from the flow/head points specified in the pump characteristics table.</li>
 <li>An overall station curve is constructed that will yield the maximum pressure available at the station with all pump units turned on</li>
 <li>Injection or Receipt activities are simulated by shutting down the line upstream and allowing the new batch to enter the line at the station.</li>
 <li>Landing or Delivery activities are simulated by shutting down the line downstream and allowing the batch to leave the line at the station.</li>
@@ -190,7 +190,7 @@ loss  = pressure loss (kpa/kilometre)<br>
 </blockquote>
 
 <h4>Viscosity and Density Fluid Properties</h4>
-<p>The two fluid properties modeled by this program are viscosity and density.  Both of these properties are functions of temperature.</p>
+<p>The two fluid properties modelled by this program are viscosity and density.  Both of these properties are functions of temperature.</p>
 
 <h5>Viscosity:</h5>
 <p>The viscosity attributes for each fluid id contained in the fluid properties file consist of two viscosity/temperature points (V1,T1) and (V2,T2).  The ASTM method is used to compute the viscosity V at some temperature T given V1,T1 and V2,T2.  Using the two viscosity points read in from the file the program solves the following equation to get two coefficients for each fluid (A and B):</p>
@@ -281,10 +281,10 @@ When a simulation completes successfully, a menu will be shown on screen that al
 <%= image_tag "Sample Display.png", alt: "Sample Display" %>
 
 <h4>Sign In and Sign out of User Accounts</h4>
-<p>A user would typically start out by going the www.phastware.com website and reading about the Phastline application by selecting the "Info" link.  If interested, they could then select the "Request Account" link from the www.phastware.com home page to send an email request to the administrator to have an account set up for them.  They will be notified when their account is ready to use and will be provided with a temporary password at that time.   The user can then sign in to their account, change their password and start creating pipelines and running simulations.  Included with the account are two sample pipelines along with sample Commodity and Pump characteristics data.
+<p>A user would typically start out by going to the www.phastware.com website and reading about the Phastline application by selecting the "documentation" link.  If interested, they could then select the "Sign-Up" link from the www.phastware.com home page to enter a user name and password for a new user account.  The new account will not have any sample pipeline, commodity or pump data in it but you could email me at wmshockey@gmail.com and I'll seed the account with the sample data for you.  Now the user can sign-in to their account and start creating/modifying pipelines and running simulations.
 
 <h3>Technical</h3>
-<p>Phastline is an entirely web-based application.  It does not require anything to be installed on the user's PC or laptop.  All data is stored in a back-end MySQL database and all front-end screens and processing were coded using the Ruby on Rails application development environment with the MVC (Model-View_Controller) architecture.  The application uses a Rails add-on (or Gem) called "Devise" to handle the user account authorizations.  All data in a users's account is secured in the SQL database and separate from other user's data.  If a user wants the application to be installed directly on a PC or laptop and not requiring an internet connection, then that is also an option.</p>
+<p>Phastline is an entirely web-based application.  It does not require anything to be installed on the user's PC or laptop.  All data is stored in a back-end SQL database and all front-end screens and processing were coded using the Ruby on Rails application development environment with the MVC (Model-View_Controller) architecture.  The application uses a Rails add-on (or Gem) called "Devise" to handle the user account authorizations.  All data in a users's account is secured in the SQL database and separate from other user's data.  If a user prefers the application to be installed directly on a PC or laptop, then that is also an option but will require some work on my part to install the necessary software on your machine.</p>
 
 <h3>Future Enhancements</h3>
-The application is currently under development and in the testing phase.  All enhancements and bugs are being recorded in a JIRA project by the team.  The first release of the application is planned for sometime in 2017.  If you are interested in being notified when it is ready, please contact Warren Shockey by email at wmshockey@gmail.com.
+<p>The application is currently under development and in the testing phase.  All enhancements and bugs are being recorded in a JIRA project by the team.  The first release of the application is planned for sometime in 2017.  If you are interested in being notified when it is ready for production use, please contact Warren Shockey by email at wmshockey@gmail.com.</p>
