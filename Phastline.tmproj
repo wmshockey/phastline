@@ -686,14 +686,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>33</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>33</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>44</integer>
+			<integer>7</integer>
 		</dict>
 		<key>app/models/simulation.rb</key>
 		<dict>
@@ -707,7 +707,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>32</integer>
+			<integer>1322</integer>
 		</dict>
 		<key>app/models/user.rb</key>
 		<dict>
@@ -1256,6 +1256,20 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+		</dict>
+		<key>app/views/pages/help.html.erb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>47</integer>
+				<key>line</key>
+				<integer>231</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>191</integer>
 		</dict>
 		<key>app/views/pages/home.html.erb</key>
 		<dict>
@@ -3043,12 +3057,13 @@
 		<string>app/models/user.rb</string>
 		<string>app/controllers/simulations_controller.rb</string>
 		<string>app/models/schedule.rb</string>
+		<string>app/views/pages/help.html.erb</string>
 		<string>app/views/results/step_detail.html.erb</string>
 		<string>app/views/results/step_linefill.html.erb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{489, 4}, {1936, 1239}}</string>
+	<string>{{487, 116}, {1936, 1239}}</string>
 </dict>
 </plist>

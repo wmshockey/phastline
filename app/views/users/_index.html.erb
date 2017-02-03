@@ -1,0 +1,28 @@
+<h2>Users</h2>
+
+<table>
+  <thead>
+   <tr>
+	  <th>ID</th>
+      <th>Email</th>
+	  <th>Sign-in count</th>
+	  <th>Current Sign-in at</th>
+	  <th>Last Sign-in at</th>
+	  <th>Number of Simulations</th>
+    </tr>
+  </thead>
+
+  <tbody>
+	<% @users.order(id: :asc).each do |u| %>
+	  <% number_of_simulations = Simulation.select {|s| s.user_id == u.id}.count %>
+      <tr>
+        <td><%= u.id %></td>
+        <td><%= u.email %></td>
+		<td><%= u.sign_in_count %></td>
+		<td><%= u.current_sign_in_at.strftime("%Y-%m-%d %H:%M") %></td>
+		<td><%= u.last_sign_in_at.strftime("%Y-%m-%d %H:%M") %></td>		
+        <td><%= number_of_simulations %></td>
+      </tr>
+	<% end %>
+  </tbody>
+</table>
