@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
+  get 'users/index'
+
   get "/pages/:page" => "pages#show"
+
+  resources :users, :only => [:index]
 
   devise_for :users
 
@@ -49,7 +53,7 @@ Rails.application.routes.draw do
     resources :elevations
     resources :temperatures
   end
-  
+    
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

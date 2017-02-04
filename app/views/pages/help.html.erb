@@ -222,6 +222,16 @@ T   = Temperature at a point on the line<br>
 **  = notation to mean "raised to the power"<br>
 </blockquote>
 
+<h5>Power Calculation:</h5>
+<p>The power shown in the application's reports is hydraulic power imparted to the fluid and is expressed in Kilowatts.  The formula used is:
+Power = Q * dP / 3600
+<br>
+where:
+<ul>
+<li>Q = Flowrate in m3/hr</li>
+<li>dP = differential pressure across the pumps in Kpa</li>
+</ul>
+
 <h4>Capacity Flowrate Calculation</h4>
 <p>The "Capacity" flowrate is computed using successive iterations until the line pressure is within 1 kpa of vapour pressure at some point on the line.  The minimum difference between line pressure and vapour pressure is termed the "violation amount".</p>
 <p>Successive flowrate values are computed using linear interpolation based on the previous two flowrates and violation amounts.  Note that a negative violation amount means there is no violation and the negative value is a measure of how much room there is until a violation is reached (over MAWP or under vapour pressure).</p> 
