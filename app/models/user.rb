@@ -9,4 +9,10 @@ class User < ActiveRecord::Base
   has_many :simulations, dependent: :destroy
   has_many :commodities, dependent: :destroy
   has_many :pumps, dependent: :destroy
+  after_create :populate_seed_data
+
+  def populate_seed_data
+    Rails.application.load_seed
+  end
+  
 end
