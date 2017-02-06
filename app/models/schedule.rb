@@ -1,3 +1,18 @@
+class ScheduleValidator < ActiveModel::Validator
+  def validate(record)
+    pipeline = Pipeline.find(record.pipeline_id)
+    stations = pipeline.stations.map {|s| s.name}
+    activities = record.activities
+    if activities.any? then
+      activities.each do |a|
+        if !stations.include?(a.station) then
+          record.errors[:base] << "Schedule activity has station #{a.station} that is not on the pipeline #{pipeline.name}"
+        end
+      end
+    end
+  end
+end
+
 class Schedule < ActiveRecord::Base
     belongs_to :simulation
     belongs_to :pipeline
@@ -8,6 +23,7 @@ class Schedule < ActiveRecord::Base
     validates :period, :presence => true, numericality: {:greather_than_or_equal_to => 0, :less_than => 366}
     validates :pipeline_id, :presence => true
     validates :sched_type, :presence => true, inclusion: { in: %w(PRIOR PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
+    validates_with ScheduleValidator
     default_scope { order(pipeline_id: :asc, name: :asc) }    
 
     def initialize_batch_sequence(prior_activities, statar)
@@ -195,3 +211,5 @@ class Schedule < ActiveRecord::Base
     end
 
 end
+
+

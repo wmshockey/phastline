@@ -4,8 +4,8 @@ class Pipeline < ActiveRecord::Base
   has_many :stations, dependent: :destroy
   has_many :elevations, dependent: :destroy
   has_many :temperatures, dependent: :destroy
-  has_many :schedules
-  has_many :nominations
+  has_many :schedules, dependent: :destroy
+  has_many :nominations, dependent: :destroy
   has_many :units, through: :stations
   validates :name, :presence => true
   default_scope { order(user_id: :asc, name: :asc) }

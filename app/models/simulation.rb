@@ -30,11 +30,10 @@ class Simulation < ActiveRecord::Base
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 1000, :less_than => 500000}
     validates :max_steptime, :presence => true, numericality: {:greater_than => 0, :less_than => 1000}
-    default_scope { order(user_id: :asc, name: :asc) }    
+    default_scope { order(user_id: :asc, pipeline_id: :asc) }    
 
 # Mainline driver code
     def run(pipeline, schedule, nomination, commodities, units, pumpar)
-#        define_all_constants
         @pipeline = pipeline
         @schedule = schedule
         @nomination = nomination
