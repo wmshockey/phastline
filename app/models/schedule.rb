@@ -27,6 +27,7 @@ class Schedule < ActiveRecord::Base
     default_scope { order(pipeline_id: :asc, name: :asc) }    
 
     def initialize_batch_sequence(prior_activities, statar)
+#     Initialize the batch sequence array with batches currently active in the prior period schedule
 #     Get list of batches listed in the prior period schedule
       batch_list = prior_activities.map {|p| p.batch_id}.uniq
 #     Find list of batches that have already been delivered out of the line
@@ -46,12 +47,14 @@ class Schedule < ActiveRecord::Base
         batch_activities = prior_activities.select {|p| p.batch_id == b}
         start_rec = batch_activities.find {|b| (b.activity_type == "INJECTION" or b.activity_type =="RECEIPT") }
         end_rec = batch_activities.find {|b| (b.activity_type == "DELIVERY" or b.activity_type == "LANDING") }
+#       if there is no starting activity for this batch then create it
         if start_rec.nil? then
           start_rec = end_rec.dup
           start_ix = 0
           end_ix = statar.index {|s| s.name == end_rec.station}
           start_rec.station = statar[0].name
           start_rec.activity_type = "INJECTION"
+#       if there is no ending activity for this batch then create it
         elsif end_rec.nil?
           end_rec = start_rec.dup
           start_ix = statar.index {|s| s.name == start_rec.station}
@@ -66,24 +69,30 @@ class Schedule < ActiveRecord::Base
         batch_temp = batch_id.partition("-")
         commodity_id = batch_temp[0]
         batch_number = batch_temp[2].partition(" ")[0]
+#       Populate all station columns in batch sequence array for this batch
         for ix in (0...max_stations)
           bs[ix][batch_ix] = Batchrec.new(batch_number, commodity_id, 0.0, start_rec.station, end_rec.station, nil, nil, nil, start_rec.shipper, start_rec.nomination_name)
           bs[ix][batch_ix].batch_id = commodity_id + "-" + batch_number.to_s.rjust(5, "0")
         end        
+#       Set volume to 0 for all stations before initial injection/receipt
         for ix in (0...start_ix)
           bs[ix][batch_ix].volume = 0.0
         end
+#       Set volume to 0 for all stations after delivery/landing
         for ix in (end_ix...max_stations)
           bs[ix][batch_ix].volume = 0.0
         end
+#       Set volume, start and end times for initial injection/receipt station
         bs[start_ix][batch_ix].volume = start_rec.volume
         bs[start_ix][batch_ix].start_time = start_rec.start_time
         bs[start_ix][batch_ix].end_time = start_rec.end_time
         bs[start_ix][batch_ix].activity_type = start_rec.activity_type
+#       Set volume and activity type as EVEN for all stations in between start and end stations
         for ix in (start_ix+1...end_ix)
           bs[ix][batch_ix].volume = start_rec.volume
           bs[ix][batch_ix].activity_type = "EVEN"
         end
+#       Set volume, start and end times for last delivery/landing station
         bs[end_ix][batch_ix].volume = end_rec.volume
         bs[end_ix][batch_ix].start_time = end_rec.start_time
         bs[end_ix][batch_ix].end_time = end_rec.end_time
@@ -113,6 +122,7 @@ class Schedule < ActiveRecord::Base
 
 
     def finalize_batch_sequence(max_batchsize, btsqar, nomination_name, shipments, statar)
+#     Finalize the batch sequence by adding on the batches from the new month shipments
 #     Break up shipments into a list of batches
       batches = Array.new
       number_of_shipments = shipments.count
@@ -177,7 +187,7 @@ class Schedule < ActiveRecord::Base
         end
       end
 #     Now tack the new batches from the nomination shipments onto the front end of the existing batch sequence array btsqar
-#     The new month batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence downstream of the first station
+#     The new month batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence sitting downstream of the first station
 #     and we want those to be from the prior period schedule batches.
       number_of_prior_batches = btsqar[0].length
       final_bs = Array.new(statar.count){Array.new(max_batches + number_of_prior_batches)}

@@ -27,7 +27,7 @@
 						<td><%= b.end_time.strftime("%Y-%m-%d %H:%M") if b.end_time %></td>
 						<td><%= station %>
 						<td><%= b.activity_type %></td>
-						<td><%= b.volume %></td>
+						<td><%= '%8.1f'%b.volume %></td>
 						<td><%= b.start_location %></td>
 						<td><%= b.end_location %></td>
 						<td><%= b.shipper %></td>

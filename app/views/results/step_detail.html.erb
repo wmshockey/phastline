@@ -39,15 +39,15 @@
       <tr>
 		<td><%= i.stat %></td>
         <td><%= '%.2f'% i.kmp %></td>
-		<td><%= '%8.2f'% i.flow %></td>
-		<td><%= '%10.2f'% i.pumped_volume %></td>
+		<td><%= '%8.1f'% i.flow %></td>
+		<td><%= '%10.1f'% i.pumped_volume %></td>
 		<td><%= i.upstream_batch %></td>
 		<td><%= i.downstream_batch %></td>
-		<td><%= '%.2f'% i.hold %></td>
-		<td><%= '%.2f'% i.suct %></td>
-        <td><%= '%.2f'% i.head %></td>
-        <td><%= '%.2f'% i.casep %></td>
-        <td><%= '%.2f'% i.disc %></td>
+		<td><%= '%.1f'% i.hold %></td>
+		<td><%= '%.1f'% i.suct %></td>
+        <td><%= '%.1f'% i.head %></td>
+        <td><%= '%.1f'% i.casep %></td>
+        <td><%= '%.1f'% i.disc %></td>
 		<td><%= '%.1f'% i.hhp %></td>
       </tr>
 	<% end %>

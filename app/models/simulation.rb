@@ -873,7 +873,7 @@ class Simulation < ActiveRecord::Base
             raise "Error occured in step_calc method"
           end
           upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
-          upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
+          upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(1).to_s
         else
           volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
           upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
@@ -884,7 +884,7 @@ class Simulation < ActiveRecord::Base
         volume_shift = i.initial_volume + i.pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
         downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
-        downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(2).to_s  
+        downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(1).to_s  
 #       Calculate the pressures for this station
 #       If full stream injection occurring at this station then set the suction to vapour pressure of commodity otherwise set it to the holding pressure
         upstream_kmp = statar[up_stn_ix].kmp

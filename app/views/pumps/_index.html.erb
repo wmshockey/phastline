@@ -25,8 +25,10 @@
 	      <tr>
 			<% if current_user.admin? then %>
 				<td><%= (User.find {|u| u.id == pump.user_id}).email %></td>
+				<td><%= link_to pump.pump_id, @pumps.find{|p| p.pump_id == pump.pump_id and p.user_id == pump.user_id} %>
+			<% else %>
+	            <td><%= link_to pump.pump_id, current_user.pumps.find {|p| p.pump_id == pump.pump_id} %></td>
 			<% end %>
-	        <td><%= link_to pump.pump_id, current_user.pumps.find {|p| p.pump_id == pump.pump_id} %></td>
 	        <td><%= pump.description %></td>
 			<td><%= pump.flow_units %></td>
 	        <td><%= pump.head_units %></td>
