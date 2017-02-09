@@ -8,6 +8,7 @@ class Pipeline < ActiveRecord::Base
   has_many :nominations, dependent: :destroy
   has_many :units, through: :stations
   validates :name, :presence => true
+  validates_uniqueness_of :name, scope: :user_id
   default_scope { order(user_id: :asc, name: :asc) }
 
   def get_volumes

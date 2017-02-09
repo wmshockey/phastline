@@ -1,7 +1,6 @@
 <%= render 'pipelines/show_one' %>
 <%= render 'form' %>
 
-<%= link_to 'Show', pipeline_temperature_path(@temperature.pipeline_id, @temperature.id) %> | 
-<%= link_to 'Back', pipeline_path(@pipeline) %>
+<%= link_to 'Back', pipeline_temperature_path(@temperature.pipeline_id, @temperature.id) %>
 
 <%= render 'index' %>

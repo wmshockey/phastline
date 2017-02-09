@@ -10,6 +10,7 @@ class Pump < ActiveRecord::Base
   validates :efficiency_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
   validates :capacity_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
   validates :head_correction_factor, :presence => true, numericality: {:greater_than => 0, :less_than_or_equal_to => 1}
+  validates_uniqueness_of :pump_id, scope: :user_id
   default_scope { order(user_id: :asc, pump_id: :asc) }
   
 end
