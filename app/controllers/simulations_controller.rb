@@ -27,6 +27,23 @@ class SimulationsController < ApplicationController
   def edit
   end
 
+  # GET /simulations/1/copy
+  def copy
+    simulations = current_user.simulations
+    @simulation = simulations.find(params[:id])
+    respond_to do |format|
+      simulation_copy = @simulation.copy(simulations, @simulation)
+      if simulation_copy
+        format.html { redirect_to simulations_url, notice: "Simulation #{@simulation.name} was successfully copied to: #{simulation_copy.name}." }
+        format.json { head :no_content }
+      else
+        flash[:error] = "Simulation copy failed."
+        format.html { render :show, notice: 'Simulation copy failed.' }
+        format.json { render json: simulation_copy.errors, status: :unprocessable_entity }
+      end
+    end        
+  end
+
   # GET /simulations/1/run
   def run
     if current_user.admin? then 

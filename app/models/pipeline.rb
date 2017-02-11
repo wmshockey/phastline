@@ -11,6 +11,71 @@ class Pipeline < ActiveRecord::Base
   validates_uniqueness_of :name, scope: :user_id
   default_scope { order(user_id: :asc, name: :asc) }
 
+
+  def copy(simulations, simulation)     
+    simulation_copy = simulation.dup
+    n = 1
+    while n <= 100
+      new_name = simulation.name + "-copy" + n.to_s
+      if simulations.find {|s| s.name == new_name} then
+        n = n + 1
+      else
+        break
+      end
+    end
+    simulation_copy.name = new_name
+    simulation_copy.save
+    return simulation_copy      
+  end
+
+
+
+  def copy(pipelines, pipeline)
+    pipeline_copy = pipeline.dup
+    n = 1
+    while n <= 100
+      new_name = pipeline.name + "-copy" + n.to_s
+      if pipelines.find {|s| s.name == new_name} then
+        n = n + 1
+      else
+        break
+      end
+    end
+    pipeline_copy.name = new_name
+    pipeline_copy.save
+    stations = pipeline.stations
+    stations.each do |s|
+      s_copy = s.dup
+      s_copy.pipeline_id = pipeline_copy.id
+      s_copy.save
+      units = s.units
+      units.each do |u|
+        u_copy = u.dup
+        u_copy.station_id = s_copy.id
+        u_copy.save
+      end
+    end  
+    segments = pipeline.segments
+    segments.each do |s|
+      s_copy = s.dup
+      s_copy.pipeline_id = pipeline_copy.id
+      s_copy.save
+    end
+    elevations = pipeline.elevations
+    elevations.each do |e|
+      e_copy = e.dup
+      e_copy.pipeline_id = pipeline_copy.id
+      e_copy.save
+    end
+    temperatures = pipeline.temperatures
+    temperatures.each do |t|
+      t_copy = t.dup
+      t_copy.pipeline_id = pipeline_copy.id
+      t_copy.save
+    end
+    return pipeline_copy
+  end
+
   def get_volumes
 # Calculate the pipeline volumes to each kmp point into a profile array
 # Note that user input for segments must include an entry for the last point on the line.

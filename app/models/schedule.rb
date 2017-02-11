@@ -27,6 +27,28 @@ class Schedule < ActiveRecord::Base
     validates_with ScheduleValidator
     default_scope { order(pipeline_id: :asc, name: :asc) }    
 
+    def copy(schedules, schedule)
+      schedule_copy = schedule.dup
+      n = 1
+      while n <= 100
+        new_name = schedule.name + "-copy" + n.to_s
+        if schedules.find {|s| s.name == new_name} then
+          n = n + 1
+        else
+          break
+        end
+      end
+      schedule_copy.name = new_name
+      schedule_copy.save
+      activities = schedule.activities
+      activities.each do |a|
+        a_copy = a.dup
+        a_copy.schedule_id = schedule_copy.id
+        a_copy.save
+      end
+      return schedule_copy
+    end
+
     def initialize_batch_sequence(prior_activities, statar)
 #     Initialize the batch sequence array with batches currently active in the prior period schedule
 #     Get list of batches listed in the prior period schedule

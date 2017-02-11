@@ -1059,8 +1059,23 @@ class Simulation < ActiveRecord::Base
     end
     Result.import @results, validate: false
   end
-      
 
+  def copy(simulations, simulation)     
+    simulation_copy = simulation.dup
+    n = 1
+    while n <= 100
+      new_name = simulation.name + "-copy" + n.to_s
+      if simulations.find {|s| s.name == new_name} then
+        n = n + 1
+      else
+        break
+      end
+    end
+    simulation_copy.name = new_name
+    simulation_copy.save
+    return simulation_copy      
+  end
+    
   def get_record(record_array, kmp)
     i = 0
     until i == record_array.count - 1

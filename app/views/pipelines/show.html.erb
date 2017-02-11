@@ -2,6 +2,7 @@
 <%= render 'show_one' %>
 <%= link_to 'Edit Pipeline', edit_pipeline_path(@pipeline) %> |
 <%= link_to 'Delete', pipeline_path(@pipeline.id), method: :delete, data: { confirm: 'Are you sure you want to delete this pipeline?' } %> |
+<%= link_to 'Copy', copy_pipeline_path(@pipeline.id), data: {confirm: 'Are you sure you want to make a copy of this pipeline?' } %> |
 <%= link_to 'Back', pipelines_path %>
 
 <%= render 'stations/index' %>

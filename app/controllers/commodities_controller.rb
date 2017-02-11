@@ -27,6 +27,23 @@ class CommoditiesController < ApplicationController
   def edit
   end
 
+  # GET /commodities/1/copy
+  def copy
+    commodities = current_user.commodities
+    @commodity = commodities.find(params[:id])
+    respond_to do |format|
+      commodity_copy = @commodity.copy(commodities, @commodity)
+      if commodity_copy
+        format.html { redirect_to commodities_url, notice: "Commodity #{@commodity.commodity_id} was successfully copied to: #{commodity_copy.commodity_id}." }
+        format.json { head :no_content }
+      else
+        flash[:error] = "Commodity copy failed."
+        format.html { render :show, notice: 'Commodity copy failed.' }
+        format.json { render json: commodities_copy.errors, status: :unprocessable_entity }
+      end
+    end        
+  end
+
   # POST /commodities
   # POST /commodities.json
   def create

@@ -26,4 +26,27 @@ class Nomination < ActiveRecord::Base
     validates_uniqueness_of :name, scope: :pipeline_id
     validates_with NominationValidator
     default_scope { order('name ASC') }
+    
+    def copy(nominations, nomination)
+      nomination_copy = nomination.dup
+      n = 1
+      while n <= 100
+        new_name = nomination.name + "-copy" + n.to_s
+        if nominations.find {|s| s.name == new_name} then
+          n = n + 1
+        else
+          break
+        end
+      end
+      nomination_copy.name = new_name
+      nomination_copy.save
+      shipments = nomination.shipments
+      shipments.each do |s|
+        s_copy = s.dup
+        s_copy.nomination_id = nomination_copy.id
+        s_copy.save
+      end
+      return nomination_copy
+    end
+        
 end

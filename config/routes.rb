@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   get 'users/index'
-
   get "/pages/:page" => "pages#show"
 
   resources :users, :only => [:index]
@@ -14,6 +13,9 @@ Rails.application.routes.draw do
 
   resources :schedules do
     resources :activities
+    member do
+      get 'copy'
+    end
   end    
   resources :results do
     member do
@@ -33,17 +35,28 @@ Rails.application.routes.draw do
   end
   resources :pumps do
     resources :headpoints
+    member do
+      get 'copy'
+    end
   end
   resources :nominations do
     resources :shipments
+    member do
+      get 'copy'
+    end
   end
   resources :simulations do
     resources :results
     member do
       get 'run'
+      get 'copy'
     end
   end
-  resources :commodities
+  resources :commodities do
+    member do
+      get 'copy'
+    end
+  end
   resources :pipelines do
     resources :segments
     resources :stations do
@@ -52,6 +65,9 @@ Rails.application.routes.draw do
     end
     resources :elevations
     resources :temperatures
+    member do
+      get 'copy'
+    end
   end
     
   # The priority is based upon order of creation: first created -> highest priority.
