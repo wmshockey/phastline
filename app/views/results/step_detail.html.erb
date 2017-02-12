@@ -40,7 +40,7 @@
 		<td><%= i.stat %></td>
         <td><%= '%.2f'% i.kmp %></td>
 		<td><%= '%8.1f'% i.flow %></td>
-		<td><%= '%10.1f'% i.pumped_volume %></td>
+		<td><%= number_with_precision(i.pumped_volume, :precision => 1, :delimiter => ',') %></td>
 		<td><%= i.upstream_batch %></td>
 		<td><%= i.downstream_batch %></td>
 		<td><%= '%.1f'% i.hold %></td>

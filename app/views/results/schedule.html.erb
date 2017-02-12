@@ -49,7 +49,7 @@
 	        <td><%= link_to activity[1].batch_id, batch_detail_result_path(:id => @sim_id, :batch => activity[1].batch_id) %></td>
 	        <td><%= activity[1].activity_type %></td>
 	        <td><%= activity[0] %></td>
-	        <td><%= '%.1f' % activity[1].volume if activity[1].volume %></td>
+	        <td><%= number_with_precision(activity[1].volume, :precision => 1, :delimiter => ',' ) if activity[1].volume %></td>
 	        <td><%= activity[1].shipper %></td>
 			<td><%= activity[1].nomination_name %></td>
 	      </tr>

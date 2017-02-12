@@ -1,4 +1,5 @@
 class Simulation < ActiveRecord::Base
+    include ActionView::Helpers::NumberHelper
     attr_accessor :lfill
     attr_accessor :viscar
     attr_accessor :tempar
@@ -58,15 +59,19 @@ class Simulation < ActiveRecord::Base
           raise "Errors occurred during processing of input data"
         end
 #       Initialize the Batch Sequence with prior activities
-        @btsqar, $initial_timestamp = @schedule.initialize_batch_sequence(@prior_activities, @statar)
+        prior_bs, $initial_timestamp = @schedule.initialize_batch_sequence(@prior_activities, @statar)
         if @schedule.errors.any?
           self.errors.add(:base, @schedule.errors.full_messages)
           raise "Errors occured during initialization of the batch sequence"
         end
         $timestamp = $initial_timestamp
-#       Add the new batches from the nominations onto the front end of the existing batch sequence
-        @btsqar = @schedule.finalize_batch_sequence(max_batchsize, @btsqar, @nomination.name, @shipments, @statar)
-#       Set initial positioning of batches in the line (linefill)
+#       Generate the new period batches
+        batches = @schedule.generate_batches(10000, max_batchsize, @nomination.name, @shipments)
+#       Construct the new period batch sequence
+        new_bs = @schedule.construct_batch_sequence(batches, @statar)
+#       Add the new batches from the nominations onto the front end of the prior period batch sequence
+        @btsqar = @schedule.merge_batch_sequences(prior_bs, new_bs, @statar)
+#       Set initial positioning of batches in the line (linefill) by setting the initial_volumes in statar
         initial_batch_positioning(@statar, @btsqar, @volmar)
         $step = 1; stepdone = false
         @stepar = Array.new
@@ -236,8 +241,21 @@ class Simulation < ActiveRecord::Base
         else
           headpoints = pumprec.headpoints
           if headpoints.nil? then
-            pipeline.errors.add(:base, "Pumping unit #{p.pump_id} does not have a head curve")
-            logger.error("Pumping unit #{p.pump_id} does not have a head curve")
+            pipeline.errors.add(:base, "Pumping unit #{sp} does not have a head curve")
+            logger.error("Pumping unit #{sp} does not have a head curve")
+          else
+            headpoints.each_with_index do |h, ix|
+              if ix > 0 then
+                if h.flow <= headpoints[ix-1].flow then
+                  pipeline.errors.add(:base, "Pump #{sp} has a flowrate value #{h.flow} in the head curve that is less than or equal to the point that precedes it")
+                  logger.error("Pump #{sp} has a flowrate value #{h.flow} in the head curve that is less than or equal to the point that precedes it")
+                end
+                if h.head > headpoints[ix-1].head then
+                  pipeline.errors.add(:base, "Pump #{sp} has a head value #{h.head} that is higher than the point that precedes it")
+                  logger.error("Pump #{sp} has a head value #{h.head} that is higher than the point that precedes it")
+                end
+              end
+            end
           end
         end
       end
@@ -631,8 +649,8 @@ class Simulation < ActiveRecord::Base
           new_flow = 0
         end
         if iter > 20 then
-          self.errors.add(:base, "flowrate iterations stopped at 20.  Cannot converge on a flowrate in step #{$step}")
-          logger.error("flowrate iterations stopped at 20.  Cannot converge on a flowrate in step #{$step}")
+          self.errors.add(:base, "Cannot find capacity flowrate in step #{$step}.  It is possible that pipeline violates pressure constraints even at zero flowrate or there are invalid pump head curves." )
+          logger.error("Cannot find capacity flowrate in step #{$step}.  It is possible that pipeline violates pressure constraints even at zero flowrate or there are invalid pump head curves.")
           raise "Error occured in adjust_flow method"
         else
           iterdone = false
@@ -874,7 +892,7 @@ class Simulation < ActiveRecord::Base
             raise "Error occured in step_calc method"
           end
           upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
-          upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(1).to_s
+          upstream_batch_str = upstream_batch_id + "  " + number_with_precision(upstream_vol, :precision => 1, :delimiter => ',').to_s
         else
           volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
           upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
@@ -885,7 +903,7 @@ class Simulation < ActiveRecord::Base
         volume_shift = i.initial_volume + i.pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
         downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
-        downstream_batch_str = downstream_batch_id + "  " + downstream_vol.round(1).to_s  
+        downstream_batch_str = downstream_batch_id + "  " + number_with_precision(downstream_vol, :precision => 1, :delimiter => ',').to_s  
 #       Calculate the pressures for this station
 #       If full stream injection occurring at this station then set the suction to vapour pressure of commodity otherwise set it to the holding pressure
         upstream_kmp = statar[up_stn_ix].kmp
@@ -931,7 +949,7 @@ class Simulation < ActiveRecord::Base
         volume_shift = statar[stn_ix - 1].initial_volume - statar[stn_ix - 1].pipe_volume + statar[stn_ix - 1].pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
         upstream_batch_id = btsqar[stn_ix - 1][upstream_batch].batch_id
-        upstream_batch_str = upstream_batch_id + "  " + upstream_vol.round(2).to_s
+        upstream_batch_str = upstream_batch_id + "  " + number_with_precision(upstream_vol, :precision => 1, :delimiter => ',').to_s
         flow = 0
         pumped_volume = 0
       end

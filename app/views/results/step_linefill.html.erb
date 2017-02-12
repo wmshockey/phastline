@@ -47,7 +47,7 @@
 		<td style="width: 25%;"><%= i.stat %></td>
 		<td style="width: 25%;"><%= '%8.2f'% i.kmp %></td>
 		<td style="width: 25%;"><%= batch_id %></td>
-		<td style="width: 25%;"><%= '%20.1f'% i.batch_vol %></td>
+		<td style="width: 25%;"><%= number_with_precision(i.batch_vol, :precision => 1, :delimiter => ',') %></td>
 	  </tr>
 	<% end %>
 

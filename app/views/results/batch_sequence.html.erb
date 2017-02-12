@@ -59,7 +59,7 @@
 			<% end %>
 			<% if (volume > 0) and (btsqar[stn_ix][batch].start_time or btsqar[stn_ix][batch].end_time) then %>
 		        <td><%= btsqar[stn_ix][batch].activity_type %>
-				<br><%= link_to '%8.1f'%volume, batch_detail_result_path(:id => @sim_id, :batch => batch_id) %></td>
+				<br><%= link_to number_with_precision(volume, :precision => 1, :delimiter => ','), batch_detail_result_path(:id => @sim_id, :batch => batch_id) %></td>
 			<% else %>
 				<td></td>
 			<% end %>

@@ -13,13 +13,21 @@
     </tr>
   </thead>
 
+  <% nominations_array = Array.new %>
+  <% @nominations.each do |n| %>
+    <% pipeline_id = n.pipeline_id %>
+    <% user_id = Pipeline.find(pipeline_id).user_id %>
+    <% nominations_array << [user_id, n] %>
+  <% end %>
+  <% nominations_array = nominations_array.sort_by {|x,y| [x, y.name] } %>
+
   <tbody>
-	<% @nominations.order(name: :asc).each do |nomination| %>
+	<% nominations_array.each do |e| %>
+	  <% nomination = e[1] %>
 	  <% if !nomination.errors.any? %>
 	      <tr>
 			<% if current_user.admin? then %>
-				<% pipeline_id = nomination.pipeline_id %>
-				<% user_id = Pipeline.find(pipeline_id).user_id %>
+				<% user_id = e[0] %>
 				<% user_email = User.find(user_id).email %>
 				<td><%= user_email %></td>
 			<% end %>

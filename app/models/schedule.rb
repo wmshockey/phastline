@@ -143,10 +143,7 @@ class Schedule < ActiveRecord::Base
       self.errors.add(:base, e.message)
     end
 
-
-    def finalize_batch_sequence(max_batchsize, btsqar, nomination_name, shipments, statar)
-#     Finalize the batch sequence by adding on the batches from the new month shipments
-#     Break up shipments into a list of batches
+    def generate_batches(start_batch_number, max_batchsize, nomination_name, shipments)
       batches = Array.new
       number_of_shipments = shipments.count
       total_volume_of_shipments = shipments.sum("volume")
@@ -168,12 +165,16 @@ class Schedule < ActiveRecord::Base
         end
       end
 #     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
-#     Give newly nominated batches a batch number starting at 10000 to distinguish them from old batches previously in the line from prior schedule.
+#     Give newly nominated batches a batch number starting at start_batch_number (10000) to distinguish them from old batches previously in the line from prior schedule.
       batches.sort! { |a, b| a.batch_number <=> b.batch_number }
       batches.each_with_index do |b, bix|
-        b.batch_number = 10000 + bix + 1
+        b.batch_number = start_batch_number + bix + 1
         b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
       end
+      return batches
+    end
+
+    def construct_batch_sequence(batches, statar)
 #     Create the two-dimensional batch sequence array
       max_batches = batches.count
       bs = Array.new(statar.count){Array.new(max_batches)}
@@ -209,13 +210,18 @@ class Schedule < ActiveRecord::Base
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
       end
-#     Now tack the new batches from the nomination shipments onto the front end of the existing batch sequence array btsqar
+      return bs
+    end
+
+    def merge_batch_sequences(prior_bs, new_bs, statar)
+#     Now tack the new batches from the nomination shipments (new_bs) onto the front end of the prior period batch sequence array prior_bs
 #     The new month batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence sitting downstream of the first station
 #     and we want those to be from the prior period schedule batches.
-      number_of_prior_batches = btsqar[0].length
-      final_bs = Array.new(statar.count){Array.new(max_batches + number_of_prior_batches)}
+      number_of_prior_batches = prior_bs[0].length
+      number_of_new_batches = new_bs[0].length
+      final_bs = Array.new(statar.count){Array.new(number_of_new_batches + number_of_prior_batches)}
       statar.each_with_index do |s, stix|
-        final_bs[stix] = bs[stix] + btsqar[stix]
+        final_bs[stix] = new_bs[stix] + prior_bs[stix]
       end
       return final_bs
     end

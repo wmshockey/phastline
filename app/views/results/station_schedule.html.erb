@@ -27,7 +27,7 @@
 	        <td><%= activity.end_time.strftime("%Y-%m-%d %H:%M") if activity.end_time %></td>
 	        <td><%= link_to activity.batch_id, batch_detail_result_path(:batch => activity.batch_id) %></td>
 	        <td><%= activity.activity_type %></td>
-	        <td><%= '%.2f' % activity.volume if activity.volume %></td>
+	        <td><%= number_with_precision(activity.volume, :precision => 1, :delimiter => ',') if activity.volume %></td>
 	        <td><%= activity.shipper %></td>
 			<td><%= activity.nomination_name %></td>
 	      </tr>
