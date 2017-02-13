@@ -621,7 +621,7 @@ class Simulation < ActiveRecord::Base
         stn_ix = stn_ix + 1
       end
 #     Check if we need to change the flowrate
-      if max_viol.abs < 10.0 then
+      if max_viol.abs < 1.0 then
         new_flow = flow
         iterdone = true
       else
