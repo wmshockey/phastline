@@ -1366,11 +1366,11 @@ class Batchrec
   attr_accessor :volume
   attr_accessor :start_location
   attr_accessor :end_location
-  attr_accessor :start_time
-  attr_accessor :end_time
-  attr_accessor :activity_type
   attr_accessor :shipper
   attr_accessor :nomination_name
+  attr_accessor :activity_type
+  attr_accessor :start_time
+  attr_accessor :end_time
   def initialize (batch_number, commodity_id, volume, start_location, end_location, start_time, end_time, activity_type, shipper, nomination_name)
     @batch_number = batch_number
     @commodity_id = commodity_id
