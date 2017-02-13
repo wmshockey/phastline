@@ -29,6 +29,23 @@ class NominationsController < ApplicationController
   def edit
   end
 
+  # GET /nominations/1/copy
+  def copy
+    nominations = current_user.nominations
+    @nomination = nominations.find(params[:id])
+    respond_to do |format|
+      nomination_copy = @nomination.copy(nominations, @nomination)
+      if nomination_copy
+        format.html { redirect_to nominations_url, notice: "Nomination #{@nomination.name} was successfully copied to: #{nomination_copy.name}." }
+        format.json { head :no_content }
+      else
+        flash[:error] = "Nomination copy failed."
+        format.html { render :show, notice: 'Nomination copy failed.' }
+        format.json { render json: nomination_copy.errors, status: :unprocessable_entity }
+      end
+    end        
+  end
+
   # POST /nominations
   # POST /nominations.json
   def create

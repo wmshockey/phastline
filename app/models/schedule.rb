@@ -1,3 +1,18 @@
+class ScheduleValidator < ActiveModel::Validator
+  def validate(record)
+    pipeline = Pipeline.find(record.pipeline_id)
+    stations = pipeline.stations.map {|s| s.name}
+    activities = record.activities
+    if activities.any? then
+      activities.each do |a|
+        if !stations.include?(a.station) then
+          record.errors[:base] << "Schedule activity has station #{a.station} that is not on the pipeline #{pipeline.name}"
+        end
+      end
+    end
+  end
+end
+
 class Schedule < ActiveRecord::Base
     belongs_to :simulation
     belongs_to :pipeline
@@ -8,9 +23,34 @@ class Schedule < ActiveRecord::Base
     validates :period, :presence => true, numericality: {:greather_than_or_equal_to => 0, :less_than => 366}
     validates :pipeline_id, :presence => true
     validates :sched_type, :presence => true, inclusion: { in: %w(PRIOR PRELIMINARY SIMULATED), message: "%{value} is not a valid schedule type" }
+    validates_uniqueness_of :name, scope: :pipeline_id
+    validates_with ScheduleValidator
     default_scope { order(pipeline_id: :asc, name: :asc) }    
 
+    def copy(schedules, schedule)
+      schedule_copy = schedule.dup
+      n = 1
+      while n <= 100
+        new_name = schedule.name + "-copy" + n.to_s
+        if schedules.find {|s| s.name == new_name} then
+          n = n + 1
+        else
+          break
+        end
+      end
+      schedule_copy.name = new_name
+      schedule_copy.save
+      activities = schedule.activities
+      activities.each do |a|
+        a_copy = a.dup
+        a_copy.schedule_id = schedule_copy.id
+        a_copy.save
+      end
+      return schedule_copy
+    end
+
     def initialize_batch_sequence(prior_activities, statar)
+#     Initialize the batch sequence array with batches currently active in the prior period schedule
 #     Get list of batches listed in the prior period schedule
       batch_list = prior_activities.map {|p| p.batch_id}.uniq
 #     Find list of batches that have already been delivered out of the line
@@ -30,12 +70,14 @@ class Schedule < ActiveRecord::Base
         batch_activities = prior_activities.select {|p| p.batch_id == b}
         start_rec = batch_activities.find {|b| (b.activity_type == "INJECTION" or b.activity_type =="RECEIPT") }
         end_rec = batch_activities.find {|b| (b.activity_type == "DELIVERY" or b.activity_type == "LANDING") }
+#       if there is no starting activity for this batch then create it
         if start_rec.nil? then
           start_rec = end_rec.dup
           start_ix = 0
           end_ix = statar.index {|s| s.name == end_rec.station}
           start_rec.station = statar[0].name
           start_rec.activity_type = "INJECTION"
+#       if there is no ending activity for this batch then create it
         elsif end_rec.nil?
           end_rec = start_rec.dup
           start_ix = statar.index {|s| s.name == start_rec.station}
@@ -50,24 +92,30 @@ class Schedule < ActiveRecord::Base
         batch_temp = batch_id.partition("-")
         commodity_id = batch_temp[0]
         batch_number = batch_temp[2].partition(" ")[0]
+#       Populate all station columns in batch sequence array for this batch
         for ix in (0...max_stations)
           bs[ix][batch_ix] = Batchrec.new(batch_number, commodity_id, 0.0, start_rec.station, end_rec.station, nil, nil, nil, start_rec.shipper, start_rec.nomination_name)
           bs[ix][batch_ix].batch_id = commodity_id + "-" + batch_number.to_s.rjust(5, "0")
         end        
+#       Set volume to 0 for all stations before initial injection/receipt
         for ix in (0...start_ix)
           bs[ix][batch_ix].volume = 0.0
         end
+#       Set volume to 0 for all stations after delivery/landing
         for ix in (end_ix...max_stations)
           bs[ix][batch_ix].volume = 0.0
         end
+#       Set volume, start and end times for initial injection/receipt station
         bs[start_ix][batch_ix].volume = start_rec.volume
         bs[start_ix][batch_ix].start_time = start_rec.start_time
         bs[start_ix][batch_ix].end_time = start_rec.end_time
         bs[start_ix][batch_ix].activity_type = start_rec.activity_type
+#       Set volume and activity type as EVEN for all stations in between start and end stations
         for ix in (start_ix+1...end_ix)
           bs[ix][batch_ix].volume = start_rec.volume
           bs[ix][batch_ix].activity_type = "EVEN"
         end
+#       Set volume, start and end times for last delivery/landing station
         bs[end_ix][batch_ix].volume = end_rec.volume
         bs[end_ix][batch_ix].start_time = end_rec.start_time
         bs[end_ix][batch_ix].end_time = end_rec.end_time
@@ -95,9 +143,7 @@ class Schedule < ActiveRecord::Base
       self.errors.add(:base, e.message)
     end
 
-
-    def finalize_batch_sequence(max_batchsize, btsqar, nomination_name, shipments, statar)
-#     Break up shipments into a list of batches
+    def generate_batches(start_batch_number, max_batchsize, nomination_name, shipments)
       batches = Array.new
       number_of_shipments = shipments.count
       total_volume_of_shipments = shipments.sum("volume")
@@ -119,12 +165,16 @@ class Schedule < ActiveRecord::Base
         end
       end
 #     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
-#     Give newly nominated batches a batch number starting at 10000 to distinguish them from old batches previously in the line from prior schedule.
+#     Give newly nominated batches a batch number starting at start_batch_number (10000) to distinguish them from old batches previously in the line from prior schedule.
       batches.sort! { |a, b| a.batch_number <=> b.batch_number }
       batches.each_with_index do |b, bix|
-        b.batch_number = 10000 + bix + 1
+        b.batch_number = start_batch_number + bix + 1
         b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
       end
+      return batches
+    end
+
+    def construct_batch_sequence(batches, statar)
 #     Create the two-dimensional batch sequence array
       max_batches = batches.count
       bs = Array.new(statar.count){Array.new(max_batches)}
@@ -160,13 +210,18 @@ class Schedule < ActiveRecord::Base
           s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
         end
       end
-#     Now tack the new batches from the nomination shipments onto the front end of the existing batch sequence array btsqar
-#     The new month batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence downstream of the first station
+      return bs
+    end
+
+    def merge_batch_sequences(prior_bs, new_bs, statar)
+#     Now tack the new batches from the nomination shipments (new_bs) onto the front end of the prior period batch sequence array prior_bs
+#     The new month batches are tacked onto the front end of the sequence because the initial linefill starts with the last batch of the sequence sitting downstream of the first station
 #     and we want those to be from the prior period schedule batches.
-      number_of_prior_batches = btsqar[0].length
-      final_bs = Array.new(statar.count){Array.new(max_batches + number_of_prior_batches)}
+      number_of_prior_batches = prior_bs[0].length
+      number_of_new_batches = new_bs[0].length
+      final_bs = Array.new(statar.count){Array.new(number_of_new_batches + number_of_prior_batches)}
       statar.each_with_index do |s, stix|
-        final_bs[stix] = bs[stix] + btsqar[stix]
+        final_bs[stix] = new_bs[stix] + prior_bs[stix]
       end
       return final_bs
     end
@@ -195,3 +250,5 @@ class Schedule < ActiveRecord::Base
     end
 
 end
+
+

@@ -18,7 +18,7 @@
 	        <td><%= shipment.end_location %></td>
 			<td><%= shipment.shipper %></td>
 			<td><%= link_to shipment.commodity_id, current_user.commodities.find {|c| c.commodity_id == shipment.commodity_id} %></td>
-			<td><%= shipment.volume %></td>
+			<td><%= number_with_precision(shipment.volume, :precision => 1, :delimiter => ',') %></td>
 	      </tr>
 	  <% end %>
 	<% end %>

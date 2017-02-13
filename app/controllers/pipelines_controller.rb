@@ -27,6 +27,23 @@ class PipelinesController < ApplicationController
   def edit
   end
 
+  # GET /pipelines/1/copy
+  def copy
+    pipelines = current_user.pipelines
+    @pipeline = pipelines.find(params[:id])
+    respond_to do |format|
+      pipeline_copy = @pipeline.copy(pipelines, @pipeline)
+      if pipeline_copy
+        format.html { redirect_to pipelines_url, notice: "Pipeline #{@pipeline.name} was successfully copied to: #{pipeline_copy.name}." }
+        format.json { head :no_content }
+      else
+        flash[:error] = "Pipeline copy failed."
+        format.html { render :show, notice: 'Pipeline copy failed.' }
+        format.json { render json: pipeline_copy.errors, status: :unprocessable_entity }
+      end
+    end        
+  end
+
   # POST /pipelines
   # POST /pipelines.json
   def create

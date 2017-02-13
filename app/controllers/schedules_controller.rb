@@ -31,6 +31,23 @@ class SchedulesController < ApplicationController
   def edit
   end
 
+  # GET /schedules/1/copy
+  def copy
+    schedules = current_user.schedules
+    @schedule = schedules.find(params[:id])
+    respond_to do |format|
+      schedule_copy = @schedule.copy(schedules, @schedule)
+      if schedule_copy
+        format.html { redirect_to schedules_url, notice: "Schedule #{@schedule.name} was successfully copied to: #{schedule_copy.name}." }
+        format.json { head :no_content }
+      else
+        flash[:error] = "Schedule copy failed."
+        format.html { render :show, notice: 'Schedule copy failed.' }
+        format.json { render json: schedule_copy.errors, status: :unprocessable_entity }
+      end
+    end        
+  end
+
   # POST /schedules
   # POST /schedules.json
   def create

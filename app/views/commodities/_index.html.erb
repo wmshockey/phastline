@@ -23,8 +23,10 @@
 	      <tr>
 			<% if current_user.admin? then %>
 				<td><%= (User.find {|u| u.id == commodity.user_id}).email %></td>
+				<td><%= link_to commodity.commodity_id, @commodities.find {|c| c.commodity_id == commodity.commodity_id and c.user_id == commodity.user_id} %></td>
+			<% else %>
+				<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
 			<% end %>
-			<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
 	        <td><%= commodity.commodity_name %></td>
 	        <td><%= commodity.temp1 %></td>
 	        <td><%= commodity.visc1 %></td>

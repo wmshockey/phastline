@@ -27,6 +27,23 @@ class PumpsController < ApplicationController
   def edit
   end
 
+  # GET /pumps/1/copy
+  def copy
+    pumps = current_user.pumps
+    @pump = pumps.find(params[:id])
+    respond_to do |format|
+      pump_copy = @pump.copy(pumps, @pump)
+      if pump_copy
+        format.html { redirect_to pumps_url, notice: "Pump #{@pump.pump_id} was successfully copied to: #{pump_copy.pump_id}." }
+        format.json { head :no_content }
+      else
+        flash[:error] = "Pump copy failed."
+        format.html { render :show, notice: 'Pump copy failed.' }
+        format.json { render json: schedule_copy.errors, status: :unprocessable_entity }
+      end
+    end        
+  end
+
   # POST /pumps
   # POST /pumps.json
   def create

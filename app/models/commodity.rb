@@ -9,7 +9,24 @@ class Commodity < ActiveRecord::Base
     validates :density, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 2000}
     validates :density_cf, :presence => true, numericality: {:greater_than_or_equal_to => 0, :less_than => 10} 
     validates :vapor, numericality: {:greater_than_or_equal_to => 0, :less_than => 10000}
+    validates_uniqueness_of :commodity_id, scope: :user_id
     default_scope { order(user_id: :asc, commodity_id: :asc) }
+
+  def copy(commodities, commodity)     
+    commodity_copy = commodity.dup
+    n = 1
+    while n <= 100
+      new_id = commodity.commodity_id + "copy" + n.to_s
+      if commodities.find {|s| s.commodity_id == new_id} then
+        n = n + 1
+      else
+        break
+      end
+    end
+    commodity_copy.commodity_id = new_id
+    commodity_copy.save
+    return commodity_copy      
+  end
 
   def visccoef(temp1, visc1, temp2, visc2)
 # Purpose is to compute the A and B viscosity coefficients used in the ASTM method.

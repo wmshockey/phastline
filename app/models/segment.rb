@@ -6,5 +6,6 @@ class Segment < ActiveRecord::Base
   validates :roughness, :presence => true, numericality: {:greather_than_or_equal_to => 0, :less_than => 0.1}
   validates :mawp, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
   validates :pipeline_id, :presence => true
+  validates_uniqueness_of :kmp, scope: :pipeline_id
   default_scope { order(pipeline_id: :asc, kmp: :asc) }
 end

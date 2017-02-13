@@ -25,7 +25,7 @@
 		  <td><%= @results[steprec].timestamp.strftime("%d-%m-%Y %H:%M") %></td>
 		  <td><%= @results[steprec].step_time.round(2) %> hrs</td>
 	      <% while stn_ix < num_stations %>
-		    <td><%= '%8.2f'% @results[steprec].flow %></td>
+		    <td><%= '%8.1f'% @results[steprec].flow %></td>
 		    <% stn_ix = stn_ix + 1 %>
 			<% steprec = steprec + 1 %>
 	      <% end %>

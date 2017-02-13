@@ -23,9 +23,9 @@
 		<% min_power = station_powers.min %>
 		<tr>
 			<td><%= station_name %></td>
-			<td><%= '%8.1f'% total_power %></td>
-			<td><%= '%8.1f'% peak_power %></td>
-			<td><%= '%8.1f'% min_power %></td>
+			<td><%= number_with_precision(total_power, :precision => 1, :delimiter => ',') %></td>
+			<td><%= number_with_precision(peak_power, :precision => 1, :delimiter => ',') %></td>
+			<td><%= number_with_precision(min_power, :precision => 1, :delimiter => ',') %></td>
 		</tr>
 	<% end %>
   </tbody>

@@ -8,5 +8,7 @@ class Activity < ActiveRecord::Base
   validates :station, :presence => true
   validates :shipper, length: { maximum: 15 }, allow_blank: true
   validates :nomination_name, length: { maximum: 15 }, allow_blank: true
+  validates_uniqueness_of :batch_id, scope: [:schedule_id, :activity_type]
   default_scope { order('start_time ASC') }
 end
+

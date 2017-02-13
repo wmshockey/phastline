@@ -29,7 +29,7 @@
 				<td><%= link_to s.stat, station_detail_result_path(:id => @sim_id, :station_id => s.station_id) %></td>
 				<td><%= '%8.2f'% station.kmp %></td>
 				<td><%= '%8.1f'% s.flow %></td>
-				<td><%= '%10.0f'% s.pumped_volume %></td>
+				<td><%= number_with_precision(s.pumped_volume, :precision => 0, :delimiter => ',') %></td>
 				<td><%= '%.1f'% s.hold %></td>
 				<td><%= '%.1f'% s.suct %></td>
 				<td><%= '%.1f'% s.head %></td>

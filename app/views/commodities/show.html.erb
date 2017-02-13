@@ -3,6 +3,9 @@
 <h2>Commodity</h2>
 <table>
   <tbody>
+		<% if current_user.admin? then %>
+			<tr><td><strong>User: </strong></td><td><%= (User.find {|u| u.id == @commodity.user_id}).email %></td></tr>
+		<% end %>
 		<tr><td><strong>Commodity ID:</strong></td><td><%= @commodity.commodity_id %></td></tr>
         <tr><td><strong>Commodity Name:</strong></td><td><%= @commodity.commodity_name %></td></tr>
 	    <tr><td><strong>Temperature point 1 (Dec C):</strong></td><td><%= @commodity.temp1 %></td></tr>
@@ -17,6 +20,7 @@
 
 <%= link_to 'Edit', edit_commodity_path(@commodity) %> |
 <%= link_to 'Delete', commodity_path(@commodity.id), method: :delete, data: { confirm: 'Are you sure you want to delete this commodity?' } %> |
+<%= link_to 'Copy', copy_commodity_path(@commodity.id), data: {confirm: 'Are you sure you want to make a copy of this commodity?' } %> |
 <%= link_to 'Back', commodities_path %>
 
 <%= render 'index' %>

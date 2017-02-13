@@ -32,7 +32,7 @@
 		<% end %>
         <td><%= @activity.activity_type %></td>
         <td><%= @activity.station %></td>
-        <td><%= @activity.volume %></td>
+        <td><%= number_with_precision(@activity.volume, :precision => 1, :delimiter => ',') %></td>
         <td><%= @activity.shipper %></td>
 		<td><%= link_to @activity.nomination_name, current_user.nominations.find {|n| n.name == @activity.nomination_name} %></td>
         

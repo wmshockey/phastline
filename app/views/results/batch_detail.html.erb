@@ -27,7 +27,7 @@
 						<td><%= b.end_time.strftime("%Y-%m-%d %H:%M") if b.end_time %></td>
 						<td><%= station %>
 						<td><%= b.activity_type %></td>
-						<td><%= b.volume %></td>
+						<td><%= number_with_precision(b.volume, :precision => 1, :delimiter => ',') %></td>
 						<td><%= b.start_location %></td>
 						<td><%= b.end_location %></td>
 						<td><%= b.shipper %></td>
