@@ -14,7 +14,7 @@ default: &default
   encoding: utf8
   pool: 5
   username: phastline_root
-  password: Hayabusa2831
+  password: Hayabusa12
   socket: /tmp/mysql.sock
 
 development:
