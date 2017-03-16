@@ -6,7 +6,7 @@
 <table>
   <thead>
    <tr>
-      <th>Step</th>
+    <th>Step</th>
 	  <th>Flowrate</th>
 	  <th>Pumped<br>Volume</th>
 	  <th>Up<br>stream<br>Batch</th>
@@ -24,7 +24,7 @@
   <tbody>
 	<% @results.each do | i | %>
       <tr>
-		<% step_string = "#{i.step} @ #{i.timestamp.strftime("%Y-%m-%d %H:%M")}" %>
+		<% step_string = "#{i.step} @ #{i.step_time.round(2)} hrs" %>
 		<td><%= link_to step_string, station_step_detail_result_path(:id => @sim_id, :step => i.step) %></td>
 		<td><%= '%8.1f'% i.flow %></td>
 		<td><%= '%10.1f'% i.pumped_volume %></td>

@@ -11,23 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170130145437) do
-
-  create_table "activities", force: :cascade do |t|
-    t.string   "batch_id",        limit: 255
-    t.datetime "start_time"
-    t.datetime "end_time"
-    t.string   "activity_type",   limit: 255
-    t.float    "volume",          limit: 24
-    t.string   "shipper",         limit: 255
-    t.string   "nomination_name", limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.integer  "schedule_id",     limit: 4
-    t.string   "station",         limit: 255
-  end
-
-  add_index "activities", ["schedule_id"], name: "index_activities_on_schedule_id", using: :btree
+ActiveRecord::Schema.define(version: 20170309144812) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -135,17 +119,6 @@ ActiveRecord::Schema.define(version: 20170130145437) do
   end
 
   add_index "results", ["simulation_id"], name: "index_results_on_simulation_id", using: :btree
-
-  create_table "schedules", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.date     "start_date"
-    t.integer  "period",      limit: 4
-    t.string   "sched_type",  limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.integer  "pipeline_id", limit: 4
-  end
 
   create_table "segments", force: :cascade do |t|
     t.float    "diameter",    limit: 24

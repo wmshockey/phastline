@@ -9,7 +9,6 @@
 	  <th>Description</th>
       <th>Pipeline</th>
 	  <th>Nomination</th>
-	  <th>Prior Schedule</th>
 	  <th>Max Flowrate (m3/hr)</th>
 	  <th>Max Batchsize (m3)</th>
 	  <th>Max Steptime (hrs)</th>
@@ -22,12 +21,10 @@
 		<% if current_user.admin? then %>
 			<% pipeline = Pipeline.find {|p| p.id == simulation.pipeline_id} %>
 			<% nomination  = Nomination.find {|n| n.id == simulation.nomination_id} %>
-			<% schedule = Schedule.find {|p| p.id == simulation.schedule_id} %>
 			<td><%= (User.find {|u| u.id == simulation.user_id}).email %></td>
 		<% else %>
 			<% pipeline = current_user.pipelines.find {|p| p.id == simulation.pipeline_id} %>
 			<% nomination = current_user.nominations.find {|n| n.id == simulation.nomination_id} %>
-			<% schedule = current_user.schedules.find {|s| s.id == simulation.schedule_id} %>
 		<% end %>
         <td><%= link_to simulation.name, simulation_path(simulation) %></td>
 		<td><%= simulation.description %></td>
@@ -41,11 +38,6 @@
 		<% else %>
 			<td><%= "Nomination missing " %></td>
 		<% end %>
-		<% if schedule then %>
-        	<td><%= link_to schedule.name, schedule %></td>
-		<% else %>
-			<td><%= "Schedule missing" %></td>
-		<% end %>
         <td><%= simulation.max_flowrate %></td>
         <td><%= simulation.max_batchsize %></td>
 		<td><%= simulation.max_steptime %></td>
@@ -54,4 +46,3 @@
 	<td colspan="8"><%= link_to 'Add Simulation', new_simulation_path %></td>
   </tbody>
 </table>
-

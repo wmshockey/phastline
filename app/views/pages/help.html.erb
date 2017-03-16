@@ -4,11 +4,11 @@
 
 <p><strong>Phastline is currently under development with an anticipated release date of sometime in 2017.  Please review the information below and if interested in using the application, get in touch with Warren Shockey at <%= mail_to "wmshockey@gmail.com" %> who will keep you posted as to the earliest release date.  Thank-you.</strong></p>
 
-<p>Phastline simulates the operation of a batched or single product liquid pipeline.  By providing the application with a physical description of the pipeline such as length, diameter, elevation, station location, pumps etc. and the type of product to be shipped, the application will calculate and report the hydraulic gradients, pressures, flowrates, power, energy and the scheduled times of batches arriving or leaving the stations.  It takes the products to be shipped in the form of a nomination, breaks the volumes into batches and simulates the movement of those batches through the pipeline, taking into account intermediate injections and deliveries at stations along the line.  Batch injections will be scheduled out over the course of the simulation to evenly spread the volumes provided by each shipper.</p>
+<p>Phastline simulates the operation of a batched or single product liquid pipeline.  By providing the application with a physical description of the pipeline such as length, diameter, elevation, station location, pumps etc. and the type of product to be shipped, the application will calculate and report the hydraulic gradients, pressures, flowrates, power and energy.  It takes the products to be shipped in the form of a nomination, breaks the volumes into batches and simulates the movement of those batches through the pipeline, taking into account intermediate injections and deliveries at stations along the line.  Batch injections will be scheduled out over the course of the simulation to evenly spread the volumes provided by each shipper.</p>
 
 <p>The maximum flowrate or capacity of the pipeline will be determined and the pressure profile at each step in time during the simulation will be calculated.  Pump curves will be combined at the stations to determine the discharge pressures and the Colebrook-White formula for line loss will be used to calculate the pressure losses between stations.  At no point will pressures exceed the maximum allowed pressure of the pipe or go below the vapour pressures of the fluids in the line.  Viscosity and density of the fluids will be corrected for temperature.  A report is provided that shows where the bottlenecks are located on the pipeline which are the points limiting the rate of flow.</p>
 
-<p>Users can modify the physical attributes of the pipeline to determine the effect of each change on pressures, flow rates and power/energy consumption.  Users can also see what a schedule might look like for the pipeline, given the nominations of product to be shipped.</p>
+<p>Users can modify the physical attributes of the pipeline to determine the effect of each change on pressures, flow rates and power/energy consumption.</p>
 
 <h3>Input Data Requirements</h3>
 <p>The application needs to know specifics of the pipeline and products to be shipped through it before it can run a simulation of its operation.  The diagram below shows an overall structure of the data used by the application.</p>
@@ -61,18 +61,6 @@ Pipeline segments are sections of pipe that have the same physical properties, s
 <li>Start (Receipt) station</li>
 <li>End (Delivery) station</li>
 <li>Commodity type</li>
-<li>Volume</li>
-<li>Shipper</li>
-</ul>
-
-<h4>Prior Schedule</h4>
-<p>For the program to simulate the operation of the pipeline, it needs to know the initial state of the pipeline.  In particular, it needs to know what is existing inside the pipeline at the start of the simulation and what operations from the previous month are still in progress.  So when the program constructs a schedule to pump the batches associated with the new nomination and new shipments, it will do so by adding them on to the end of the previous period's schedule without violating what is currently under way from the previous period.  This sounds complicated but it is the reality when operating a pipeline and it is desired to simulate what will happen in the future month(s).  Fortunately, the schedule for past periods is usually readily available as it is a record of what actually happened in the previous month.  In the case where the user doesn't know the previous period's schedule, he/she can manually input a simple previous schedule consisting of a single batch that fills the entire line.  A schedule consists of "activities" which are detailed in the following way:</p>
-<ul>
-<li>Station (e.g Edmonton)</li>
-<li>Batch ID (e.g. CRW-01000)</li>
-<li>Start time</li>
-<li>End time</li>
-<li>Activity Type (e.g. INJECTION, RECEIPT, LANDING, DELIVERY)</li>
 <li>Volume</li>
 <li>Shipper</li>
 </ul>
@@ -143,7 +131,7 @@ Dynamic (or flowing) pressure loss refers to pressure lost along the line due to
 <strong>Reynolds number formula:</strong>
 <br>
 reynl = kreyn * flow/(diam*visc)
-<br>     
+<br>
 where:
 <blockquote>
 reynl = Reynolds number</br>
@@ -152,7 +140,7 @@ flow  = flowrate (m3/hr)</br>
 diam  = diameter (meters)</br>
 visc  = viscosity (centistokes)</br>
 </blockquote>
- 
+
 <strong>Friction Factor calculation:</strong>
 <br>
 if reynl > 40000 then use Colebrook-White formula:<br>
@@ -234,7 +222,7 @@ where:
 
 <h4>Capacity Flowrate Calculation</h4>
 <p>The "Capacity" flowrate is computed using successive iterations until the line pressure is within 1 kpa of vapour pressure at some point on the line.  The minimum difference between line pressure and vapour pressure is termed the "violation amount".</p>
-<p>Successive flowrate values are computed using linear interpolation based on the previous two flowrates and violation amounts.  Note that a negative violation amount means there is no violation and the negative value is a measure of how much room there is until a violation is reached (over MAWP or under vapour pressure).</p> 
+<p>Successive flowrate values are computed using linear interpolation based on the previous two flowrates and violation amounts.  Note that a negative violation amount means there is no violation and the negative value is a measure of how much room there is until a violation is reached (over MAWP or under vapour pressure).</p>
 
 <h4>Batch Sizing and Sequencing</h4>
 <p>The volumes of product desired to be shipped on the line are specified in the nomination.  These volumes are typically broken up into smaller standard size batches so that a shipper is not required to supply all of it at one time.  The standard size of the batches is set by the user when they run a simulation (e.g. 10,000 m3).  Once the shipments are broken up into batches, they are sequenced in an order that ensures equitable distribution of injections from each shipper over the course of the simulation period (typically one month).</p>
@@ -243,25 +231,23 @@ where:
 <p>The bottleneck percentages listed in the summary results display following a simulation show the percentage of times each station is considered to be a "bottleneck".  When a station is tagged as being a bottleneck, that means that at some point in the line between it and the next station, there is a low pressure point that is close to the vapour pressure of the fluid in the line at that point in time.  If the intention is to increase the capacity of a pipeline, those stations that show high bottleneck percentages should be given consideration for either adding additional pumps or replacing line segments downstream of the station with wider diameter pipe or higher MAWP ratings.</p>
 
 <h4>Initial Linefill</h4>
-<p>The batches in the line at the start of the simulation are determined by the prior schedule.  This is the main purpose of the prior schedule.  The program fills the line downstream of the first station by looking in the prior schedule for which batch was last to leave that station.  It then positions that full batch immediately downstream of the first station.  This way, the first batch to be injected at the first station will be the first batch of the new schedule.  (Note: this is to be revised in a future release of the application because it is not the best way to do it.  The program should take into consideration the fact that there are ongoing activities at the first station and that the first station may not be pumping at the time of starting the simulation run.)
+<p>The batches in the line at the start of the simulation are set so that the last batch of the batch sequence lies fully downstream of the first station in the line. This way, the first batch to be injected at the first station will be the first batch of the bactch sequence.</p>
 
 <h3>How to Use the Application</h3>
 
-<p>The Phastline application is intended to be a training tool for someone interested in understanding how a batched liquid pipeline is designed and operated.  As a design tool, the user can evaluate different variations of pipe diameter, size, station spacing and pump installations to see how each change effects the overall pipeline capacity.  As an operational tool, the user can configure pipeline as it currently exists, then use current or forecasted nomination volumes to run through it to determine the power and energy usage which could ultimately determine the cost of operating the pipeline.  The schedule used by the simulation is displayed as output so could also be used as an example of a feasible schedule for operating the line with the new nominated volumes.</p>
+<p>The Phastline application is intended to be a training tool for someone interested in understanding how a batched liquid pipeline is designed and operated.  As a design tool, the user can evaluate different variations of pipe diameter, size, station spacing and pump installations to see how each change effects the overall pipeline capacity.  As an operational tool, the user can configure pipeline as it currently exists, then use current or forecasted nomination volumes to run through it to determine the power and energy usage which could ultimately determine the cost of operating the pipeline. </p>
 <p>The user is provided with sample set of data when they first sign-up to use the application.  This includes:</p>
 <ul>
 <li>Commodity properties for about 24 different commodities</li>
 <li>Pump data for about 12 different pumps</li>
 <li>Pipeline data for two different pipelines.  One example is for an actual pipeline operated by a large North American pipeline company.  The other is a simple fictional 3 station line with only a few nominated shipments.
-<li>Prior Schedule and Nomination data for each of the two sample pipelines provided.</li>
 </ul>
 
 <p>For running their own studies, a user would typically start out by setting up the input data for the pipeline they are interested in as follows.</p>
 <ol>
 <li>Create a Pipeline.  Enter the data points for where the stations are located on the line, where the segments are, what the elevations are and what temperatures are.</li>
-<li>Create a Prior Schedule.  Determine what the initial state of the pipeline is and enter that in the form of activities in the "prior schedule".  This could be as complex as the full reconciled schedule from a previous month or as simple as a single batch occupying the whole line.</li>
 <li>Create a Nomination and enter the shipments desired to be pumped through the line.</li>
-<li>Run a Simulation.  With the Pipeline, Prior Schedule and Nomination data finalized, the user would then run a new simulation.  Running a new simulation is simply a matter of giving it a name and then specifying the Pipeline, Prior Schedule and Nomination to be used.</li>
+<li>Run a Simulation.  With the Pipeline and Nomination data finalized, the user would then run a new simulation.  Running a new simulation is simply a matter of giving it a name and then specifying the Pipeline and Nomination to be used.</li>
 <li>The Maximum Flowrate is a constraint that is imposed on the simulation to make sure that at no point in time will the flowrate go higher than the value specified at any point on the line.  This value can be set to an arbitrarily high value so that the program will calculate and use the capacity flow rate for the line.</li>
 <li>The Maximum Batch size is used to break up the nominated shipments into batches.</li>
 <li>The Maximum Step Time is the upper limit to how long the duration of a time step is in performing the simulation.  Shorter a Max Step Time will mean greater precision in the hydraulic gradients but will take longer running time on the computer to complete the simulation.</li>
@@ -271,14 +257,12 @@ where:
 <p>Running a simulation is simply a matter of selecting it form the index list of simulations shown on the first screen in the application, then pressing the "Run Simulation" button.  The length of time the program takes to complete the simulation depends on how large the pipeline is (pipeline length and number of stations) and how large the nominated shipments are (large volumes mean large number of batches).  Simulations typically take from a few seconds to a minute, depending on how large the pipeline is and how many batches there are.</p>
 
 <h4>Viewing Output displays and reports</h4>
-When a simulation completes successfully, a menu will be shown on screen that allows the user to view the output results from a number of different perspectives.  He/she can look at the average summary results, the linefills at each step, the pressures at each station in each step, the total power and energy consumed, the schedule of batches through each station or the list of activities associated with each batch.
+When a simulation completes successfully, a menu will be shown on screen that allows the user to view the output results from a number of different perspectives.  He/she can look at the average summary results, the linefills at each step, the pressures at each station in each step, the total power and energy consumed.
 <p>The current list of display available for viewing the simulation results are:</p>
 <ul>
 <li>Average Summary Results</li>
-<li>Batch Detail - shows all activities associated with a given batch</li>
-<li>Schedule - an overall summary of the entire pipeline schedule</li>
+<li>Batch Sequence - an overall summary of the entire pipeline schedule</li>
 <li>Power/Energy - report showing the total power and energy consumption of the pipeline</li>
-<li>Station Schedule - shows all activities at a station</li>
 <li>Station Curves - shows the combined flowrate/pressure curve for each station</li>
 <li>Station Detail - Flowrate, pressure and power at a station over the course of the simulation</li>
 <li>Station Step Detail - Flowrate, pressure and power at a station shown step by step</li>

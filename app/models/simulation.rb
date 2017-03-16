@@ -21,23 +21,20 @@ class Simulation < ActiveRecord::Base
     attr_accessor :stepar
     attr_accessor :statcv
     attr_accessor :summary_results
-    attr_accessor :prior_activities
     belongs_to :user
     has_many :results, dependent: :destroy
     validates :name, :presence => true
     validates :pipeline_id, :presence => true
     validates :nomination_id, :presence => true
-    validates :schedule_id, :presence => true
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 1000, :less_than => 500000}
     validates :max_steptime, :presence => true, numericality: {:greater_than => 0, :less_than => 1000}
     validates_uniqueness_of :name, scope: :user_id
-    default_scope { order(user_id: :asc, pipeline_id: :asc) }    
+    default_scope { order(user_id: :asc, pipeline_id: :asc) }
 
 # Mainline driver code
-    def run(pipeline, schedule, nomination, commodities, units, pumpar)
+    def run(pipeline, nomination, commodities, units, pumpar)
         @pipeline = pipeline
-        @schedule = schedule
         @nomination = nomination
         @commodities = commodities
         @pumpar = pumpar
@@ -45,7 +42,6 @@ class Simulation < ActiveRecord::Base
         Result.destroy_all(simulation_id: id)
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
-        @prior_activities = @schedule.activities 
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
         @volmar = @pipeline.get_volumes
         @tempar = @pipeline.get_all_temps
@@ -58,19 +54,12 @@ class Simulation < ActiveRecord::Base
         if self.errors.any? then
           raise "Errors occurred during processing of input data"
         end
-#       Initialize the Batch Sequence with prior activities
-        prior_bs, $initial_timestamp = @schedule.initialize_batch_sequence(@prior_activities, @statar)
-        if @schedule.errors.any?
-          self.errors.add(:base, @schedule.errors.full_messages)
-          raise "Errors occured during initialization of the batch sequence"
-        end
+        $initial_timestamp = Time.now
         $timestamp = $initial_timestamp
 #       Generate the new period batches
-        batches = @schedule.generate_batches(10000, max_batchsize, @nomination.name, @shipments)
+        batches = generate_batches(max_batchsize, @nomination.name, @shipments)
 #       Construct the new period batch sequence
-        new_bs = @schedule.construct_batch_sequence(batches, @statar)
-#       Add the new batches from the nominations onto the front end of the prior period batch sequence
-        @btsqar = @schedule.merge_batch_sequences(prior_bs, new_bs, @statar)
+        @btsqar = construct_batch_sequence(batches, @statar)
 #       Set initial positioning of batches in the line (linefill) by setting the initial_volumes in statar
         initial_batch_positioning(@statar, @btsqar, @volmar)
         $step = 1; stepdone = false
@@ -123,13 +112,13 @@ class Simulation < ActiveRecord::Base
           raise "Errors occurred during step processing"
         end
         $maxsteps = $step - 1
-#       Clean up batch sequence and remove batches that had non activity in the simulation (e.g. prior schedule batches that were not intially in the line)
-        @schedule.clean_batch_sequence(@btsqar)
+#       Clean up batch sequence and remove batches that had non activity in the simulation
+        clean_batch_sequence(@btsqar)
 #       Save step results in database table for user viewing
         save_results
-        if self.errors.empty? then          
+        if self.errors.empty? then
           return true
-        else 
+        else
           raise "Errors occurred during final cleanup and saving of results"
           logger.error("Errors occurred during final cleanup and saving of results")
         end
@@ -144,10 +133,8 @@ class Simulation < ActiveRecord::Base
       if @pipeline.nil? then self.errors.add(:base, "Pipeline cannot be found") end
       if @nomination.nil? then self.errors.add(:base, "Nomination cannot be found") end
       if @shipments.empty? then self.errors.add(:base, "Nomination does not contain any shipments") end
-      if @schedule.nil? then self.errors.add(:base, "Schedule cannot be found") end
-      if @prior_activities.nil? then self.errors.add(:base, "Schedule does not contain any activities") end
       if @stations.empty? then self.errors.add(:base, "Pipeline does not have any stations") end
-      if @segmar.empty? then self.errors.add(:base, "Pipeline does not have any pipe segments") end  
+      if @segmar.empty? then self.errors.add(:base, "Pipeline does not have any pipe segments") end
       if @tempar.empty? then self.errors.add(:base, "Pipeline does not have any temperatures specified") end
       if @elevar.empty? then self.errors.add(:base, "Pipeline does not have any elevations specified") end
       if pipeline.stations.count <= 1 then
@@ -177,46 +164,12 @@ class Simulation < ActiveRecord::Base
       if pipeline.temperatures.last.kmp > pipeline.stations.last.kmp then
         pipeline.errors.add(:base, "Pipeline temperatures are specified beyond last station on the line")
       end
-#     Check to make sure prior schedule has at least one valid activity with an end time so that a start time can be determined for the simulation.
-      prior_schedule_ok = false
-      prior_sched_volume = 0.0
-      prior_activities.each do |a|
-        if a.end_time then
-          prior_schedule_ok = true
-        end
-        if a.activity_type == "INJECTION" or a.activity_type == "RECEIPT" then
-          prior_sched_volume = prior_sched_volume + a.volume
-        end         
-      end
-      if not prior_schedule_ok then
-        pipeline.errors.add(:base, "Prior Schedule does not have any activities with end times.  An end-time is needed so the simulation can determine it's start time")
-      end
-      if prior_sched_volume < @volmar.last.y then
-        pipeline.errors.add(:base, "Prior Schedule does not contain enough previous activity to completely fill the pipeline for the initial linefill")
-      end
-#     Check to ensure the stations listed for the pipeline, nomination and prior schedule all match
+#     Check to ensure the stations listed for the pipeline and nomination all match
       pipeline_stations = @statar.map {|s| s.name}
-      schedule_stations = (@prior_activities.map {|s| s.station}).uniq
       nomination_stations = (@shipments.map {|s| s.start_location} + @shipments.map {|t| t.end_location}).uniq
-      schedule_stations.each do |stn|
-        if not pipeline_stations.include? stn then
-          pipeline.errors.add(:base, "Station #{stn} listed in the prior schedule #{@schedule.name} is not a station listed for pipeline #{@pipeline.name}")
-        end
-      end
       nomination_stations.each do |stn|
         if not pipeline_stations.include? stn then
           pipeline.errors.add(:base, "Station #{stn} listed in the nomination #{@nomination.name} is not a station listed for pipeline #{@pipeline.name}")
-        end
-      end
-#     Check to ensure that the batch-id's in the prior schedule all reference commodity id's that exist in the commodities table
-      prior_activities.each do |a|
-        batch_temp = a.batch_id.partition("-")
-        commodity_id = batch_temp[0]
-        batch_id_ok = false
-        if @commodities.any? {|c| c.commodity_id == commodity_id} then
-          batch_id_ok = true
-        else
-          pipeline.errors.add(:base, "#{a.activity_type} activity for batch #{a.batch_id} in the prior schedule refers to a commodity that is not in the commodities database")
         end
       end
 #     Check if there are any pumps on the whole line
@@ -264,9 +217,9 @@ class Simulation < ActiveRecord::Base
         @pipeline.errors.each do |n, msg|
           self.errors.add(:base, msg)
         end
-      end    
+      end
     end
-      
+
 
     def cole_loss(flow, visc, dens, diam, thick, ruff)
 #   Calculate the dynamic (flowing) pressure loss of a pipe segment using the Colebrook White equation.
@@ -321,7 +274,7 @@ class Simulation < ActiveRecord::Base
         kmp = statar[stn_ix].kmp
         vol = volmar.interpolate_y(kmp)
         kmp_end = statar[stn_ix + 1].kmp
-        vol_end = volmar.interpolate_y(kmp_end)        
+        vol_end = volmar.interpolate_y(kmp_end)
 #       Position initial batch out of the station after shifting the sequence by the sum of the initial_volume setting and the total pumped volume at that station
         upstream_batch = batch
         volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume
@@ -343,7 +296,7 @@ class Simulation < ActiveRecord::Base
               kmp = volmar.interpolate_x(vol)
               batch, commodity_id, batch_vol = get_next_batch(btsqar, stn_ix, batch, 'down')
               batch_number = btsqar[stn_ix][batch].batch_number
-              batch_id = commodity_id + "-" + batch_number.to_s.rjust(5, "0")              
+              batch_id = commodity_id + "-" + batch_number.to_s.rjust(5, "0")
             elsif (vol_end - next_vol1) <= 0 then
               batch_vol = batch_vol - (next_vol1 - vol_end)
 #             Don't record sliver batches
@@ -352,12 +305,103 @@ class Simulation < ActiveRecord::Base
               end
               kmp = kmp_end
             end
-        end            
+        end
         stn_ix = stn_ix + 1
       end
       return lf
     end
 
+    def generate_batches(max_batchsize, nomination_name, shipments)
+      batches = Array.new
+      number_of_shipments = shipments.count
+      total_volume_of_shipments = shipments.sum("volume")
+      total_number_of_batches = total_volume_of_shipments / max_batchsize
+      shipments.each_with_index do |s, ix|
+        number_of_batches_in_shipment = s.volume / max_batchsize
+        spacing_of_batches = (total_number_of_batches / number_of_batches_in_shipment).round
+        vol = s.volume
+        batch_number_within_shipment = 0
+        while vol > max_batchsize
+          batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
+          batches << Batchrec.new(batch_number, s.commodity_id, max_batchsize, s.start_location, s.end_location, nil, nil, nil, s.shipper, nomination_name)
+          vol = vol - max_batchsize
+          batch_number_within_shipment = batch_number_within_shipment + 1
+        end
+        if vol > 0.0 then
+          batch_number = (ix+1) + batch_number_within_shipment * spacing_of_batches
+          batches << Batchrec.new(batch_number, s.commodity_id, vol, s.start_location, s.end_location, nil, nil, nil, s.shipper, nomination_name)
+        end
+      end
+#     Re-order the batches by batch_number to spread shipment batches out over the month for best ratability and assign batch id's for each.
+      batches.sort! { |a, b| a.batch_number <=> b.batch_number }
+      batches.each_with_index do |b, bix|
+        b.batch_number = bix + 1
+        b.batch_id = b.commodity_id + "-" + b.batch_number.to_s.rjust(5, "0")
+      end
+      return batches
+    end
+
+    def construct_batch_sequence(batches, statar)
+#     Create the two-dimensional batch sequence array
+      max_batches = batches.count
+      bs = Array.new(statar.count){Array.new(max_batches)}
+      batches.each_with_index do |b, btix|
+        start_loc = b.start_location
+        station_rec = statar.detect {|s| s.name == start_loc}
+        start_kmp = station_rec.kmp
+        end_loc = b.end_location
+        station_rec = statar.detect {|s| s.name == end_loc}
+        end_kmp = station_rec.kmp
+        statar.each_with_index do |s, stix|
+          stat = s.name
+          kmp = s.kmp
+          if start_kmp <= kmp and end_kmp > kmp then
+            batch_rec = batches[btix].dup
+            if statar[stix].name == start_loc then
+              batch_rec.activity_type = "INJECTION"
+            else
+              batch_rec.activity_type = "EVEN"
+            end
+            bs[stix][btix] = batch_rec
+          else
+            batch_rec = batches[btix].dup
+            if statar[stix].name == end_loc then
+              batch_rec.activity_type = "DELIVERY"
+              bs[stix][btix] = batch_rec
+              bs[stix][btix].volume = 0.0
+            else
+              bs[stix][btix] = batch_rec
+              bs[stix][btix].volume = 0.0
+            end
+          end
+          s.sequence_volume = s.sequence_volume + bs[stix][btix].volume
+        end
+      end
+      return bs
+    end
+
+    def clean_batch_sequence(btsqar)
+#   Remove batches from the batch sequence if they have no activity during the simulation.
+      batch_ix = 0
+      num_stations = btsqar.length
+      num_batches = btsqar[0].length
+      while batch_ix < num_batches
+        active = false
+        stn_ix = 0
+        while stn_ix < num_stations
+          if btsqar[stn_ix][batch_ix].start_time or btsqar[stn_ix][batch_ix].end_time then
+            active = true
+          end
+          stn_ix = stn_ix + 1
+        end
+        if not active then
+          btsqar.map {|row| row.delete_at(batch_ix) }
+          num_batches = num_batches - 1
+        else
+          batch_ix = batch_ix + 1
+        end
+      end
+    end
 
     def step_shift_volumes(statar, btsqar, flowar)
 #     Determine volume to the next batch interface out of station or coming into the next downstream station
@@ -381,9 +425,11 @@ class Simulation < ActiveRecord::Base
 #       Get the volume to the next batch coming into the downstream station
         volume_shift = statar[stn_ix].initial_volume - statar[stn_ix].pipe_volume + statar[stn_ix].pumped_volume
         batch2, vol2, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+#       Get the volume to finish the batch sequence
+        vol3 = statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume
 #       Calculate the time to next batch interface between this station and the next.
         if flow > 0 then
-          time_step = [vol1, vol2].min / flow
+          time_step = [vol1, vol2, vol3].min / flow
         else
           time_step = 999999.0
         end
@@ -406,56 +452,52 @@ class Simulation < ActiveRecord::Base
         btsqar[0][0].start_time = $timestamp
       end
       $timestamp = $timestamp + time_shift * 3600.0
-      if not all_done then
-        if time_shift < max_steptime then
-  #       Record the end time of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
-  #       Set the end_time of the event
-          btsqar[event_station][event_batch].end_time = $timestamp
-  #       Set the start_time for the next batch in the sequence
-          if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-  #       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
-          event_activity = btsqar[event_station][event_batch].activity_type
-          if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
-            all_done = true
-          else
+      if time_shift < max_steptime then
+#       Record the end time of the event in btsqar for the schedule.  The end_time has been determined from above code.  The start_time for the next batch in the sequence can therefore also be set.
+#       Set the end_time of the event
+        btsqar[event_station][event_batch].end_time = $timestamp
+#       Set the start_time for the next batch in the sequence
+        if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
+        btsqar[event_station][event_batch].start_time = $timestamp
+#       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
+        if event_station != statar.count - 1 then
+          while btsqar[event_station][event_batch].volume == 0
+            zero_volume_event_time = btsqar[event_station][event_batch].start_time
+            btsqar[event_station][event_batch].end_time = zero_volume_event_time
+            if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
             btsqar[event_station][event_batch].start_time = $timestamp
           end
-  #       If this is a zero volume batch then set the end time equal to the start time.  Also set the start time of the subsquent batch equal to the end time.
-          if event_station != statar.count - 1 then
-            while btsqar[event_station][event_batch].volume == 0
-              zero_volume_event_time = btsqar[event_station][event_batch].start_time
-              btsqar[event_station][event_batch].end_time = zero_volume_event_time
-              if event_batch == btsqar[0].count-1 then event_batch = 0 else event_batch = event_batch + 1 end
-      #       Check if all done.  All done if we have run out of new month batches are trying to re-inject prior months batches, which have a different nomination name.
-              event_activity = btsqar[event_station][event_batch].activity_type
-              if (event_activity == "INJECTION" or event_activity == "RECEIPT") and (btsqar[event_station][event_batch].nomination_name != @nomination.name) then
-                all_done = true
-              else
-                btsqar[event_station][event_batch].start_time = zero_volume_event_time
-              end
-            end
-          end
-        else
-          time_shift = max_steptime
         end
+      else
+        time_shift = max_steptime
+      end
 #       Update the pumped volumes for all stations to advance to the next step
-        stn_ix = 0
-        while stn_ix < statar.count - 1
-          if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
-            kmp = statar[stn_ix].kmp
-            flow = flowar.get_y(kmp)
-            pumped_vol_increment = flow * time_shift
-            next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
-            if next_vol > statar[stn_ix].sequence_volume then
-              next_vol = statar[stn_ix].sequence_volume
-            end        
-            statar[stn_ix].pumped_volume = statar[stn_ix].pumped_volume + pumped_vol_increment
+      stn_ix = 0
+      while stn_ix < statar.count - 1
+        if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
+          kmp = statar[stn_ix].kmp
+          flow = flowar.get_y(kmp)
+          pumped_vol_increment = flow * time_shift
+          next_vol = statar[stn_ix].pumped_volume + pumped_vol_increment
+          if next_vol > statar[stn_ix].sequence_volume then
+            next_vol = statar[stn_ix].sequence_volume
           end
-          stn_ix = stn_ix + 1
+          statar[stn_ix].pumped_volume = statar[stn_ix].pumped_volume + pumped_vol_increment
         end
+        stn_ix = stn_ix + 1
+      end
+#     Check if all done.
+      stn_ix = 0
+      all_done = true
+      while stn_ix < statar.count - 1
+        if (statar[stn_ix].sequence_volume - statar[stn_ix].pumped_volume) >= 1.0 then
+          all_done = false
+          break
+        end
+        stn_ix = stn_ix + 1
       end
       return all_done, time_shift
-    end        
+    end
 
     def get_next_batch(btsqar, stn_ix, batch, direction)
       max_batch = btsqar[0].count - 1
@@ -469,7 +511,7 @@ class Simulation < ActiveRecord::Base
         while btsqar[stn_ix][batch].volume == 0
           if batch < max_batch then batch = batch+1 else batch = 0 end
         end
-      end        
+      end
       commodity_id = btsqar[stn_ix][batch].commodity_id
       batch_vol = btsqar[stn_ix][batch].volume
       return batch, commodity_id, batch_vol
@@ -501,9 +543,9 @@ class Simulation < ActiveRecord::Base
       else
         upstream_vol = vol
         downstream_vol = batch_vol - vol
-      end      
+      end
       upstream_batch = batch
-      downstream_batch = batch    
+      downstream_batch = batch
 #     If upstream volume is zero, loop until find a non-zero batch
       while upstream_vol <= 0.0000001
         if volume_shift >= 0 then
@@ -513,7 +555,7 @@ class Simulation < ActiveRecord::Base
         end
         upstream_batch = batch
         upstream_vol = batch_vol
-      end      
+      end
 #     If downstream volume is zero, loop until find a non-zero batch
       while downstream_vol <= 0.0000001
         if volume_shift >= 0 then
@@ -531,7 +573,7 @@ class Simulation < ActiveRecord::Base
       end
       return upstream_batch, upstream_vol, downstream_batch, downstream_vol
     rescue Exception => e
-      self.errors.add(:base, e.message)           
+      self.errors.add(:base, e.message)
     end
 
     def calc_rate_ratios(statar, btsqar)
@@ -557,7 +599,7 @@ class Simulation < ActiveRecord::Base
       stn_ix = 0
       while stn_ix < max_stn_ix - 1
         stat = statar[stn_ix].name
-        kmp = statar[stn_ix].kmp      
+        kmp = statar[stn_ix].kmp
 #       Injection check:  If the total btsqar volume of the batch leaving a station is zero on the upstream side of the station.
         volume_shift = statar[stn_ix + 1].initial_volume + statar[stn_ix + 1].pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix + 1)
@@ -593,10 +635,10 @@ class Simulation < ActiveRecord::Base
         stat = statar[stn_ix].name
         rr_rec_array << Raterec.new(kmp, stat, rr[stn_ix])
         stn_ix = stn_ix + 1
-      end      
+      end
       return rr_rec_array
     end
-                    
+
     def calc_flowrates(maxflow, ratear)
       flowar = Profile.new
       stn_ix = 0
@@ -608,7 +650,7 @@ class Simulation < ActiveRecord::Base
         stn_ix = stn_ix + 1
       end
       return flowar
-    end     
+    end
 
     def adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
 #   Find the max minimum pressure violation on current iteration (the worst violation of minimum pressure)
@@ -661,11 +703,11 @@ class Simulation < ActiveRecord::Base
       self.errors.add(:base, e.message)
     end
 
-      
+
     def visc_profile(lfill, tempar)
 #   Purpose is to compute the viscosity profile adjusted for temperature of the commodity in the line.
       vp = Profile.new
-      kmp = lfill.first.kmp     
+      kmp = lfill.first.kmp
       while kmp != nil
         commodity_id = get_record(lfill, kmp).commodity_id
         @commodity = @commodities.detect{ |c| c.commodity_id == commodity_id }
@@ -678,11 +720,11 @@ class Simulation < ActiveRecord::Base
       end
       return vp
     end
-    
+
     def xval(e)
       xval = -1.47 - 1.84*e - 0.51*e**2
     end
-    
+
     def visc_corr(acoef, bcoef, temp)
 #   Purpose is to adjust the viscosity of an oil for tempeature using the ASTM method.
       err = 2.5e-5
@@ -706,7 +748,7 @@ class Simulation < ActiveRecord::Base
 #   Purpose is to evalute the initial estimate to viscosity at a specified temperature
       return 10**(10**(acoef - bcoef * Math.log10(temp+273.15))) - 0.7
     end
-        
+
   def dens_profile(lfill, tempar)
 #   Calculate the density profile from the densities of the commodities in the line adjusted for temperature in the line.
     dp = Profile.new
@@ -723,7 +765,7 @@ class Simulation < ActiveRecord::Base
      end
     return dp
   end
-       
+
   def static_loss(densar, elevar)
 #   Calculate the static pressure profile (pressure loss/gain due to elevation changes)
     sl = Profile.new
@@ -809,8 +851,8 @@ class Simulation < ActiveRecord::Base
     end
     return hd
   end
-   
-  
+
+
   def suct_calc(lfill)
 #   Calculate the suction pressure profile.  This is set to the vapor pressure of the commodity at stations
 #   where there is a full stream injection occurring (start of line and at break out stations)
@@ -856,7 +898,7 @@ class Simulation < ActiveRecord::Base
         tdlos = tdlos + dloss*dist
         mxdf = pres - maxp
         mndf = minp - pres
-        if mxdf >= mxvl then 
+        if mxdf >= mxvl then
           mxpt = kmp
           mxvl = mxdf
         end
@@ -884,7 +926,7 @@ class Simulation < ActiveRecord::Base
       if stn_ix > 0 then up_stn_ix = stn_ix - 1 else up_stn_ix = stn_ix end
       if kmp != statar.last.kmp then
 #       Get batch coming into station on upstream side
-        if stn_ix > 0 then          
+        if stn_ix > 0 then
           volume_shift = statar[stn_ix - 1].initial_volume - statar[stn_ix - 1].pipe_volume + statar[stn_ix - 1].pumped_volume
           upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix - 1)
           if upstream_vol < 0.0000001 then
@@ -898,12 +940,12 @@ class Simulation < ActiveRecord::Base
           upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
           upstream_batch_id = btsqar[stn_ix][upstream_batch].batch_id
           upstream_batch_str = " "   #no upstream batch for first station in the line
-        end         
+        end
 #       Get batch leaving station on downstream side
         volume_shift = i.initial_volume + i.pumped_volume
         upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
         downstream_batch_id = btsqar[stn_ix][downstream_batch].batch_id
-        downstream_batch_str = downstream_batch_id + "  " + number_with_precision(downstream_vol, :precision => 1, :delimiter => ',').to_s  
+        downstream_batch_str = downstream_batch_id + "  " + number_with_precision(downstream_vol, :precision => 1, :delimiter => ',').to_s
 #       Calculate the pressures for this station
 #       If full stream injection occurring at this station then set the suction to vapour pressure of commodity otherwise set it to the holding pressure
         upstream_kmp = statar[up_stn_ix].kmp
@@ -923,7 +965,7 @@ class Simulation < ActiveRecord::Base
           head = 0
           casep = hold
           disp = pres
-        else          
+        else
           casep = pres
           disp = casep
         end
@@ -937,7 +979,7 @@ class Simulation < ActiveRecord::Base
 #       tdlos = total dynamic pressure loss (pressure loss due to internal pipe friction)
         mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos = loss_calc(stat, disp, statar, slossar, dlossar, maxpressar, minpressar)
 #       If the discharge pressure has to be reduced due to max pressure violation, then any minimum pressure violation must increase accordingly and the max violation is reset to 0.
-        if pres > mxdp then 
+        if pres > mxdp then
           mnvl = mnvl + (pres - mxdp)
           mxvl = 0
           pres = mxdp
@@ -989,7 +1031,7 @@ class Simulation < ActiveRecord::Base
       bottlenecks[step_ix] = bottleneck_station
       step_ix = step_ix + 1
     end
-    summary_results = Array.new    
+    summary_results = Array.new
 #   Calculate the totals and averages for each station across all steps
     stations.each do |i|
       station_id = i[0]
@@ -1033,12 +1075,12 @@ class Simulation < ActiveRecord::Base
     return summary_results
   end
 
-        
+
   def save_results
     @results = Array.new
     @stepar.each do |s|
         result = Result.new
-        station = @pipeline.stations.find{|i| i.name == s.stat}        
+        station = @pipeline.stations.find{|i| i.name == s.stat}
         result.simulation_id = self.id
         result.simulation_name = self.name
         result.step = s.step
@@ -1078,7 +1120,7 @@ class Simulation < ActiveRecord::Base
     Result.import @results, validate: false
   end
 
-  def copy(simulations, simulation)     
+  def copy(simulations, simulation)
     simulation_copy = simulation.dup
     n = 1
     while n <= 100
@@ -1091,9 +1133,9 @@ class Simulation < ActiveRecord::Base
     end
     simulation_copy.name = new_name
     simulation_copy.save
-    return simulation_copy      
+    return simulation_copy
   end
-    
+
   def get_record(record_array, kmp)
     i = 0
     until i == record_array.count - 1
@@ -1103,8 +1145,8 @@ class Simulation < ActiveRecord::Base
     i = i - 1
     return record_array[i]
   end
-  
-    
+
+
   def next_record (record_array, kmp)
 # Find the next point in a record array
     np = nil
@@ -1115,8 +1157,8 @@ class Simulation < ActiveRecord::Base
       end
     end
     return np
-  end   
-  
+  end
+
 end
 
 class Profile < Array
@@ -1137,7 +1179,7 @@ class Profile < Array
     end
     return np
   end
-  
+
   def get_y (x)
 # Get the y value of a profile array at a specified x point.
     y = nil
@@ -1149,7 +1191,7 @@ class Profile < Array
       end
     end
     return y
-  end  
+  end
 
   def get_x (y)
 # Get the x of a profile array for a specified y value (e.g. station array)
@@ -1161,7 +1203,7 @@ class Profile < Array
       end
     end
     return x
-  end 
+  end
 
   def interpolate_y (x)
 # Use linear interpolation to get the value of a x point within a profile array (e.g. elevations)
@@ -1208,8 +1250,8 @@ class Profile < Array
       end
     end
     return x
-  end      
-    
+  end
+
 end
 
 
@@ -1224,7 +1266,7 @@ class Profile_point
     @x = x
     @y = y
   end
-end  
+end
 
 class Statrec
   attr_accessor :station_id
@@ -1358,7 +1400,7 @@ class Raterec
     @rate_ratio = rate_ratio
   end
 end
-  
+
 class Batchrec
   attr_accessor :batch_id
   attr_accessor :batch_number
@@ -1418,6 +1460,3 @@ class Stationcurverec
     @head = head
   end
 end
-
-
-
