@@ -12,62 +12,38 @@
 <% num_stations = stations.size %>
 <% num_batches = btsqar[0].size %>
 
-<% batch_order = Array.new %>
-<% batch = 0 %>
-<% while batch < num_batches %>
-  <% stn_ix = 0 %>
-  <% earliest_time = DateTime.new(2100, 1, 1) %>
-  <% while stn_ix < num_stations %>
-	<% if btsqar[stn_ix][batch].start_time and btsqar[stn_ix][batch].start_time < earliest_time %>
-	    <% earliest_time = btsqar[stn_ix][batch].start_time %>
-	<% end %>
-	<% if btsqar[stn_ix][batch].end_time and btsqar[stn_ix][batch].end_time < earliest_time then %>
-		<% earliest_time = btsqar[stn_ix][batch].end_time %>
-	<% end %>
-	<% stn_ix = stn_ix + 1 %>
-  <% end %>
-  <% batch_order << [batch, earliest_time] %>
-  <% batch = batch + 1 %>
-<% end %>
-<% batch_order.sort_by! {|b| b[1]} %>
-
-<h2>Pipeline Schedule</h2>
+<h2>Batch Sequence</h2>
 <table>
   <tbody>
 	  <% stn_ix = 0 %>
 	  <tr>
 	    <td>Batch</td>
-	    <td>Nom</td>
 	    <% while stn_ix < num_stations %>
-	      <td> <%= link_to stations[stn_ix], station_schedule_result_path(:id => @sim_id, :stat => stations[stn_ix]) %> </td>
+	      <td> <%= stations[stn_ix] %> </td>
 		  <% stn_ix = stn_ix + 1 %>
 		<% end %>
 	  </tr>
-	  <% btix = 0 %>
-	  <% while btix < num_batches %>
+	  <% batch = 0 %>
+	  <% while batch < num_batches %>
 	    <% stn_ix = 0 %>
-	    <% batch = batch_order[btix][0] %>
 		<tr>
 		  <% batch_id = btsqar[stn_ix][batch].batch_id %>
-		  <td><%= link_to batch_id, batch_detail_result_path(:id => @sim_id, :batch => batch_id) %></td>
-		  <td><%= btsqar[stn_ix][batch].nomination_name %></td>
+		  <td><%= batch_id %></td>
 	      <% while stn_ix < num_stations %>
-			<% if btsqar[stn_ix][batch].activity_type == "DELIVERY" or btsqar[stn_ix][batch].activity_type == "LANDING" then %>
-				<% volume = btsqar[stn_ix - 1][batch].volume %>
-			<% else %>
-				<% volume = btsqar[stn_ix][batch].volume %>
-			<% end %>
-			<% if (volume > 0) and (btsqar[stn_ix][batch].start_time or btsqar[stn_ix][batch].end_time) then %>
-		        <td><%= btsqar[stn_ix][batch].activity_type %>
-				<br><%= link_to number_with_precision(volume, :precision => 1, :delimiter => ','), batch_detail_result_path(:id => @sim_id, :batch => batch_id) %></td>
-			<% else %>
-				<td></td>
-			<% end %>
-		    <% stn_ix = stn_ix + 1 %>
+			    <% if btsqar[stn_ix][batch].activity_type == "DELIVERY" or btsqar[stn_ix][batch].activity_type == "LANDING" then %>
+				    <% volume = btsqar[stn_ix - 1][batch].volume %>
+			    <% else %>
+				    <% volume = btsqar[stn_ix][batch].volume %>
+			    <% end %>
+			    <% if (volume > 0) then %>
+				    <td><%= number_with_precision(volume, :precision => 1, :delimiter => ',') %></td>
+			    <% else %>
+				    <td></td>
+			    <% end %>
+		      <% stn_ix = stn_ix + 1 %>
 	      <% end %>
 	    </tr>
-		<% btix = btix + 1 %>
-      <% end %>
+		  <% batch = batch + 1 %>
+    <% end %>
   </tbody>
 </table>
-

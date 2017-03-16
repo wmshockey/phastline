@@ -11,25 +11,6 @@ class Pipeline < ActiveRecord::Base
   validates_uniqueness_of :name, scope: :user_id
   default_scope { order(user_id: :asc, name: :asc) }
 
-
-  def copy(simulations, simulation)     
-    simulation_copy = simulation.dup
-    n = 1
-    while n <= 100
-      new_name = simulation.name + "-copy" + n.to_s
-      if simulations.find {|s| s.name == new_name} then
-        n = n + 1
-      else
-        break
-      end
-    end
-    simulation_copy.name = new_name
-    simulation_copy.save
-    return simulation_copy      
-  end
-
-
-
   def copy(pipelines, pipeline)
     pipeline_copy = pipeline.dup
     n = 1
@@ -54,7 +35,7 @@ class Pipeline < ActiveRecord::Base
         u_copy.station_id = s_copy.id
         u_copy.save
       end
-    end  
+    end
     segments = pipeline.segments
     segments.each do |s|
       s_copy = s.dup
@@ -134,7 +115,7 @@ class Pipeline < ActiveRecord::Base
         pipe_vol = end_vol - start_vol
       else
         pipe_vol = 0
-      end        
+      end
       stat_records << Statrec.new(stat_array[stn_ix].id, start_kmp, stat_array[stn_ix].name, pipe_vol, 0.0, 0.0, 0.0)
       stn_ix = stn_ix + 1
     end
@@ -164,7 +145,7 @@ class Pipeline < ActiveRecord::Base
         row_list = station_units.map{|t| t.unit_row}.uniq.sort
         row_list.each do |row|
           row_curve = Profile.new
-          row_units = station_units.select {|r| r.unit_row == row}      
+          row_units = station_units.select {|r| r.unit_row == row}
           row_flow_values = Array.new
 #         Get the common flowrate values list
           row_units.each do |u|
@@ -206,18 +187,18 @@ class Pipeline < ActiveRecord::Base
 #         Add flowrates for all rows in parallel
           if total_row_curve.size > 0 then
             row_head_values = row_curve.map {|t| t.val}
-            total_row_head_values = total_row_curve.map {|t| t.val}            
+            total_row_head_values = total_row_curve.map {|t| t.val}
             max_pres = [row_head_values.max, total_row_head_values.max].min
             min_pres = [row_head_values.min, total_row_head_values.min].max
 #           Combine the curves in parallel only if they share a common range of pressures.
-            if min_pres < max_pres then            
+            if min_pres < max_pres then
               total_row_head_values = (total_row_head_values + row_head_values).uniq.sort
               total_row_head_values = total_row_head_values.select {|t| t >= min_pres and t <= max_pres}
               new_total_row_curve = []
               total_row_head_values.each do |head|
                 row_flow = row_curve.interpolate_x(head)
                 total_row_flow = total_row_curve.interpolate_x(head) + row_curve.interpolate_x(head)
-                new_total_row_curve << Profile_point.new(total_row_flow, head)              
+                new_total_row_curve << Profile_point.new(total_row_flow, head)
               end
             else
               logger.warn "Warning: Parallel units are incompatible at #{i.name}.  All pumps at this station are turned off."
@@ -226,12 +207,12 @@ class Pipeline < ActiveRecord::Base
           else
             new_total_row_curve = row_curve
           end
-          total_row_curve = new_total_row_curve            
+          total_row_curve = new_total_row_curve
         end     # end of rows loop
 #       Add total row curve to station curves
         total_row_curve.each do |t|
           station_curves << Stationcurverec.new(i.station_id, i.name, t.kmp, t.val)
-        end                   
+        end
       end    #end of if station has units block
     end    #end of station loop
     station_curves.sort_by! {|e| [e.station_id, e.flow]}
@@ -239,4 +220,3 @@ class Pipeline < ActiveRecord::Base
   end
 
 end
-

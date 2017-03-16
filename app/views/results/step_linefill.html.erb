@@ -13,7 +13,7 @@
 <% linefill = steprecs[0].linefill %>
 
 
-<h2>Linefill for step <%= @step.to_s %> @ <%= steprecs[0].timestamp.strftime("%Y-%m-%d %H:%M") %>
+<h2>Linefill for step <%= @step.to_s %> @ <%= steprecs[0].step_time.round(2) %> hrs
 <% if @step == 1 then %>
 	<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => $maxsteps) %>
 <% else %>
@@ -53,4 +53,3 @@
 
  </tbody>
 </table>
-

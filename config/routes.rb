@@ -7,16 +7,10 @@ Rails.application.routes.draw do
   devise_for :users
 
 #  as :user do
-#    get 'users/edit' => 'devise/registrations#edit', :as => 'edit_user_registration'    
-#   patch 'users' => 'devise/registrations#update', :as => 'user_registration'            
+#    get 'users/edit' => 'devise/registrations#edit', :as => 'edit_user_registration'
+#   patch 'users' => 'devise/registrations#update', :as => 'user_registration'
 #  end
 
-  resources :schedules do
-    resources :activities
-    member do
-      get 'copy'
-    end
-  end    
   resources :results do
     member do
       get 'summary'
@@ -26,8 +20,6 @@ Rails.application.routes.draw do
       get 'station_curves'
       get 'step_flowrates'
       get 'batch_sequence'
-      get 'schedule'
-      get 'station_schedule'
       get 'batch_detail'
       get 'power'
       get 'step_linefill'
@@ -69,7 +61,7 @@ Rails.application.routes.draw do
       get 'copy'
     end
   end
-    
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
