@@ -11,7 +11,7 @@
 <p>Users can modify the physical attributes of the pipeline to determine the effect of each change on pressures, flow rates and power/energy consumption.  Users can also see what a schedule might look like for the pipeline, given the nominations of product to be shipped.</p>
 
 <h3>Input Data Requirements</h3>
-<p>The application needs to know specifics of the pipeline and products to be shipped through it before it can run a simulation of it's operation.  The diagram below shows an overall structure of the data used by the application.</p>
+<p>The application needs to know specifics of the pipeline and products to be shipped through it before it can run a simulation of its operation.  The diagram below shows an overall structure of the data used by the application.</p>
 <%= image_tag "Phastline Data Structure.jpg", alt: "Data Structure" %>
 
 <h4>Users</h4>
@@ -23,7 +23,7 @@
 <ul>
 <li>Commodity ID</li>
 <li>viscosity at two different temperatures</li>
-<li>Density at one temperature and a density correction factor to calculate what it's density will be at other temperatures</li>
+<li>Density at one temperature and a density correction factor to calculate what its density will be at other temperatures</li>
 <li>Vapour pressure of the fluid</li>
 
 
@@ -56,7 +56,7 @@ Pipeline segments are sections of pipe that have the same physical properties, s
 <p>An estimated pipeline temperature profile is required so that the program can calculate the changes to both viscosity and density of the product in the line.  For higher temperatures, the viscosity of a fluid typically decreases resulting in lower pressure loss as it is pumped through the line.  Similarly for density, a fluid has slightly lower density at a higher temperatures.  The temperature profile is a series of data points with (kmp, temperature) values.</p>
 
 <h4>Nominations</h4>
-<p>A nomination is what a pipeline company typically receives from it's shipper customers on a monthly basis.  A nomination consist of the type of commodity the shipper wishes to move through the pipeline, a volume and the starting (receipt) and ending (delivery) locations over which the product will travel.  When nominations are received, the program will break the volumes up into smaller batches according to a user specified maximum batch size.  The program will then sequence the batches in the order in which they will be pumped over the month in a manner that evenly distributes the batch injections over that time period.  This is so that no one shipper is over taxed to provide all of it's nominated volume all at once to the pipeline.  Shipper's have supply and feeder pipeline facilities with limited capacity and this has to be taken into account.  A nomination typically corresponds to one calendar month pumping period and will consist of multiple shipments of different commodities from multiple shippers.  Each of the desired shipments is usually of a volume higher than what can be practically shipped down the line in one batch.  A nomination consists of shipments where each shipment will have the following data values:</p>
+<p>A nomination is what a pipeline company typically receives from its shipper customers on a monthly basis.  A nomination consist of the type of commodity the shipper wishes to move through the pipeline, a volume and the starting (receipt) and ending (delivery) locations over which the product will travel.  When nominations are received, the program will break the volumes up into smaller batches according to a user specified maximum batch size.  The program will then sequence the batches in the order in which they will be pumped over the month in a manner that evenly distributes the batch injections over that time period.  This is so that no one shipper is over taxed to provide all of its nominated volume all at once to the pipeline.  Shipper's have supply and feeder pipeline facilities with limited capacity and this has to be taken into account.  A nomination typically corresponds to one calendar month pumping period and will consist of multiple shipments of different commodities from multiple shippers.  Each of the desired shipments is usually of a volume higher than what can be practically shipped down the line in one batch.  A nomination consists of shipments where each shipment will have the following data values:</p>
 <ul>
 <li>Start (Receipt) station</li>
 <li>End (Delivery) station</li>

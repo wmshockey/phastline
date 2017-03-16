@@ -848,14 +848,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>5</integer>
+				<integer>58</integer>
 				<key>line</key>
-				<integer>1384</integer>
+				<integer>249</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>1349</integer>
+			<integer>207</integer>
 		</dict>
 		<key>app/models/station.rb</key>
 		<dict>
@@ -1596,9 +1596,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>264</integer>
+				<integer>811</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>58</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
