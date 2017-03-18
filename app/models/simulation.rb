@@ -246,7 +246,7 @@ class Simulation < ActiveRecord::Base
       return kdarc*dens*frict*flow**2/(diam**5)
     end
 
-
+=begin
     def initial_batch_positioning(statar, btsqar, volmar)
 #   Calculate the initial linefill by setting the initial_volume for each station.
 #   The initial volume setting for each station is the total sequence volume for the station minus the pipe volume to that point in the line.
@@ -258,6 +258,50 @@ class Simulation < ActiveRecord::Base
       stn_ix = stn_ix + 1
     end
   end
+=end
+
+    def initial_batch_positioning(statar, btsqar, volmar)
+#     Calculate the linefill.  Fill the line between stations with commodities using the batch sequence array.
+      lf = Array.new
+      stn_ix = 0
+      kmp = statar[stn_ix].kmp
+      stat = statar[stn_ix].name
+      max_batch = btsqar[0].size - 1
+#     Specify initial split across first station
+      batch = max_batch
+      batch_vol = btsqar[stn_ix][batch].volume
+#     Calculate the linefill between stations.
+      while stn_ix < statar.count - 1
+        stat = statar[stn_ix].name
+        kmp = statar[stn_ix].kmp
+        vol = volmar.interpolate_y(kmp)
+        kmp_end = statar[stn_ix + 1].kmp
+        vol_end = volmar.interpolate_y(kmp_end)
+#       Determine initial volume pumped
+        initial_volume = 0
+        bix = 0
+        while bix != batch 
+          initial_volume = initial_volume + btsqar[stn_ix][bix].volume
+          if bix < max_batch then bix = bix+1 else bix = 0 end
+        end
+#       Adjust the volume of the downstream batch at this station based on volume of batch left on the upstream side.
+#        if stn_ix > 0 and batch_vol > 0 then
+#          fraction_left_on_upstream_batch = batch_vol / btsqar[stn_ix - 1][batch].volume
+#          volume_left_on_downstream_batch = btsqar[stn_ix][batch].volume * fraction_left_on_upstream_batch
+#          batch_vol = btsqar[stn_ix][batch].volume - volume_left_on_downstream_batch
+#        end
+        initial_volume = initial_volume + batch_vol
+        statar[stn_ix].initial_volume = initial_volume        
+#       Get batch split at downstream station
+        pipe_volume = volmar.interpolate_y(kmp_end) - volmar.interpolate_y(kmp)
+        volume_shift = statar[stn_ix].initial_volume + statar[stn_ix].pumped_volume - pipe_volume
+        upstream_batch, upstream_vol, downstream_batch, downstream_vol = get_batch_split(btsqar, volume_shift, stn_ix)
+        batch = downstream_batch
+        batch_vol = downstream_vol
+        stn_ix = stn_ix + 1
+      end      
+    end           
+
 
 
     def linefill(statar, btsqar, volmar)
