@@ -12,17 +12,19 @@
 <% num_stations = stations.size %>
 <% num_batches = btsqar[0].size %>
 
-<h2>Batch Sequence</h2>
+<h3>Batch Sequence</h3>
 <table>
   <tbody>
 	  <% stn_ix = 0 %>
-	  <tr>
-	    <td>Batch</td>
-	    <% while stn_ix < num_stations %>
-	      <td> <%= stations[stn_ix] %> </td>
-		  <% stn_ix = stn_ix + 1 %>
-		<% end %>
-	  </tr>
+	  <thead>
+		  <tr>
+		    <th>Batch</th>
+		    <% while stn_ix < num_stations %>
+		      <th> <%= stations[stn_ix] %> </th>
+			  <% stn_ix = stn_ix + 1 %>
+			<% end %>
+		  </tr>
+	  </thead>
 	  <% batch = 0 %>
 	  <% while batch < num_batches %>
 	    <% stn_ix = 0 %>

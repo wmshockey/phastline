@@ -3,7 +3,7 @@
 <% @pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
 <% @nomination = Nomination.find {|n| n.name == @simulation.nomination_id} %>
 
-<h2>Simulation Average Summary Results - total time: <%= (($timestamp - $initial_timestamp)/3600.0).round(2).to_s %> hours</h2>
+<h3>Simulation Average Summary Results - total time: <%= (($timestamp - $initial_timestamp)/3600.0).round(2).to_s %> hours</h3>
 <table>
 	<thead>
 		<tr>

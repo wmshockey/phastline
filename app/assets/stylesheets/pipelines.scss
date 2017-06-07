@@ -60,8 +60,9 @@ dl {margin:0 0 1.5em 0;}
 dl dt {font-weight:bold;}
 dd {margin-left:1.5em;}
 table {margin-bottom:1.4em;width:100%; border: 1px solid black}
+.toedit {border: 5px solid green;}
 th {font-weight:bold}
-/* thead th {background:#c3d9ff;} */
+thead th {background:#e6ffe6;}
 th, td, caption {padding:4px 10px 4px 5px; border: 1px solid black; height:25px}
 /* tbody tr:nth-child(even) td, tbody tr.even td {background:#e5ecf9;} */
 tfoot {font-style:italic;}
@@ -80,6 +81,33 @@ caption {background:#eee;}
 .bottom {margin-bottom:0;padding-bottom:0;}
 .fixed {table-layout: fixed }
 .fixed_row_height {height:30px}
+
+/* Menu Bar */
+.menu1 ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e7e7e7;
+    background-color: #f3f3f3;
+}
+.menu1 li {
+    float: left;
+}
+.menu1 li a {
+    display: block;
+    color: #666;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+.menu1 li a:hover:not(.active) {
+    background-color: #ddd;
+}
+.menu1 li a.active {
+    color: white;
+    background-color: #4CAF50;
+}
 
 /* forms.css */
 label {font-weight:bold;}

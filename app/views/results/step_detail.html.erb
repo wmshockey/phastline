@@ -2,7 +2,7 @@
 
 <% stepresults = @results.select {|r| r.simulation_id == @sim_id and r.step == @step} %>
 
-<h2>Details for Step <%= @step %> @ <%= stepresults[0].timestamp.strftime("%Y-%m-%d %H:%M") %>
+<h3>Details for Step <%= @step %> duration <%= stepresults[0].step_time.round(2) %> hrs ----
 	<% if @step == 1 then %>
 		<%= link_to "Prev", step_detail_result_path(:id => @sim_id, :step => $maxsteps) %>
 	<% else %>
@@ -13,12 +13,12 @@
 		 <%= link_to "Next", step_detail_result_path(:id => @sim_id, :step => 1) %>
 	<% else %>
 		<%= link_to "Next", step_detail_result_path(:id => @sim_id, :step => @step+1) %>
-	<% end %>	
-</h2>
+	<% end %>
+</h3>
 
 <table>
   <thead>
-   <tr>
+   <tr bgcolor="#e6ffe6">
       <th>Station</th>
 	  <th>Kmp</th>
 	  <th>Flowrate</th>

@@ -25,18 +25,20 @@
 	<div><h1 class="span-6 top"><%= link_to 'Phastware', '/pages/home' %></div> </h1><div><h1 class="span-17 top"><p>&copy; 2017 Seraphim Consulting Company.</p></h1></div>
 	<% if user_signed_in? %>
     	<div class="span-12 pull-6 large"><em>Phastline Application</em> </div> <div class="span-12 push-6 large"><%= link_to "User: #{current_user.email} ", edit_user_registration_path %></div>
-	    <nav class="span-24 large loud">
-			<div class="span-3"><%= link_to 'Simulations', simulations_path %></div>
-			<div class="span-2"><%= link_to 'Pipelines', pipelines_path %></div>
-			<div class="span-3"><%= link_to 'Nominations', nominations_path %></div>
-			<div class="span-3"><%= link_to 'Commodities', commodities_path %></div>
-			<div class="span-2"><%= link_to 'Pumps', pumps_path %></div>
-			<div class="span-2"><%= link_to 'About', '/pages/about' %></div>
-			<div class="span-2"><%= link_to 'Help', '/pages/help' %></div>
-			<% if current_user.admin? %>
-				<div class="span-2"><%= link_to 'Admin', users_path %></div>
-			<% end %>
-			<div class="span-2 last"><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></div>
+	    <nav class="span-24 large loud menu1">
+			<ul>
+				<li class="span-3"><%= link_to 'Simulations', simulations_path %></li>
+				<li class="span-3"><%= link_to 'Pipelines', pipelines_path %></li>
+				<li class="span-3"><%= link_to 'Nominations', nominations_path %></li>
+				<li class="span-3"><%= link_to 'Commodities', commodities_path %></li>
+				<li class="span-2"><%= link_to 'Pumps', pumps_path %></li>
+				<li class="span-2"><%= link_to 'About', '/pages/about' %></li>
+				<li class="span-2"><%= link_to 'Help', '/pages/help' %></li>
+				<% if current_user.admin? %>
+					<li class="span-2"><%= link_to 'Admin', users_path %></li>
+				<% end %>
+				<li class="span-3 last"><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></li>
+			</ul>
 	    </nav>
 	<% end %>
     <div class="span-24">

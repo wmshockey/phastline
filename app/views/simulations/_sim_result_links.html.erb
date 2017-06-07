@@ -1,10 +1,13 @@
-<p>
-<%= link_to 'Summary Results', summary_result_path(@simulation.id) %> |
-<%= link_to "Step Details", step_detail_result_path(:id => @simulation.id, :step => 1) %> |
-<%= link_to "Step Linefill", step_linefill_result_path(:id => @simulation.id, :step => 1) %> |
-<%= link_to "Step Flowrates", step_flowrates_result_path(:id => @simulation.id) %> |
-<%= link_to "Station Curves", station_curves_result_path(:id => @simulation.id) %> |
-<%= link_to "Batch Sequence", batch_sequence_result_path(:id => @simulation.id) %> |
-<%= link_to "Power/Energy", power_result_path(:id => @simulation.id) %> |
-<%= link_to 'Back', :back %>
-</p>
+<nav class="span-24 large loud menu1">
+	<ul>
+		<li><%= link_to 'Summary Results', summary_result_path(@simulation.id) %> </li>
+		<li><%= link_to "Step Details", step_detail_result_path(:id => @simulation.id, :step => 1) %></li>
+		<li><%= link_to "Step Linefill", step_linefill_result_path(:id => @simulation.id, :step => 1) %></li>
+		<li><%= link_to "Step Flowrates", step_flowrates_result_path(:id => @simulation.id) %><li>
+		<li><%= link_to "Station Curves", station_curves_result_path(:id => @simulation.id) %></li>
+		<li><%= link_to "Batch Sequence", batch_sequence_result_path(:id => @simulation.id) %></li>
+		<li><%= link_to "Power/Energy", power_result_path(:id => @simulation.id) %></li>
+		<li><%= link_to 'Back', :back %></li>
+	</ul>
+</nav>
+

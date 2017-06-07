@@ -1,7 +1,7 @@
 <p id="notice"><%= notice %></p>
 
 <h2>Commodity</h2>
-<table>
+<table class="toedit">
   <tbody>
 		<% if current_user.admin? then %>
 			<tr><td><strong>User: </strong></td><td><%= (User.find {|u| u.id == @commodity.user_id}).email %></td></tr>
