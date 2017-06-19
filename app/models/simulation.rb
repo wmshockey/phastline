@@ -1059,6 +1059,9 @@ class Simulation < ActiveRecord::Base
   def summary_results_calc(results)
 #   Get the list of stations from the saved step results.  @results is the only data available at this point.
     stations = results.map {|s| [s.station_id, s.kmp, s.stat]}.uniq
+    $maxsteps = results.map {|s| s.step}.max
+    $initial_timestamp = results.first.timestamp
+    $timestamp = results.last.timestamp + results.last.step_time * 3600.0
     stations.sort_by! {|s| s[1]}
 #   Find the bottleneck points for each step on the line
     bottlenecks = Array[$maxsteps]

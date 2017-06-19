@@ -25,7 +25,7 @@
 	<% @results.each do | i | %>
       <tr>
 		<% step_string = "#{i.step} @ #{i.step_time.round(2)} hrs" %>
-		<td><%= link_to step_string, station_step_detail_result_path(:id => @sim_id, :step => i.step) %></td>
+		<td><%= link_to step_string, step_detail_result_path(:id => @sim_id, :step => i.step) %></td>
 		<td><%= '%8.1f'% i.flow %></td>
 		<td><%= '%10.1f'% i.pumped_volume %></td>
 		<td><%= i.upstream_batch %></td>

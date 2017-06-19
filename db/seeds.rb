@@ -312,11 +312,7 @@ Shipment.create(nomination_id: nomination.id, start_location: 'Edmonton', end_lo
 Shipment.create(nomination_id: nomination.id, start_location: 'Edmonton', end_location: 'Superior', shipper: 'SHELL', commodity_id: '41E', volume: 75000.0)
 Shipment.create(nomination_id: nomination.id, start_location: 'Kerrobert', end_location: 'Superior', shipper: 'TEX', commodity_id: 'NGL', volume: 120000.0)
 
-schedule = Schedule.create(pipeline_id: pipeline.id, name: 'Initial Big', description: 'Initial schedule for simulations', start_date: DateTime.strptime("2016-12-01 07:00", "%Y-%m-%d %H:%M"), period: 30, sched_type: "PRIOR")
-Activity.create(schedule_id: schedule.id, batch_id: '63E-00200', start_time: DateTime.strptime("2016-12-01 09:30", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-02 04:00", "%Y-%m-%d %H:%M"), activity_type: 'INJECTION', station: 'Edmonton', volume: 200000.0, shipper: '', nomination_name: '2016-04')
-Activity.create(schedule_id: schedule.id, batch_id: '63E-00200', start_time: DateTime.strptime("2016-12-01 09:30", "%Y-%m-%d %H:%M"), end_time: nil, activity_type: 'DELIVERY', station: 'Superior', volume: 200000.0, shipper: '', nomination_name: '2016-04')
-
-Simulation.create(user_id: uid, name: 'Big Line Benchmark', description: 'Big Line Benchmark Test from Nov 25th', max_flowrate: 600.0, max_batchsize: 10000.0, max_steptime: 12, pipeline_id: pipeline.id, nomination_id: nomination.id, schedule_id: schedule.id)
+Simulation.create(user_id: uid, name: 'Big Line Benchmark', description: 'Big Line Benchmark Test from Nov 25th', max_flowrate: 600.0, max_batchsize: 10000.0, max_steptime: 12, pipeline_id: pipeline.id, nomination_id: nomination.id)
 
 pipeline = Pipeline.create(user_id: uid, name: 'Small Pipeline', description: 'A small pipeline for testing purposes.')
 
@@ -346,11 +342,4 @@ nomination = Nomination.create(pipeline_id: pipeline.id, name: 'Small Nom', desc
 Shipment.create(nomination_id: nomination.id, start_location: 'Tim', end_location: 'Two Town', shipper: 'SHELL', commodity_id: 'BR', volume: 100000.0)
 Shipment.create(nomination_id: nomination.id, start_location: 'Tim', end_location: 'Two Town', shipper: 'IOL', commodity_id: 'SYN', volume: 50000.0)
 
-schedule = Schedule.create(pipeline_id: pipeline.id, name: 'Small Sched 1', description: 'Test initial schedule for Small Pipeline', start_date: DateTime.strptime("2017-01-01 07:00", "%Y-%m-%d %H:%M"), period: 31, sched_type: "PRIOR")
-Activity.create(schedule_id: schedule.id, batch_id: 'CRW-00001', start_time: DateTime.strptime("2016-12-01 09:30", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-02 04:00", "%Y-%m-%d %H:%M"), activity_type: 'INJECTION', station: 'Tim', volume: 5000.0, shipper: '', nomination_name: '2016-11')
-Activity.create(schedule_id: schedule.id, batch_id: 'BR-00002', start_time: DateTime.strptime("2016-12-02 04:00", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-15 23:00", "%Y-%m-%d %H:%M"), activity_type: 'INJECTION', station: 'Tim', volume: 200000.0, shipper: '', nomination_name: '2016-11')
-Activity.create(schedule_id: schedule.id, batch_id: 'CRW-00001', start_time: DateTime.strptime("2016-12-18 10:30", "%Y-%m-%d %H:%M"), end_time: DateTime.strptime("2016-12-19 13:00", "%Y-%m-%d %H:%M"), activity_type: 'DELIVERY', station: 'Two Town', volume: 0.0, shipper: '', nomination_name: '2016-11')
-Activity.create(schedule_id: schedule.id, batch_id: 'BR-00002', start_time: DateTime.strptime("2016-12-19 13:00", "%Y-%m-%d %H:%M"), end_time: nil, activity_type: 'DELIVERY', station: 'Two Town', volume: 0.0, shipper: '', nomination_name: '2016-11')
-
-Simulation.create(user_id: uid, name: 'Small Sim', description: 'Testing', max_flowrate: 2000.0, max_batchsize: 10000.0, max_steptime: 12, pipeline_id: pipeline.id, nomination_id: nomination.id, schedule_id: schedule.id)
-
+Simulation.create(user_id: uid, name: 'Small Sim', description: 'Testing', max_flowrate: 2000.0, max_batchsize: 10000.0, max_steptime: 12, pipeline_id: pipeline.id, nomination_id: nomination.id)

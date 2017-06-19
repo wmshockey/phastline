@@ -13,7 +13,8 @@
 /tmp
 /config/database.yml
 Phastline.tmproj
+.DS_Store
+**/.DS_Store
 <<<<<<< HEAD
-
 =======
 >>>>>>> d2da4c9139bda8bd777999c11aff39309c829ae8

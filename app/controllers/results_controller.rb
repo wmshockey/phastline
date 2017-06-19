@@ -1,5 +1,6 @@
 class ResultsController < ApplicationController
   before_action :set_result, only: [:show, :edit, :update, :destroy]
+  before_action :check_for_results, only: [:summary, :step_detail, :station_detail, :station_step_detail, :station_curves, :step_flowrates, :batch_sequence, :station_schedule, :batch_detail, :power, :step_linefill]
 
   # GET /results
   # GET /results.json
@@ -10,66 +11,49 @@ class ResultsController < ApplicationController
   # GET /results
   # GET /results.json
   def summary
-    @simulation = Simulation.find(params[:id])
-    @sim_id = params[:id].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id}
     @summary_results = @simulation.summary_results_calc(@results)
   end
   
   def step_detail
-    @sim_id = params[:id].to_i
     @step = params[:step].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id}
   end
   
   def station_detail
-    @sim_id = params[:id].to_i
     @station_id = params[:station_id].to_i
     @results = Result.select {|r| r.simulation_id == @sim_id and r.station_id == @station_id}
   end
 
   def station_step_detail
-    @sim_id = params[:id].to_i
     @station_id = params[:station_id].to_i
     @results = Result.select {|r| r.simulation_id == @sim_id and r.station_id == @station_id}
   end
 
   def station_curves
-    @sim_id = params[:id].to_i
     @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
 
   def step_flowrates
-    @sim_id = params[:id].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id}
     @stations = @results.map {|s| s.station_id}.uniq
   end
 
   def batch_sequence
-    @sim_id = params[:id].to_i
     @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
 
   def station_schedule
-    @sim_id = params[:id].to_i
     @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1 and r.stat == params[:stat]}
   end
   
   def batch_detail
-    @sim_id = params[:id].to_i
     @batch = params[:batch]
     @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
   
   def power
-    @sim_id = params[:id].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id}
   end
   
   def step_linefill
-    @sim_id = params[:id].to_i
     @step = params[:step].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id}
   end
 
   # GET /results/1
@@ -130,6 +114,19 @@ class ResultsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_result
       @result = Result.find(params[:id])
+    end
+    
+    def check_for_results
+      @sim_id = params[:id].to_i
+      @simulation = Simulation.find(params[:id])
+      @results = Result.select {|r| r.simulation_id == @sim_id}
+      if @results.empty?
+        respond_to do |format|
+          flash[:error] = "No simulation results available at this point, please re-run the simulation"
+          format.html { redirect_to @simulation, notice: 'No Simulation Results Available'}
+          format.json {head :no_content}
+        end
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
