@@ -89,7 +89,18 @@ class CommoditiesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_commodity
       @commodities = current_user.commodities.all
-      @commodity = Commodity.find(params[:id])
+      begin
+        @commodity = Commodity.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @commodity = nil
+        flash[:error] = "Commodity #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to commodities_url, notice: "Commodity with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end
+      
+      
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

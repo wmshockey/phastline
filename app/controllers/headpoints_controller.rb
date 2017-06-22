@@ -72,7 +72,16 @@ class HeadpointsController < ApplicationController
     def set_headpoint
       @pumps = Pump.all
       @pump = Pump.find(params[:pump_id])
-      @headpoint = @pump.headpoints.find(params[:id])
+      begin
+        @headpoint = @pump.headpoints.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @headpoint = nil
+        flash[:error] = "Headpoint #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to pump_path(@pump), notice: "Headpoint with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end     
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

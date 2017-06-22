@@ -1,4 +1,5 @@
 class SegmentsController < ApplicationController
+  before_action :set_segment, only: [:show, :edit, :update, :destroy]
 
   def index
     @pipeline = Pipeline.find(params[:pipeline_id])
@@ -63,6 +64,21 @@ class SegmentsController < ApplicationController
     end
   
   private
+  # Use callbacks to share common setup or constraints between actions.
+  def set_segment
+    @pipeline = Pipeline.find(params[:pipeline_id])
+    begin
+      @segment = @pipeline.segments.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => e
+      @segment = nil
+      flash[:error] = "Segment #{params[:id]} cannot be found or no longer exists."
+      respond_to do |format|
+        format.html { redirect_to pipeline_path(@pipeline), notice: "Segment with id #{params[:id]} not found." }
+        format.json { head :no_content }
+      end
+    end                
+  end
+  
     def segment_params
       params.require(:segment).permit(:id, :kmp, :diameter, :thickness, :roughness, :mawp)
     end

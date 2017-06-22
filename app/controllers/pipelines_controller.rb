@@ -88,7 +88,16 @@ class PipelinesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_pipeline
       @pipelines = current_user.pipelines.all
-      @pipeline = Pipeline.find(params[:id])
+      begin
+        @pipeline = Pipeline.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @pipeline = nil
+        flash[:error] = "Pipeline #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to pipelines_url, notice: "Pipeline with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end      
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

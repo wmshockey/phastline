@@ -1,5 +1,5 @@
 class SimulationsController < ApplicationController
-  before_action :set_simulation, only: [:show, :edit, :update, :destroy]
+  before_action :set_simulation, only: [:show, :edit, :update, :destroy, :run]
   before_action :authenticate_user!
 
   # GET /simulations
@@ -119,11 +119,21 @@ class SimulationsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_simulation
       @simulations = current_user.simulations.all
-      @simulation = Simulation.find(params[:id])
+      begin
+        @simulation = Simulation.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @simulation = nil
+        flash[:error] = "Simulation #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to simulations_url, notice: "Simulation with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end
     end
+      
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def simulation_params
-      params.require(:simulation).permit(:name, :description, :pipeline_id, :nomination_id, :schedule_id, :max_flowrate, :max_batchsize, :max_steptime)
+      params.require(:simulation).permit(:name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime)
     end
 end

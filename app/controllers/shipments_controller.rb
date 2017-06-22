@@ -77,7 +77,16 @@ class ShipmentsController < ApplicationController
     def set_shipment
       @nomination = Nomination.find(params[:nomination_id])
       @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id}
-      @shipment = @nomination.shipments.find(params[:id])
+      begin
+         @shipment = @nomination.shipments.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @shipment = nil
+        flash[:error] = "Shipment #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to nomination_path(@nomination), notice: "Shipment with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end    
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

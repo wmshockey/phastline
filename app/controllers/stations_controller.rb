@@ -75,7 +75,16 @@ class StationsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_station
       @pipeline = Pipeline.find(params[:pipeline_id])
-      @station = @pipeline.stations.find(params[:id])
+      begin
+        @station = @pipeline.stations.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @station = nil
+        flash[:error] = "Station #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to pipeline_path(@pipeline), notice: "Station with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end      
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

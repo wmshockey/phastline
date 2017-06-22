@@ -1,6 +1,6 @@
 class ResultsController < ApplicationController
   before_action :set_result, only: [:show, :edit, :update, :destroy]
-  before_action :check_for_results, only: [:summary, :step_detail, :station_detail, :station_step_detail, :station_curves, :step_flowrates, :batch_sequence, :station_schedule, :batch_detail, :power, :step_linefill]
+  before_action :check_for_results, only: [:summary, :step_detail, :station_detail, :station_step_detail, :station_curves, :step_flowrates, :batch_sequence, :batch_detail, :power, :step_linefill]
 
   # GET /results
   # GET /results.json
@@ -40,10 +40,6 @@ class ResultsController < ApplicationController
     @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
   end
 
-  def station_schedule
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1 and r.stat == params[:stat]}
-  end
-  
   def batch_detail
     @batch = params[:batch]
     @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}

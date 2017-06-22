@@ -91,8 +91,19 @@ class NominationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_nomination
-      @nomination = Nomination.find(params[:id])
-      @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id }
+      begin
+        @nomination = Nomination.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @nomination = nil
+        flash[:error] = "Nomination #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to nominations_url, notice: "Nomination with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end
+      if !@nomination.nil?
+        @pipeline = Pipeline.find {|p| p.id == @nomination.pipeline_id }  
+      end    
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

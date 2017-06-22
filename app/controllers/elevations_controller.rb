@@ -72,7 +72,16 @@ class ElevationsController < ApplicationController
       # Use callbacks to share common setup or constraints between actions.
       def set_elevation
         @pipeline = Pipeline.find(params[:pipeline_id])
-        @elevation = @pipeline.elevations.find(params[:id])
+        begin
+          @elevation = @pipeline.elevations.find(params[:id])
+        rescue ActiveRecord::RecordNotFound => e
+          @elevation = nil
+          flash[:error] = "Elevation #{params[:id]} cannot be found or no longer exists."
+          respond_to do |format|
+            format.html { redirect_to pipeline_path(@pipeline), notice: "Elevation with id #{params[:id]} not found." }
+            format.json { head :no_content }
+          end
+        end                
       end
 
       # Never trust parameters from the scary internet, only allow the white list through.

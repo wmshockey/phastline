@@ -80,7 +80,16 @@ class UnitsController < ApplicationController
     def set_unit
       @pipeline = Pipeline.find(params[:pipeline_id])
       @station = Station.find(params[:station_id])
-      @unit = Unit.find(params[:id])
+      begin
+        @unit = Unit.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @unit = nil
+        flash[:error] = "Unit #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to pipeline_station_path(@pipeline, @station), notice: "Unit with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end     
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

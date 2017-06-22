@@ -39,7 +39,7 @@ class PumpsController < ApplicationController
       else
         flash[:error] = "Pump copy failed."
         format.html { render :show, notice: 'Pump copy failed.' }
-        format.json { render json: schedule_copy.errors, status: :unprocessable_entity }
+        format.json { render json: pump_copy.errors, status: :unprocessable_entity }
       end
     end        
   end
@@ -88,8 +88,17 @@ class PumpsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_pump
-      @pumps = current_user.pumps.all     
-      @pump = Pump.find(params[:id])
+      @pumps = current_user.pumps.all 
+      begin
+        @pump = Pump.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        @pump = nil
+        flash[:error] = "Pump #{params[:id]} cannot be found or no longer exists."
+        respond_to do |format|
+          format.html { redirect_to pumps_url, notice: "Pump with id #{params[:id]} not found." }
+          format.json { head :no_content }
+        end
+      end      
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
