@@ -8,5 +8,5 @@
 <%= link_to 'Back', simulations_path %>
 <br><br>
 
-<%= button_to "Run Simulation", {:controller => :simulations, :action => 'run'}, :method => :get %>
+<%= button_to( "Run Simulation", {:controller => :simulations, :action => 'run'}, class: "btn success", :method => :get) %>
 

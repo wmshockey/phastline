@@ -1,12 +1,12 @@
 <%= render 'top' %>
 
 <h3>Flow Rates</h3>
-<table>
+<table class="table table-bordered table-hover table-condensed">
   <tbody>
 	  <% stn_ix = 0 %>
 	  <% num_stations = @stations.count %>
 	  <% num_steprecs = @results.count %>
-	  <tr bgcolor="#e6ffe6">
+	  <tr>
 	    <td>Step</td>
 	    <td>Timestamp</td>
 	    <td>Duration</td>

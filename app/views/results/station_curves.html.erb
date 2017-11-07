@@ -1,11 +1,11 @@
 <%= render 'top' %>
 
 <h3>Station Curves</h3>
-<table>
+<table class="table table-bordered table-hover table-condensed">
 	<tbody>
 		<% @results.each do |r| %>
 			<% station_name = r.stat %>
-			<tr><td colspan="2"; bgcolor="#e6ffe6"><strong>Station: <%= station_name %></strong><br>
+			<tr><td><strong>Station: <%= station_name %></strong><br>
 				 <% station_units = Unit.select {|u| u.station_id == r.station_id} %>
 				 <% (1..6).each do |row| %>
 					<% row_units = station_units.select {|su| su.unit_row == row} %>

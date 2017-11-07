@@ -5,7 +5,7 @@
 <% flow_units = @pump.flow_units %>
 
 <h2>Headpoint</h2>
-<table class="toedit">
+<table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
 	  <th>Flowrate (<%= flow_units %>)</th>
@@ -24,5 +24,5 @@
 <%= link_to 'Edit', edit_pump_headpoint_path(@headpoint.pump_id, @headpoint.id) %> |
 <%= link_to 'Delete', pump_headpoint_path(@headpoint.pump_id, @headpoint.id), method: :delete, data: { confirm: 'Are you sure?' } %> |
 <%= link_to 'Back', pump_path(@pump) %>
-
+<br><br>
 <%= render 'index' %>

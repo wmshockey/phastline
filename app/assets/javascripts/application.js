@@ -9,8 +9,12 @@
 //
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
+// I removed the "//= require turbolinks" line here because it was causing the javascript to only work after a refresh.  - WMS Nov 2017
 //
 //= require jquery
 //= require jquery_ujs
-//= require turbolinks
-//= require_tree .
+//= require bootstrap-sprockets
+//= require_self
+//= require_tree .	
+
+

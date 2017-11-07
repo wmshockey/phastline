@@ -1,5 +1,6 @@
-<nav class="span-24 large loud menu1">
-	<ul>
+<nav class="navbar navbar-default small">
+  <div class="container-fluid">
+	<ul class="nav navbar-nav">
 		<li><%= link_to 'Summary Results', summary_result_path(@simulation.id) %> </li>
 		<li><%= link_to "Step Details", step_detail_result_path(:id => @simulation.id, :step => 1) %></li>
 		<li><%= link_to "Step Linefill", step_linefill_result_path(:id => @simulation.id, :step => 1) %></li>
@@ -9,5 +10,5 @@
 		<li><%= link_to "Power/Energy", power_result_path(:id => @simulation.id) %></li>
 		<li><%= link_to 'Back', :back %></li>
 	</ul>
+  </div>
 </nav>
-

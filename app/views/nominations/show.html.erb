@@ -5,5 +5,5 @@
 <%= link_to 'Delete', nomination_path(@nomination.id), method: :delete, data: { confirm: 'Are you sure you want to delete this nomination?' } %> |
 <%= link_to 'Copy', copy_nomination_path(@nomination.id), data: {confirm: 'Are you sure you want to make a copy of this nomination?' } %> |
 <%= link_to 'Back', nominations_path %>
-
+<br><br>
 <%= render 'shipments/index' %>
