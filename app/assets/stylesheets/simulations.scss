@@ -3,13 +3,11 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 
-.btn {
-    border: none;
-    color: white;
-    padding: 14px 28px;
-    font-size: 16px;
-    cursor: pointer;
-}
 
 .success {background-color: #4CAF50;} /* Green */
 .success:hover {background-color: #46a049;}
+
+.progress {
+	visibility: hidden;	
+}
+

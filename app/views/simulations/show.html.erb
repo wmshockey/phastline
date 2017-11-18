@@ -2,11 +2,12 @@
 
 <%= render 'show' %>
 
-<%= link_to 'Edit Simulation', edit_simulation_path(@simulation) %> |
-<%= link_to 'Delete', simulation_path(@simulation.id), method: :delete, data: { confirm: 'Are you sure you want to delete this simulation?' } %> |
-<%= link_to 'Copy', copy_simulation_path(@simulation.id),  data: {confirm: 'Are you sure you want to make a copy of this simulation?' } %> |
-<%= link_to 'Back', simulations_path %>
-<br><br>
+<div id="simulation">
+	<div class="progress">
+	    <div class="progress-bar", id="sim_progress_bar", style="width: 0%;"></div>
+	</div>
+	<div class="message"></div>	
+</div>
 
-<%= button_to( "Run Simulation", {:controller => :simulations, :action => 'run'}, class: "btn success", :method => :get) %>
-
+	
+	

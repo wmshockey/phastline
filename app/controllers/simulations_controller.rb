@@ -48,31 +48,11 @@ class SimulationsController < ApplicationController
   def run
     if current_user.admin? then
       @simulation = Simulation.find(params[:id])
-      sim_owner = User.find {|u| u.id == @simulation.user_id}
-      pipeline = Pipeline.find{|p| p.id == @simulation.pipeline_id}
-      nomination = Nomination.find{|n| n.id == @simulation.nomination_id}
-      commodities = sim_owner.commodities
-      units = pipeline.units
-      pumpar = sim_owner.pumps
     else
       @simulation = current_user.simulations.find(params[:id])
-      pipeline = current_user.pipelines.find{|p| p.id == @simulation.pipeline_id}
-      nomination = current_user.nominations.find{|n| n.id == @simulation.nomination_id}
-      commodities = current_user.commodities
-      units = pipeline.units
-      pumpar = current_user.pumps
     end
-    respond_to do |format|
-      if @simulation.run(pipeline, nomination, commodities, units, pumpar)
-        flash[:success] = "Simulation ran successfully."
-        format.html { render :run, status: :ok, location: @simulation }
-        format.json { render :run, status: :ok, location: @simulation }
-      else
-        flash[:error] = "Simulation run failed."
-        format.html { render :run, notice: 'Simulation run failed.' }
-        format.json { render json: @simulation.errors, status: :unprocessable_entity }
-      end
-    end
+    @progress_bar = current_user.progressbars.create!(message: 'Queued', percent: 0)
+    SimWorker.perform_later(current_user, @simulation, @progress_bar)
   end
 
   # POST /simulations

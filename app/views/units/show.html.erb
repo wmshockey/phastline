@@ -21,8 +21,12 @@
   </tbody>
 </table>
 
-<%= link_to 'Edit', edit_pipeline_station_unit_path(@pipeline, @station, @unit) %> |
-<%= link_to 'Delete', pipeline_station_unit_path(@pipeline, @station, @unit), method: :delete, data: { confirm: 'Are you sure?' } %> |
-<%= link_to 'Back', pipeline_station_path(@pipeline, @station) %>
-<br><br>
-<%= render 'index' %>
+<nav class="navbar navbar-default small">
+  <div class="container-fluid">
+	<ul class="nav navbar-nav">
+		<li><%= link_to 'Edit', edit_pipeline_station_unit_path(@pipeline, @station, @unit) %> </li>
+		<li><%= link_to 'Delete', pipeline_station_unit_path(@pipeline, @station, @unit), method: :delete, data: { confirm: 'Are you sure?' } %> </li>
+		<li><%= link_to 'Back', pipeline_station_path(@pipeline, @station) %> </li>
+	</ul>
+  </div>
+</nav>

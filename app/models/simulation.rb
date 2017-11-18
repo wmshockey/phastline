@@ -33,13 +33,18 @@ class Simulation < ActiveRecord::Base
     default_scope { order(user_id: :asc, pipeline_id: :asc) }
 
 # Mainline driver code
-    def run(pipeline, nomination, commodities, units, pumpar)
+    def run(progress_bar, pipeline, nomination, commodities, units, pumpar)
+        percent_complete = 0
+        @progress_bar = progress_bar
+        @progress_bar.update_attributes!(message: "Starting simulation...", percent: "#{percent_complete}")        
         @pipeline = pipeline
         @nomination = nomination
         @commodities = commodities
         @pumpar = pumpar
         @units = units
+        @progress_bar.update_attributes!(message: "Clearing out previous results...", percent: "#{percent_complete}")        
         Result.destroy_all(simulation_id: id)
+        @progress_bar.update_attributes!(message: "Gathering up all input data...", percent: "#{percent_complete}")        
         @shipments = @nomination.shipments
         @stations = @pipeline.stations
         @segmar = @pipeline.segments.sort_by { |a| a.kmp}
@@ -50,6 +55,7 @@ class Simulation < ActiveRecord::Base
         @statar = @pipeline.get_all_stations(@volmar)
 #       Get the combined station curves
         @statcv = @pipeline.get_station_curves(@statar, @units, @pumpar)
+        @progress_bar.update_attributes!(message: "Performing data integrity checks...", percent: "#{percent_complete}")        
         data_integrity_checks(@pipeline)
         if self.errors.any? then
           raise "Errors occurred during processing of input data"
@@ -57,6 +63,7 @@ class Simulation < ActiveRecord::Base
         $initial_timestamp = Time.now
         $timestamp = $initial_timestamp
 #       Generate the new period batches
+        @progress_bar.update_attributes!(message: "Generating batches...", percent: "#{percent_complete}")        
         batches = generate_batches(max_batchsize, @nomination.name, @shipments)
 #       Construct the new period batch sequence
         @btsqar = construct_batch_sequence(batches, @statar)
@@ -65,6 +72,7 @@ class Simulation < ActiveRecord::Base
         $step = 1; stepdone = false
         @stepar = Array.new
 #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
+        @progress_bar.update_attributes!(message: "Starting step processing...", percent: "#{percent_complete}")        
         while not stepdone
           @lfill = linefill(@statar, @btsqar, @volmar)
           @viscar = visc_profile(@lfill, @tempar)
@@ -107,6 +115,8 @@ class Simulation < ActiveRecord::Base
             logger.error("Number of steps exceeds 1000.  Simulation stopped at step 1000")
             raise "Error occurred - too many steps"
           end
+          percent_complete = percent_calc(@statar)
+          @progress_bar.update_attributes!(message: "step: #{$step},", percent: "#{percent_complete}")        
         end
         if self.errors.any?
           raise "Errors occurred during step processing"
@@ -115,7 +125,9 @@ class Simulation < ActiveRecord::Base
 #       Clean up batch sequence and remove batches that had non activity in the simulation
         clean_batch_sequence(@btsqar)
 #       Save step results in database table for user viewing
+        @progress_bar.update_attributes!(message: "Saving step results...", percent: "#{percent_complete}")        
         save_results
+        @progress_bar.update_attributes!(message: "Successful Simulation!  See results below. <br>", percent: "#{percent_complete}")        
         if self.errors.empty? then
           return true
         else
@@ -124,6 +136,11 @@ class Simulation < ActiveRecord::Base
         end
     rescue Exception => e
       self.errors.add(:base, e.message)
+      message_text = "Failed Simulation.  Please see error messages below.<br>"
+      self.errors.each do |n, msg|
+        message_text = message_text + msg + "<br>"
+      end
+      @progress_bar.update_attributes!(message: message_text, percent: "#{percent_complete}")
 #      self.errors.add(:base, e.backtrace)
       return false
     end
@@ -515,7 +532,7 @@ class Simulation < ActiveRecord::Base
       else
         time_shift = max_steptime
       end
-#       Update the pumped volumes for all stations to advance to the next step
+#     Update the pumped volumes for all stations to advance to the next step
       stn_ix = 0
       while stn_ix < statar.count - 1
         if statar[stn_ix].pumped_volume < statar[stn_ix].sequence_volume then
@@ -954,6 +971,21 @@ class Simulation < ActiveRecord::Base
     end
     mxdp = disp - mxvl
     return mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos
+  end
+
+  def percent_calc(statar)
+    percent = 100.0
+    statar.each do |i|
+      pumped_vol = i.pumped_volume
+      sequence_vol = i.sequence_volume
+      if sequence_vol > 0 then
+        stn_percent = pumped_vol/sequence_vol
+        if stn_percent < percent then
+          percent = stn_percent
+        end
+      end
+    end
+    return (percent*100 + 0.5).to_i
   end
 
   def step_calc(statar, flowar, btsqar, suctar, headar, slossar, dlossar, maxpressar, minpressar)

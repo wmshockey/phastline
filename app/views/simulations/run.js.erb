@@ -1,0 +1,9 @@
+(function() {
+	var progressBar = new ProgressBar("#simulation", "<%= progressbar_path @progress_bar %>");
+	$('.progress').css("visibility", "visible");
+	progressBar.start();
+}
+)();
+
+
+

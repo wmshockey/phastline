@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170309144812) do
+ActiveRecord::Schema.define(version: 20171107154044) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -67,6 +67,16 @@ ActiveRecord::Schema.define(version: 20170309144812) do
     t.datetime "updated_at",                null: false
     t.integer  "user_id",     limit: 4
   end
+
+  create_table "progressbars", force: :cascade do |t|
+    t.string   "message",    limit: 255
+    t.integer  "percent",    limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "progressbars", ["user_id"], name: "index_progressbars_on_user_id", using: :btree
 
   create_table "pumps", force: :cascade do |t|
     t.string   "pump_id",                      limit: 255
@@ -211,6 +221,7 @@ ActiveRecord::Schema.define(version: 20170309144812) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   add_foreign_key "elevations", "pipelines"
+  add_foreign_key "progressbars", "users"
   add_foreign_key "segments", "pipelines"
   add_foreign_key "shipments", "nominations"
   add_foreign_key "stations", "pipelines"

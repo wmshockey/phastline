@@ -21,8 +21,12 @@
   </tbody>
 </table>
 
-<%= link_to 'Edit', edit_pump_headpoint_path(@headpoint.pump_id, @headpoint.id) %> |
-<%= link_to 'Delete', pump_headpoint_path(@headpoint.pump_id, @headpoint.id), method: :delete, data: { confirm: 'Are you sure?' } %> |
-<%= link_to 'Back', pump_path(@pump) %>
-<br><br>
-<%= render 'index' %>
+<nav class="navbar navbar-default small">
+  <div class="container-fluid">
+	<ul class="nav navbar-nav">
+		<li><%= link_to 'Edit', edit_pump_headpoint_path(@headpoint.pump_id, @headpoint.id) %> </li>
+		<li><%= link_to 'Delete', pump_headpoint_path(@headpoint.pump_id, @headpoint.id), method: :delete, data: { confirm: 'Are you sure?' } %> </li>
+		<li><%= link_to 'Back', pump_path(@pump) %> </li>
+	</ul>
+  </div>
+</nav>

@@ -18,8 +18,7 @@ $(document).ready(() => {
 	
   $('li').on('mouseleave', event => {
 	  $(event.currentTarget).css({fontWeight: ''})
-	 
+ 
   })
-
   
 }); 

@@ -28,5 +28,9 @@ module Phastline
     # Set the Timezone
     config.time_zone = 'Mountain Time (US & Canada)'
     config.active_record.default_timezone = :local
+    
+    # Set the Active Job queuing service
+    config.active_job.queue_adapter = :sidekiq
+    
   end
 end

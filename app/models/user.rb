@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   has_many :simulations, dependent: :destroy
   has_many :commodities, dependent: :destroy
   has_many :pumps, dependent: :destroy
+  has_many :progressbars, dependent: :destroy
   after_create :populate_seed_data
 
   def populate_seed_data

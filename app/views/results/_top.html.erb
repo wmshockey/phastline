@@ -4,6 +4,5 @@
 	<% simulation_id = @results.first.simulation_id %>
 	<% @simulation = Simulation.find {|s| s.id == simulation_id} %>
 	<%= render 'simulations/show' %>
-	<%= render 'simulations/sim_result_links' %>
 <% end %>
 
