@@ -118,7 +118,7 @@ class ResultsController < ApplicationController
       @results = Result.select {|r| r.simulation_id == @sim_id}
       if @results.empty?
         respond_to do |format|
-          flash[:error] = "No simulation results available at this point, please re-run the simulation"
+          flash[:error] = "No simulation results available at this point, please run a simulation"
           format.html { redirect_to @simulation, notice: 'No Simulation Results Available'}
           format.json {head :no_content}
         end

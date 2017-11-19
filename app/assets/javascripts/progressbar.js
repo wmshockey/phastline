@@ -20,7 +20,16 @@ class ProgressBar {
 					  (data.message.substring(0, 6) === "Failed"))) {
 				              setTimeout(othis.start.bind(othis), 1000);
 						  	 }
-							 else { $('.progress').css("visibility", "hidden");}	
+							 else { 
+								 $('.progress').css("visibility", "hidden");
+								 if (data.message.substring(0,6) === "Failed") {
+								 	 $(".message").addClass("bg-danger strong")
+								 }
+								 else {
+								 	 $(".message").addClass("bg-success strong")
+							 	 }							 
+							 
+							 }	
 				}
 			})
 		}			

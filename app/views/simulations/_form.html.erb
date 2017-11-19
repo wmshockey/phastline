@@ -4,8 +4,8 @@
 <%= form_for(@simulation) do |f| %>
 	 <p>
 	 <% if @simulation.errors.any? %>
-	   <div id="error_explanation">
-	     <h2><%= pluralize(@simulation.errors.count, "error") %> prohibited this simulation from being saved:</h2>
+	   <div id="error_explanation", class="bg-danger">
+	     <%= pluralize(@simulation.errors.count, "error") %> prohibited this simulation from being saved:
 
 	     <ul>
 	     <% @simulation.errors.full_messages.each do |message| %>
@@ -50,6 +50,6 @@
 
 
 	<div class="actions">
-	   <%= f.submit %>
+	   <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>
 	</div>
 <% end %>

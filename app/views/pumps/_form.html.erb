@@ -2,8 +2,8 @@
 <%= form_for(@pump) do |f| %>
   <p>
   <% if @pump.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@pump.errors.count, "error") %> prohibited this pump from being saved:</h2>
+    <div id="error_explanation", class="bg-danger">
+      <%= pluralize(@pump.errors.count, "error") %> prohibited this pump from being saved:
 
       <ul>
       <% @pump.errors.full_messages.each do |message| %>
@@ -29,6 +29,6 @@
 	  </tbody>
 	</table>
   <div class="actions">
-    <%= f.submit %>
+    <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>  
   </div>
 <% end %>

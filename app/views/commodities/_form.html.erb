@@ -2,8 +2,8 @@
 <%= form_for(@commodity) do |f| %>
   <p>
   <% if @commodity.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@commodity.errors.count, "error") %> prohibited this commodity from being saved:</h2>
+    <div id="error_explanation", class="bg-danger">
+      <%= pluralize(@commodity.errors.count, "error") %> prohibited this commodity from being saved:
 
       <ul>
       <% @commodity.errors.full_messages.each do |message| %>
@@ -27,13 +27,7 @@
 			<tr><td><%= f.label "Vapour pressure (kpa)" %></td><td><%= f.number_field :vapor,  :step => "any"  %></td></tr>
 	  </tbody>
 	</table>
-<nav class="navbar navbar-default small">
-  <div class="container-fluid">
-	<ul class="nav navbar-nav">
-		<li><%= f.submit %></li>
-		<li><%= link_to 'Back', commodity_path(@commodity.id) %></li>
-	</ul>
-  </div>
-</nav>
-
+<div class="actions">
+  <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>
+</div>
 <% end %>

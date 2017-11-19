@@ -1,9 +1,9 @@
-<h2>Segment</h2>
+<h3>Segment</h3>
 <%= form_for([@pipeline, @segment]) do |f| %>
 <p>
 <% if @segment.errors.any? %>
-  <div id="error_explanation">
-    <h2><%= pluralize(@segment.errors.count, "error") %> prohibited this segment from being saved:</h2>
+  <div id="error_explanation", class="bg-danger">
+    <%= pluralize(@segment.errors.count, "error") %> prohibited this segment from being saved:
     <ul>
     <% @segment.errors.full_messages.each do |message| %>
       <li><%= message %></li>
@@ -35,6 +35,6 @@
   </tbody>
 </table>
 <div class="actions">
-  <%= f.submit %>
+  <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>  
 </div>
 <% end %>

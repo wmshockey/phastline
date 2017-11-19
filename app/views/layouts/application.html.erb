@@ -8,26 +8,13 @@
 </head>
 
 <div class="container">
-	<% if !success.nil? %>
-	  <p class = "bg-success"><%= success %></p>
-	<% end %>
-	<% if !notice.nil? %>
-	  <p class="bg-info"><%= notice %></p>
-	<% end %>
-	<% if !alert.nil? %>
-	  <p class="bg-warning"><%= alert %></p>
-	<% end %>
-	<% if !error.nil? %>
-	  <p class="bg-danger"><%= error %></p>
-	<% end %>
 
 <body>
 	<div class="row">
-		<div class="col-sm-1"><h3><%= link_to 'Phastware', '/pages/home' %></h3></div>
-		<div class="col-sm-3 super text-left copyright">&copy; 2017 Seraphim Consulting Company.</div>	
+		<div class="col-sm-4"><h3><%= link_to 'Phastware', '/pages/home' %><span class="text-left copyright"> &copy; 2017 Seraphim Consulting Company.</span></h3></div>			
 		<% if user_signed_in? %>
-    	<div class="col-sm-3", style="vertical-align: bottom;"><h4>Phastline Application</h4></div>
-		<div class="col-sm-4 text-right", style="vertical-align: bottom;"><%= link_to "User: #{current_user.email} ", edit_user_registration_path %></div>
+    	<div class="col-sm-3"><h3>Phastline Application</h3></div>
+		<div class="col-sm-5 text-right"><%= link_to "User: #{current_user.email} ", edit_user_registration_path %></div>
 	</div>
 
 	<nav class="navbar navbar-default">
@@ -47,18 +34,27 @@
 			</ul>
 		</div>
     </nav>
+
+	<% if !success.nil? %>
+	  <p class = "bg-success strong"><%= success %></p>
 	<% end %>
+	<% if !notice.nil? %>
+	  <p class="bg-info strong"><%= notice %></p>
+	<% end %>
+	<% if !alert.nil? %>
+	  <p class="bg-warning strong"><%= alert %></p>
+	<% end %>
+	<% if !error.nil? %>
+	  <p class="bg-danger strong"><%= error %></p>
+	<% end %>
+
     <div class="col-sm-12">
 	  <%= yield %>
     </div>
+
 </body>
 
 </div>
 
-<div class="container">
-<% if !@simulation.nil? %>
-  <%= render 'shared/error_messages', :object => @simulation %>
-<% end %>
-</div>
-
+<%end%>
 </html>

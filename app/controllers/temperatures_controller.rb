@@ -31,7 +31,7 @@ class TemperaturesController < ApplicationController
 
       respond_to do |format|
         if @temperature.save
-          format.html { redirect_to new_pipeline_temperature_path(@pipeline), notice: 'Temperature was successfully created.' }
+          format.html { redirect_to pipeline_temperatures_path(@pipeline), notice: 'Temperature was successfully created.' }
           format.json { render :show, status: :created, location: @temperature }
         else
           format.html { render :new }
@@ -45,7 +45,7 @@ class TemperaturesController < ApplicationController
     def update
       respond_to do |format|
         if @temperature.update(temperature_params)
-          format.html { redirect_to pipeline_path(@pipeline), notice: 'Temperature was successfully updated.' }
+          format.html { redirect_to pipeline_temperatures_path(@pipeline), notice: 'Temperature was successfully updated.' }
           format.json { render :show, status: :ok, location: @temperature }
         else
           format.html { render :edit }
@@ -59,7 +59,7 @@ class TemperaturesController < ApplicationController
     def destroy
         respond_to do |format|
           if @temperature.destroy
-            format.html { redirect_to pipeline_path(@pipeline), notice: 'Temperature was successfully deleted.' }
+            format.html { redirect_to pipeline_temperatures_path(@pipeline), notice: 'Temperature was successfully deleted.' }
             format.json { render :show, status: :destroyed, location: @pipeline }
           else
             format.html { render :delete }
@@ -78,7 +78,7 @@ class TemperaturesController < ApplicationController
           @temperature = nil
           flash[:error] = "Temperature #{params[:id]} cannot be found or no longer exists."
           respond_to do |format|
-            format.html { redirect_to pipeline_path(@pipeline), notice: "Temperature with id #{params[:id]} not found." }
+            format.html { redirect_to pipeline_temperatures_path(@pipeline), notice: "Temperature with id #{params[:id]} not found." }
             format.json { head :no_content }
           end
         end       

@@ -1,7 +1,7 @@
 <% if object.errors.any? %>
   <ul>
     <% object.errors.each do |n, msg| %>
-      <li class="error"><%= n %> <%= msg %></li>
+      <li class="error bg-danger"><%= n %> <%= msg %></li>
     <% end %>
   </ul> 
 <% end %>

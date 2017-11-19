@@ -1,10 +1,9 @@
-<p id="notice"><%= notice %></p>
 <%= render 'pumps/show_one' %>
 
 <% head_units = @pump.head_units %>
 <% flow_units = @pump.flow_units %>
 
-<h2>Headpoint</h2>
+<h3>Headpoint</h3>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -24,7 +23,7 @@
 <nav class="navbar navbar-default small">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
-		<li><%= link_to 'Edit', edit_pump_headpoint_path(@headpoint.pump_id, @headpoint.id) %> </li>
+		<li><%= link_to 'Edit Headpoint', edit_pump_headpoint_path(@headpoint.pump_id, @headpoint.id) %> </li>
 		<li><%= link_to 'Delete', pump_headpoint_path(@headpoint.pump_id, @headpoint.id), method: :delete, data: { confirm: 'Are you sure?' } %> </li>
 		<li><%= link_to 'Back', pump_path(@pump) %> </li>
 	</ul>

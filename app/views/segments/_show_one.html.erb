@@ -1,0 +1,24 @@
+<h3>Segment</h3>
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+	  <th>Distance (kmp)</th>
+      <th>Diameter (meters)</th>
+	  <th>Thickness (meters)</th>
+      <th>Roughness (meters)</th>
+	  <th>MAWP (kpa)</th>
+	  <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+      <tr>
+		<td style="width: 120px;"><%= '%8.2f' % @segment.kmp %></td>
+        <td style="width: 160px;"><%= @segment.diameter %></td>
+        <td style="width: 160px;"><%= @segment.thickness  %></td>
+        <td style="width: 160px;"><%= '%12.10f' % @segment.roughness  %></td>
+        <td style="width: 160px;"><%= @segment.mawp %></td>
+		<td style="width: 60px;" %></td>
+      </tr>
+  </tbody>
+</table>

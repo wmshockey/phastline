@@ -2,8 +2,8 @@
 <%= form_for(@pipeline) do |f| %>
   <p>
   <% if @pipeline.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@pipeline.errors.count, "error") %> prohibited this pipeline from being saved:</h2>
+    <div id="error_explanation", class="bg-danger">
+      <%= pluralize(@pipeline.errors.count, "error") %> prohibited this pipeline from being saved:
 
       <ul>
       <% @pipeline.errors.full_messages.each do |message| %>
@@ -30,6 +30,6 @@
 	  </tbody>
 	</table>
   <div class="actions">
-    <%= f.submit %>
+	<span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>   
   </div>  
 <% end %>

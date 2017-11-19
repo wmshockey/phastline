@@ -1,8 +1,7 @@
-<p id="notice"><%= notice %></p>
 <%= render 'pipelines/show_one' %>
 <%= render 'stations/show_one' %>
 
-<h2>Pump Unit</h2>
+<h4>Pump Unit</h4>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -24,7 +23,7 @@
 <nav class="navbar navbar-default small">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
-		<li><%= link_to 'Edit', edit_pipeline_station_unit_path(@pipeline, @station, @unit) %> </li>
+		<li><%= link_to 'Edit Pump Unit', edit_pipeline_station_unit_path(@pipeline, @station, @unit) %> </li>
 		<li><%= link_to 'Delete', pipeline_station_unit_path(@pipeline, @station, @unit), method: :delete, data: { confirm: 'Are you sure?' } %> </li>
 		<li><%= link_to 'Back', pipeline_station_path(@pipeline, @station) %> </li>
 	</ul>

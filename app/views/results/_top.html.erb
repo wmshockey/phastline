@@ -1,5 +1,5 @@
 <% if @results.empty? then %>
-	<h3 class="error">Simulation results are not available at this point, please re-run the simulation</h2>
+	<h3 class="error">Simulation results are not available at this point, please run a simulation</h2>
 <% else %>
 	<% simulation_id = @results.first.simulation_id %>
 	<% @simulation = Simulation.find {|s| s.id == simulation_id} %>

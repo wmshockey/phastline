@@ -36,7 +36,7 @@ class Simulation < ActiveRecord::Base
     def run(progress_bar, pipeline, nomination, commodities, units, pumpar)
         percent_complete = 0
         @progress_bar = progress_bar
-        @progress_bar.update_attributes!(message: "Starting simulation...", percent: "#{percent_complete}")        
+        @progress_bar.update_attributes!(message: "Initializing simulation...", percent: "#{percent_complete}")        
         @pipeline = pipeline
         @nomination = nomination
         @commodities = commodities
@@ -127,8 +127,8 @@ class Simulation < ActiveRecord::Base
 #       Save step results in database table for user viewing
         @progress_bar.update_attributes!(message: "Saving step results...", percent: "#{percent_complete}")        
         save_results
-        @progress_bar.update_attributes!(message: "Successful Simulation!  See results below. <br>", percent: "#{percent_complete}")        
         if self.errors.empty? then
+          @progress_bar.update_attributes!(message: "Successful Simulation!  You can now view the results. <br>", percent: "#{percent_complete}")        
           return true
         else
           raise "Errors occurred during final cleanup and saving of results"
@@ -141,6 +141,8 @@ class Simulation < ActiveRecord::Base
         message_text = message_text + msg + "<br>"
       end
       @progress_bar.update_attributes!(message: message_text, percent: "#{percent_complete}")
+#     Now wait 2 seconds so that client side progressbar javascript routine can pick up and record the error messages.
+      sleep(2)
 #      self.errors.add(:base, e.backtrace)
       return false
     end

@@ -26,7 +26,7 @@ class SimWorker < ActiveJob::Base
     end
     if @simulation.run(@progress_bar, pipeline, nomination, commodities, units, pumpar)
       @progress_bar.update_attributes!({
-        message: 'Successful Simulation - see results below.',
+        message: 'Successful Simulation.  You can now view the results.',
         percent: 0
       })
       return true
