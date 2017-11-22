@@ -1,4 +1,4 @@
-<h2>Pumps</h2>
+<h2>Pumps  <%= image_tag "pump-icon.png"%></h2>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -42,6 +42,6 @@
 	      </tr>
 	  <% end %>
     <% end %>
-	<td colspan="11"><%= link_to 'Add Pump', new_pump_path %></td>
+	<td colspan="11"><%= link_to 'Add Pump', new_pump_path, class: 'btn btn-success' %></td>
   </tbody>
 </table>

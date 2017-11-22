@@ -1,4 +1,4 @@
-<h2>Pipeline</h2>
+<h2>Pipeline  <%= image_tag "pipeline-icon.png"%></h2>
 <%= form_for(@pipeline) do |f| %>
   <p>
   <% if @pipeline.errors.any? %>
@@ -29,7 +29,6 @@
 	      </tr>
 	  </tbody>
 	</table>
-  <div class="actions">
-	<span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>   
-  </div>  
+<%= f.submit :Submit, class: 'btn btn-success' %>
+<%= link_to 'Back', :back, class: 'btn btn-default' %>
 <% end %>

@@ -1,4 +1,4 @@
-<h2>Pipelines</h2>
+<h2>Pipelines  <%= image_tag "pipeline-icon.png"%></h2>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
    <tr>
@@ -22,8 +22,7 @@
 	      </tr>
 	  <% end %>
 	<% end %>
-	<td colspan="2"><%= link_to 'Add Pipeline', new_pipeline_path %></td>
+	<td colspan="3"><%= link_to 'Add Pipeline', new_pipeline_path, class: 'btn btn-success' %></td>
   </tbody>
 </table>
-
 

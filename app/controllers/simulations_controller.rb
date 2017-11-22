@@ -51,7 +51,7 @@ class SimulationsController < ApplicationController
     else
       @simulation = current_user.simulations.find(params[:id])
     end
-    @progress_bar = current_user.progressbars.create!(message: 'Queued', percent: 0)
+    @progress_bar = current_user.progressbars.create!(message: "Queued Simulation \"#{@simulation.name}\" for processing.", percent: 0)
     SimWorker.perform_later(current_user, @simulation, @progress_bar)
   end
 
@@ -90,7 +90,7 @@ class SimulationsController < ApplicationController
   def destroy
     @simulation.destroy
     respond_to do |format|
-      format.html { redirect_to simulations_url, notice: 'Simulation was successfully destroyed.' }
+      format.html { redirect_to simulations_url, notice: 'Simulation was successfully deleted.' }
       format.json { head :no_content }
     end
   end

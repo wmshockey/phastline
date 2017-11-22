@@ -5,6 +5,7 @@ class ShipmentsController < ApplicationController
   # GET /shipments.json
   def index
     @nomination = current_user.nominations.find(params[:nomination_id])
+    @pipeline = @nomination.pipeline
     @shipments = @nomination.shipments.all
   end
 
@@ -39,7 +40,7 @@ class ShipmentsController < ApplicationController
 
     respond_to do |format|
       if @shipment.save
-        format.html { redirect_to new_nomination_shipment_path(@nomination), notice: 'Shipment was successfully created.' }
+        format.html { redirect_to nomination_shipments_path(@nomination), notice: 'Shipment was successfully created.' }
         format.json { render :show, status: :created, location: @shipment }
       else
         format.html { render :new }
@@ -53,7 +54,7 @@ class ShipmentsController < ApplicationController
   def update
     respond_to do |format|
       if @shipment.update(shipment_params)
-        format.html { redirect_to nomination_path(@nomination), notice: 'Shipment was successfully updated.' }
+        format.html { redirect_to nomination_shipments_path(@nomination), notice: 'Shipment was successfully updated.' }
         format.json { render :show, status: :ok, location: @shipment }
       else
         format.html { render :edit }
@@ -67,7 +68,7 @@ class ShipmentsController < ApplicationController
   def destroy
     @shipment.destroy
     respond_to do |format|
-      format.html { redirect_to nomination_path(@nomination), notice: 'Shipment was successfully destroyed.' }
+      format.html { redirect_to nomination_shipments_path(@nomination), notice: 'Shipment was successfully deleted.' }
       format.json { head :no_content }
     end
   end
@@ -83,7 +84,7 @@ class ShipmentsController < ApplicationController
         @shipment = nil
         flash[:error] = "Shipment #{params[:id]} cannot be found or no longer exists."
         respond_to do |format|
-          format.html { redirect_to nomination_path(@nomination), notice: "Shipment with id #{params[:id]} not found." }
+          format.html { redirect_to nomination_shipments_path(@nomination), notice: "Shipment with id #{params[:id]} not found." }
           format.json { head :no_content }
         end
       end    

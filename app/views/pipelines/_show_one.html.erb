@@ -1,4 +1,4 @@
-<h2>Pipeline</h2>
+<h2>Pipeline  <%= image_tag "pipeline-icon.png"%></h2>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -21,7 +21,7 @@
   </tbody>
 </table>
 
-<nav class="navbar navbar-default small">
+<nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
 		<li><%= link_to 'Edit Pipeline', edit_pipeline_path(@pipeline) %> </li>
@@ -32,6 +32,7 @@
             <li><%= link_to 'Segments', pipeline_segments_path(@pipeline)%></li>
             <li><%= link_to 'Elevations', pipeline_elevations_path(@pipeline)%></li>
 			<li><%= link_to 'Temperatures', pipeline_temperatures_path(@pipeline)%></li>
+			<li><%= link_to 'DRA Regions', pipeline_dras_path(@pipeline)%></li>
 		  </ul>		
 		<li><%= link_to 'Delete', pipeline_path(@pipeline.id), method: :delete, data: { confirm: 'Are you sure you want to delete this pipeline?' } %> </li>
 		<li><%= link_to 'Copy', copy_pipeline_path(@pipeline.id), data: {confirm: 'Are you sure you want to make a copy of this pipeline?' } %> </li>

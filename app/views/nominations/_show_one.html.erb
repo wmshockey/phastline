@@ -1,4 +1,5 @@
-<h2>Nomination</h2>
+<h2>Nomination <%= image_tag("nomination-icon.png") %></h2>
+
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -20,3 +21,14 @@
     </tr>
   </tbody>
 </table>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+	<ul class="nav navbar-nav">
+		<li><%= link_to 'Edit Nomination', edit_nomination_path(@nomination) %> </li>
+		<li><%= link_to 'Delete', nomination_path(@nomination.id), method: :delete, data: { confirm: 'Are you sure you want to delete this nomination?' } %> </li>
+		<li><%= link_to 'Copy', copy_nomination_path(@nomination.id), data: {confirm: 'Are you sure you want to make a copy of this nomination?' } %> </li>
+		<li><%= link_to 'Back', nominations_path %> </li>
+	</ul>
+  </div>
+</nav>

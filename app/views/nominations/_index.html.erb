@@ -1,4 +1,4 @@
-<h2>Nominations</h2>
+<h2>Nominations  <%= image_tag("nomination-icon.png") %></h2> 
 <table class="table table-bordered table-hover table-condensed">
   <thead>
    <tr>
@@ -39,6 +39,7 @@
 	      </tr>
 	  <% end %>
 	<% end %>
-	<td colspan="5"><%= link_to 'Add Nomination', new_nomination_path %></td>
+	<td colspan="6"><%= link_to 'Add Nomination', new_nomination_path, class: 'btn btn-success' %></td>
   </tbody>
 </table>
+

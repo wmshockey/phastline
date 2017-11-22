@@ -3,6 +3,7 @@
 <% @pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
 <% @nomination = Nomination.find {|n| n.name == @simulation.nomination_id} %>
 
+<div id="results">
 <h3>Simulation Average Summary Results - total time: <%= (($timestamp - $initial_timestamp)/3600.0).round(2).to_s %> hours</h3>
 <table class="table table-bordered table-hover table-condensed">
 	<thead>
@@ -11,11 +12,11 @@
 			<th>Kmp</th>
 			<th>Flowrate</th>
 			<th>Pumped<br>Volume</th>
-			<th>Holding</th>
-			<th>Suction</th>
-			<th>Head</th>
-			<th>Case</th>
-			<th>Discharge</th>
+			<th>Holding<br>Pressure</th>
+			<th>Suction<br>Pressure</th>
+			<th>Head<br>Pressure</th>
+			<th>Case<br>Pressure</th>
+			<th>Discharge<br>Pressure</th>
 			<th>Bottleneck<br>Percent</th>
 			<th>Energy<br>(KwH)</th>
 		</tr>
@@ -41,6 +42,7 @@
 		<% end %>
 	</tbody>
 </table>
+</div>
 
 <% session.delete :return_to %>
 <% session[:return_to] ||= request.path %>

@@ -12,7 +12,7 @@
 <% steprecs = @results.select {|r| r.step == @step} %>
 <% linefill = steprecs[0].linefill %>
 
-
+<div id="results">
 <h3>Linefill for step <%= @step.to_s %> duration <%= steprecs[0].step_time.round(2) %> hrs ----
 	<% if @step == 1 then %>
 		<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => $maxsteps) %>
@@ -53,3 +53,4 @@
 
  </tbody>
 </table>
+</div>

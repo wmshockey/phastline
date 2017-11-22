@@ -1,5 +1,4 @@
-<h2>Simulation</h2>
-
+<h2>Simulation  <%= image_tag("simulation-icon.png") %></h2>
 
 <%= form_for(@simulation) do |f| %>
 	 <p>
@@ -48,8 +47,6 @@
 		</tbody>
 	</table>
 
-
-	<div class="actions">
-	   <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>
-	</div>
+<%= f.submit :Submit, class: 'btn btn-success' %>
+<%= link_to 'Back', :back, class: 'btn btn-default' %>
 <% end %>

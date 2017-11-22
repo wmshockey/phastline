@@ -1,4 +1,4 @@
-<h2>Simulation</h2>
+<h2>Simulation  <%= image_tag("simulation-icon.png") %></h2>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
 	<tr>
@@ -45,12 +45,12 @@
   </tbody>
 </table>
 
-<nav class="navbar navbar-default small">
+<nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
-		<li><%= link_to 'Run Simulation', url_for(action: 'run', controller: 'simulations'), remote: true, :method => :get %> </li>
+		<li id="runSim"><%= link_to 'Run Simulation', url_for(action: 'run', controller: 'simulations'), remote: true, :method => :get%> </li>
 		<li class="dropdown">
-	        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Results<span class="caret"></span></a>
+	        <a id="showResults", class="dropdown-toggle" data-toggle="dropdown" href="#">Results<span class="caret"></span></a>
 			<ul class="dropdown-menu">
 				<li><%= link_to 'Summary Results', summary_result_path(@simulation.id) %> </li>
 				<li><%= link_to "Step Details", step_detail_result_path(:id => @simulation.id, :step => 1) %></li>
@@ -69,9 +69,12 @@
   </div>
 </nav>
 
-<div id="simulation">
+<div id="simulation", class="hidden">
 	<div class="progress">
 	    <div class="progress-bar", id="sim_progress_bar", style="width: 0%;"></div>
 	</div>
-	<div class="message"></div>	
+	<span class="small">Simulation Message Panel:</span>
+	<div class="panel panel-success">
+		<div class="panel-heading message"></div>	
+	</div>	
 </div>

@@ -2,6 +2,7 @@
 
 <% stepresults = @results.select {|r| r.simulation_id == @sim_id and r.step == @step} %>
 
+<div id="results">
 <h3>Details for Step <%= @step %> duration <%= stepresults[0].step_time.round(2) %> hrs ----
 	<% if @step == 1 then %>
 		<%= link_to "Prev", step_detail_result_path(:id => @sim_id, :step => $maxsteps) %>
@@ -54,3 +55,4 @@
   </tbody>
 </table>
 <br>
+</div>

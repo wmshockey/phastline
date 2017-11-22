@@ -57,6 +57,7 @@ Rails.application.routes.draw do
     end
     resources :elevations
     resources :temperatures
+    resources :dras
     member do
       get 'copy'
     end

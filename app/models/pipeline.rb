@@ -4,6 +4,7 @@ class Pipeline < ActiveRecord::Base
   has_many :stations, dependent: :destroy
   has_many :elevations, dependent: :destroy
   has_many :temperatures, dependent: :destroy
+  has_many :dras, dependent: :destroy
   has_many :nominations, dependent: :destroy
   has_many :units, through: :stations
   validates :name, :presence => true
@@ -97,6 +98,21 @@ class Pipeline < ActiveRecord::Base
       elev_profile.add_point(i.kmp, i.elevation)
     end
     return elev_profile
+  end
+  
+  def get_all_dras
+# Get all dras into a profile array
+    dra_profile = Profile.new
+    dra_array = dras.sort_by { |a| a.start_kmp}
+    line_start_kmp = elevations[0].kmp
+    dra_profile.add_point(line_start_kmp, 0)
+    dra_array.each do |i|
+      # first delete any previous point with the same kmp (0 value points)
+      dra_profile.delete_if {|x| x.kmp == i.start_kmp}
+      dra_profile.add_point(i.start_kmp, i.dra_percent)
+      dra_profile.add_point(i.end_kmp, 0)
+    end
+    return dra_profile
   end
 
   def get_all_stations(volmar)

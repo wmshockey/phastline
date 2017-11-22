@@ -26,7 +26,7 @@ class SegmentsController < ApplicationController
     @segment = @pipeline.segments.new(segment_params)
     respond_to do |format|
       if @segment.save
-        format.html { redirect_to new_pipeline_segment_path(@pipeline), notice: 'Segment was successfully created.' }
+        format.html { redirect_to pipeline_segments_path(@pipeline), notice: 'Segment was successfully created.' }
         format.json { render :show, status: :created, location: @segment }
       else
         format.html { render :new }
@@ -40,7 +40,7 @@ class SegmentsController < ApplicationController
     @segment = @pipeline.segments.find(params[:id])
     respond_to do |format|
       if @segment.update(segment_params)
-        format.html {redirect_to @pipeline, notice: 'Segment was successfully updated.'}
+        format.html {redirect_to pipeline_segments_path(@pipeline), notice: 'Segment was successfully updated.'}
         format.json {render :show, status: :updated, location: @segment}
       else
         format.html {render :edit}
@@ -54,7 +54,7 @@ class SegmentsController < ApplicationController
       @segment = @pipeline.segments.find(params[:id])
       respond_to do |format|
         if @segment.destroy
-          format.html { redirect_to pipeline_path(@pipeline), notice: 'Segment was successfully deleted.' }
+          format.html { redirect_to pipeline_segments_path(@pipeline), notice: 'Segment was successfully deleted.' }
           format.json { render :show, status: :destroyed, location: @pipeline }
         else
           format.html { render :delete }
@@ -73,7 +73,7 @@ class SegmentsController < ApplicationController
       @segment = nil
       flash[:error] = "Segment #{params[:id]} cannot be found or no longer exists."
       respond_to do |format|
-        format.html { redirect_to pipeline_path(@pipeline), notice: "Segment with id #{params[:id]} not found." }
+        format.html { redirect_to pipeline_segments_path(@pipeline), notice: "Segment with id #{params[:id]} not found." }
         format.json { head :no_content }
       end
     end                

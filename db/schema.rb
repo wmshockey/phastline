@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171107154044) do
+ActiveRecord::Schema.define(version: 20171120012818) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -28,6 +28,15 @@ ActiveRecord::Schema.define(version: 20171107154044) do
     t.float    "acoef",          limit: 24
     t.float    "bcoef",          limit: 24
     t.integer  "user_id",        limit: 4
+  end
+
+  create_table "dras", force: :cascade do |t|
+    t.float    "start_kmp",   limit: 24
+    t.float    "end_kmp",     limit: 24
+    t.float    "dra_percent", limit: 24
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "pipeline_id", limit: 4
   end
 
   create_table "elevations", force: :cascade do |t|
