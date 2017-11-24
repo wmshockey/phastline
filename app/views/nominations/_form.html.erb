@@ -4,7 +4,7 @@
 
 <p>
   <% if @nomination.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@nomination.errors.count, "error") %> prohibited this nomination from being saved:
       <ul>
       <% @nomination.errors.full_messages.each do |message| %>

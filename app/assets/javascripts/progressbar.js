@@ -4,6 +4,7 @@ class ProgressBar {
 		this.url = url;
 		this.message = this.elem.find('.message');
 		this.bar = this.elem.find('.progress-bar');
+		this.count = 0;
 		$(".panel").removeClass("panel-danger").addClass("panel-success")	
 	}
 	
@@ -26,12 +27,13 @@ class ProgressBar {
 					$(".panel").removeClass("panel-success").addClass("panel-danger strong");
 					$('.progress').css("visibility", "hidden")
 				}
-				else if (data.message.substring(0,6) === "Queued") {
+				else if ((data.message.substring(0,6) === "Queued") && (othis.count > 5)) {
 					 othis.message.html("Simulation server is not responding.  Please contact support.");
 					 $(".panel").removeClass("panel-success").addClass("panel-danger strong");
 					 $('.progress').css("visibility", "hidden")
 				}
 				else {
+					othis.count = othis.count + 1;
 					setTimeout(othis.start.bind(othis), 1000);
 				}
 				},

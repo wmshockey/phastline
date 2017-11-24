@@ -4,7 +4,7 @@
   <% flow_units = @pump.flow_units %>
   <p>
   <% if @headpoint.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@headpoint.errors.count, "error") %> prohibited this headpoint from being saved:
 
       <ul>

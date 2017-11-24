@@ -4,7 +4,7 @@
 <%= form_for([@pipeline, @dra]) do |f| %>
   <p>
   <% if @dra.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@dra.errors.count, "error") %> prohibited this DRA from being saved:
 
       <ul>

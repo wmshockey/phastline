@@ -4,7 +4,7 @@
 <%= form_for([@pipeline, @segment]) do |f| %>
 <p>
 <% if @segment.errors.any? %>
-  <div id="error_explanation", class="bg-danger">
+  <div id="error_explanation", class="alert alert-danger">
     <%= pluralize(@segment.errors.count, "error") %> prohibited this segment from being saved:
     <ul>
     <% @segment.errors.full_messages.each do |message| %>

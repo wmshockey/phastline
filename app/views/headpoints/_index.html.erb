@@ -1,4 +1,6 @@
-<h3>Headpoints</h3>
+<h3 class="col-sm-4">Headpoints</h3>
+<h3 class="col-sm-8 text-right"><%= link_to 'Add Headpoint', new_pump_headpoint_path(@pump), class: 'btn btn-success' %></h3>
+
 <table class="table table-bordered table-hover table-condensed">
   <% head_units = @pump.head_units %>
   <% flow_units = @pump.flow_units %>
@@ -17,7 +19,6 @@
 	      </tr>
 	  <% end %>
 	<% end %>
-    <tr><td colspan="2"><%= link_to 'Add Headpoint', new_pump_headpoint_path(@pump), class: 'btn btn-success' %></td></tr>
   </tbody>
 </table>
 

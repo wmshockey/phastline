@@ -2,7 +2,7 @@
 <%= form_for(@commodity) do |f| %>
   <p>
   <% if @commodity.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@commodity.errors.count, "error") %> prohibited this commodity from being saved:
 
       <ul>

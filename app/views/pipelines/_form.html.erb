@@ -2,7 +2,7 @@
 <%= form_for(@pipeline) do |f| %>
   <p>
   <% if @pipeline.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@pipeline.errors.count, "error") %> prohibited this pipeline from being saved:
 
       <ul>

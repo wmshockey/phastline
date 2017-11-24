@@ -1,79 +1,77 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Phastware Pipeline Hydraulics Application Software Tools </title>
-  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
+	<head>
+	  <title>Phastware Pipeline Hydraulics Application Software Tools </title>
+	  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
+	  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+	  <%= csrf_meta_tags %>
+	</head>
 
-<div class="container">
+	<div class="container">
 
-<body>
-	<div class="row">
-		<div class="col-sm-4"><h3><%= link_to 'Phastware', '/pages/home' %><span class="text-left copyright"> &copy; 2017 Seraphim Consulting Company.</span></h3></div>			
-		<% if user_signed_in? %>
-    	<div class="col-sm-3"><h3>Phastline Application</h3></div>
-		<div class="col-sm-5 text-right" data-toggle="tooltip" title="show user information / change password"><%= link_to "User: #{current_user.email} ", edit_user_registration_path %></div>
+		<body>
+			<div class="row col-sm-12">
+				<div class="col-sm-4"><h3><%= link_to 'Phastware', '/pages/home' %><span class="text-left copyright" %> &copy; 2017 Seraphim Consulting Company.</span></h3></div>			
+
+			<% if user_signed_in? %>
+
+		    	<div class="col-sm-6"><h3>Phastline Application</h3></div>
+
+				<nav class="navbar navbar-custom col-sm-2">
+					<ul class="nav navbar-nav pull-right">
+						<li class="dropdown">
+					        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= image_tag("user-icon-small.png") %><span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><%= link_to "Profile / Change Password", edit_user_registration_path %> </li>
+								<li><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></li>
+							</ul>
+						</li>			
+					</ul>
+				</nav>
+			</div>
+
+			<div class="row no-padding thumbnail text-center no-gutters col-sm-12", style="display:inline-block">
+			    <img src="/assets/pipeline-long-icon2.png" alt="" class="img-responsive no-padding">	
+			    <div class="caption no-padding col-sm-12", style="display:inline-block">
+					<nav class="navbar navbar-custom">
+						  <div class="container-fluid">
+							<ul class="nav navbar-nav">
+								<li data-toggle="tooltip" title="View list of simulations"><%= link_to 'Simulations', simulations_path %></li>
+								<li data-toggle="tooltip" title="View list of pipelines"><%= link_to 'Pipelines', pipelines_path %></li>
+								<li data-toggle="tooltip" title="View list of nominations"><%= link_to 'Nominations', nominations_path %></li>
+								<li data-toggle="tooltip" title="View list of commodities"><%= link_to 'Commodities', commodities_path %></li>
+								<li data-toggle="tooltip" title="View list of pumps"><%= link_to 'Pumps', pumps_path %></li>
+								<li data-toggle="tooltip" title="Show software version information"><%= link_to 'About', '/pages/about' %></li>
+								<li data-toggle="tooltip" title="View the application user documentation"><%= link_to 'Help', '/pages/help' %></li>
+								<% if current_user.admin? %>
+									<li data-toggle="tooltip" title="View list of registered users"><%= link_to 'Admin', users_path %></li>
+								<% end %>
+							</ul>
+						</div>
+				    </nav>
+				  </div>
+			</div>	
+			<% end %>
+			
+
+			<% if !success.nil? %>
+			  <p class = "alert alert-success"><%= success %></p>
+			<% end %>
+			<% if !notice.nil? %>
+			  <p class="alert alert-info"><%= notice %></p>
+			<% end %>
+			<% if !alert.nil? %>
+			  <p class="alert alert-warning"><%= alert %></p>
+			<% end %>
+			<% if !error.nil? %>
+			  <p class="alert alert-danger"><%= error %></p>
+			<% end %>
+
+		    <div class="col-sm-12">
+			  <%= yield %>
+			</div>
+	
+		</body>
 	</div>
-
-	<nav class="navbar navbar-default">
-		  <div class="container-fluid">
-			<ul class="nav navbar-nav">
-				<li data-toggle="tooltip" title="View list of simulations"><%= link_to 'Simulations', simulations_path %></li>
-				<li data-toggle="tooltip" title="View list of pipelines"><%= link_to 'Pipelines', pipelines_path %></li>
-				<li data-toggle="tooltip" title="View list of nominations"><%= link_to 'Nominations', nominations_path %></li>
-				<li data-toggle="tooltip" title="View list of commodities"><%= link_to 'Commodities', commodities_path %></li>
-				<li data-toggle="tooltip" title="View list of pumps"><%= link_to 'Pumps', pumps_path %></li>
-				<li data-toggle="tooltip" title="Show software version information"><%= link_to 'About', '/pages/about' %></li>
-				<li data-toggle="tooltip" title="View the application user documentation"><%= link_to 'Help', '/pages/help' %></li>
-				<% if current_user.admin? %>
-					<li data-toggle="tooltip" title="View list of registered users"><%= link_to 'Admin', users_path %></li>
-				<% end %>
-				<li data-toggle="tooltip" title="Log out of Phastline application"><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></li>
-			</ul>
-		</div>
-    </nav>
-<div class="row" id="box-search">
-    <div class="thumbnail text-center">
-        <img src="pipeline-menu-icon.png" alt="" class="img-responsive">
-        <div class="caption">
-            <p>Pipelines</p>
-        </div>
-    </div>
-</div>
-
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-<%= link_to image_tag("pipeline-menu-icon.png"), "http://www.mysite.com/" %>
-
-
-	<% if !success.nil? %>
-	  <p class = "bg-success strong"><%= success %></p>
-	<% end %>
-	<% if !notice.nil? %>
-	  <p class="bg-info strong"><%= notice %></p>
-	<% end %>
-	<% if !alert.nil? %>
-	  <p class="bg-warning strong"><%= alert %></p>
-	<% end %>
-	<% if !error.nil? %>
-	  <p class="bg-danger strong"><%= error %></p>
-	<% end %>
-
-    <div class="col-sm-12">
-	  <%= yield %>
-	  <%end%>
-    </div>
-
-</body>
-
-</div>
 
 </html>

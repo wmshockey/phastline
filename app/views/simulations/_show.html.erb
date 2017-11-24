@@ -48,7 +48,7 @@
 <nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
-		<li id="runSim"><%= link_to 'Run Simulation', url_for(action: 'run', controller: 'simulations'), remote: true, :method => :get%> </li>
+		<li id="runSim", data-toggle="tooltip" title="Start a simulation of the pipeline."><%= link_to 'Run Simulation', url_for(action: 'run', controller: 'simulations'), remote: true, :method => :get%> </li>
 		<li class="dropdown">
 	        <a id="showResults", class="dropdown-toggle" data-toggle="dropdown" href="#">Results<span class="caret"></span></a>
 			<ul class="dropdown-menu">
@@ -61,9 +61,9 @@
 				<li><%= link_to "Power/Energy", power_result_path(:id => @simulation.id) %></li>
 			</ul>
 		</li>			
-		<li><%= link_to 'Edit Simulation', edit_simulation_path(@simulation) %> </li>
-		<li><%= link_to 'Delete', simulation_path(@simulation.id), method: :delete, data: { confirm: 'Are you sure you want to delete this simulation?' } %> </li>
-		<li><%= link_to 'Copy', copy_simulation_path(@simulation.id),  data: {confirm: 'Are you sure you want to make a copy of this simulation?' } %> </li>
+		<li data-toggle="tooltip" title="Change the attributes of a simulation."><%= link_to 'Edit Simulation', edit_simulation_path(@simulation) %> </li>
+		<li data-toggle="tooltip" title="Delete a simulation record."><%= link_to 'Delete', simulation_path(@simulation.id), method: :delete, data: { confirm: 'Are you sure you want to delete this simulation?' } %> </li>
+		<li data-toggle="tooltip" title="Create another copy of this simulation."><%= link_to 'Copy', copy_simulation_path(@simulation.id),  data: {confirm: 'Are you sure you want to make a copy of this simulation?' } %> </li>
 		<li><%= link_to 'Back', simulations_path %> </li>
 	</ul>
   </div>

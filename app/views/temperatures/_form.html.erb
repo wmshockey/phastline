@@ -4,7 +4,7 @@
 <%= form_for([@pipeline, @temperature]) do |f| %>
   <p>
   <% if @temperature.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@temperature.errors.count, "error") %> prohibited this temperature from being saved:
 
       <ul>

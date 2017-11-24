@@ -4,7 +4,7 @@
 <%= form_for([@pipeline, @elevation]) do |f| %>
   <p>
   <% if @elevation.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@elevation.errors.count, "error") %> prohibited this elevation from being saved:
 
       <ul>

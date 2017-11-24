@@ -3,7 +3,7 @@
 <%= form_for(@simulation) do |f| %>
 	 <p>
 	 <% if @simulation.errors.any? %>
-	   <div id="error_explanation", class="bg-danger">
+	   <div id="error_explanation", class="alert alert-danger">
 	     <%= pluralize(@simulation.errors.count, "error") %> prohibited this simulation from being saved:
 
 	     <ul>

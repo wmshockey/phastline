@@ -2,7 +2,7 @@
 <%= form_for(@pump) do |f| %>
   <p>
   <% if @pump.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@pump.errors.count, "error") %> prohibited this pump from being saved:
 
       <ul>

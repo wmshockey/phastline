@@ -5,7 +5,7 @@
 
 	<p>
 	<% if @shipment.errors.any? %>
-	  <div id="error_explanation", class="bg-danger">
+	  <div id="error_explanation", class="alert alert-danger">
 	    <%= pluralize(@shipment.errors.count, "error") %> prohibited this shipment from being saved:
 
 	    <ul>
