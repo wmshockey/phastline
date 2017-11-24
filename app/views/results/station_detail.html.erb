@@ -1,6 +1,8 @@
 <%= render 'top' %>
 
 <% station_name = @results.first.stat %>
+
+<div id="results">
 <h3>Step Detail for Station: <%= station_name %></h3>
 
 <table class="table table-bordered table-hover table-condensed">
@@ -40,3 +42,4 @@
 	<% end %>
   </tbody>
 </table>
+</div>

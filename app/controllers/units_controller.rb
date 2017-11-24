@@ -42,7 +42,7 @@ class UnitsController < ApplicationController
     @unit = @station.units.new(unit_params)
     respond_to do |format|
       if @unit.save
-        format.html { redirect_to new_pipeline_station_unit_path(@pipeline, @station), notice: 'Unit was successfully created.' }
+        format.html { redirect_to pipeline_station_units_path(@pipeline, @station), notice: 'Unit was successfully created.' }
         format.json { render :show, status: :created, location: @unit }
       else
         format.html { render :new }
@@ -56,7 +56,7 @@ class UnitsController < ApplicationController
   def update
     respond_to do |format|
       if @unit.update(unit_params)
-        format.html { redirect_to pipeline_station_path(@pipeline, @station), notice: 'Unit was successfully updated.' }
+        format.html { redirect_to pipeline_station_units_path(@pipeline, @station), notice: 'Unit was successfully updated.' }
         format.json { render :show, status: :ok, location: @unit }
       else
         format.html { render :edit }
@@ -70,7 +70,7 @@ class UnitsController < ApplicationController
   def destroy
     @unit.destroy
     respond_to do |format|
-      format.html { redirect_to pipeline_station_path(@pipeline, @station), notice: 'Unit was successfully destroyed.' }
+      format.html { redirect_to pipeline_station_units_path(@pipeline, @station), notice: 'Unit was successfully deleted.' }
       format.json { head :no_content }
     end
   end
@@ -86,7 +86,7 @@ class UnitsController < ApplicationController
         @unit = nil
         flash[:error] = "Unit #{params[:id]} cannot be found or no longer exists."
         respond_to do |format|
-          format.html { redirect_to pipeline_station_path(@pipeline, @station), notice: "Unit with id #{params[:id]} not found." }
+          format.html { redirect_to pipeline_station_units_path(@pipeline, @station), notice: "Unit with id #{params[:id]} not found." }
           format.json { head :no_content }
         end
       end     

@@ -31,7 +31,7 @@ class ElevationsController < ApplicationController
 
       respond_to do |format|
         if @elevation.save
-          format.html { redirect_to new_pipeline_elevation_path(@pipeline), notice: 'Elevation was successfully created.' }
+          format.html { redirect_to pipeline_elevations_path(@pipeline), notice: 'Elevation was successfully created.' }
           format.json { render :show, status: :created, location: @elevation }
         else
           format.html { render :new }
@@ -45,7 +45,7 @@ class ElevationsController < ApplicationController
     def update
       respond_to do |format|
         if @elevation.update(elevation_params)
-          format.html { redirect_to pipeline_path(@pipeline), notice: 'Elevation was successfully updated.' }
+          format.html { redirect_to pipeline_elevations_path(@pipeline), notice: 'Elevation was successfully updated.' }
           format.json { render :show, status: :ok, location: @elevation }
         else
           format.html { render :edit }
@@ -59,7 +59,7 @@ class ElevationsController < ApplicationController
     def destroy
         respond_to do |format|
           if @elevation.destroy
-            format.html { redirect_to pipeline_path(@pipeline), notice: 'Elevation was successfully deleted.' }
+            format.html { redirect_to pipeline_elevations_path(@pipeline), notice: 'Elevation was successfully deleted.' }
             format.json { render :show, status: :destroyed, location: @pipeline }
           else
             format.html { render :delete }
@@ -78,7 +78,7 @@ class ElevationsController < ApplicationController
           @elevation = nil
           flash[:error] = "Elevation #{params[:id]} cannot be found or no longer exists."
           respond_to do |format|
-            format.html { redirect_to pipeline_path(@pipeline), notice: "Elevation with id #{params[:id]} not found." }
+            format.html { redirect_to pipeline_elevations_path(@pipeline), notice: "Elevation with id #{params[:id]} not found." }
             format.json { head :no_content }
           end
         end                

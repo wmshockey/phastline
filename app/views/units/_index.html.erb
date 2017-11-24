@@ -1,4 +1,8 @@
-<h4>Pump Units</h4>
+<div class="col-sm-4"></div>
+<div class="col-sm-8">
+<h4 class="col-sm-4">Pump Units  <%= image_tag("pump-unit-icon.png") %></h4>
+<h4 class="col-sm-8 text-right"><%= link_to 'Add Pump Unit', new_pipeline_station_unit_path(@pipeline, @station), class: 'btn btn-success' %></h4>
+
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -26,9 +30,9 @@
 	      </tr>
 	  <% end %>
     <% end %>
-	<td colspan="3"><%= link_to 'Add Pump Unit', new_pipeline_station_unit_path(@pipeline, @station) %></td>
   </tbody>
 </table>
+</div>
 
 
 

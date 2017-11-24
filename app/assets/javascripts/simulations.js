@@ -21,4 +21,14 @@ $(document).ready(() => {
  
   })
   
+  $('#runSim').click(function() {
+	  $("#simulation").removeClass("hidden")
+  })
+  
+  $('#showResults').click(function() {
+	  $('#simulation').addClass("hidden")
+  })
+  
+  $('[data-toggle="tooltip"]').tooltip();
+  
 }); 

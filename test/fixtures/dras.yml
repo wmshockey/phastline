@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  start_kmp: 1.5
+  end_kmp: 1.5
+  dra_percent: 1.5
+
+two:
+  start_kmp: 1.5
+  end_kmp: 1.5
+  dra_percent: 1.5

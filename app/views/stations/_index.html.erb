@@ -1,4 +1,8 @@
-<h3>Stations</h3>Select a station to view its pump units
+<div class="col-sm-2"></div>
+<div class="col-sm-10">
+<h3 class="col-sm-4">Stations  <%= image_tag "station-icon.png"%></h3>
+<h3 class="col-sm-8 text-right"><%= link_to 'Add Station', new_pipeline_station_path(@pipeline), class: 'btn btn-success' %></h3>
+
 <table class="table table-bordered table-hover table-condensed">
   <thead>
    <tr>
@@ -17,6 +21,6 @@
 		<td><%= link_to number_of_units, pipeline_station_path(station.pipeline_id, station.id) %>
       </tr>
 	<% end %>
-	<tr><td colspan="3"><%= link_to 'Add Station', new_pipeline_station_path(@pipeline) %></td></tr>
   </tbody>
 </table>
+</div>

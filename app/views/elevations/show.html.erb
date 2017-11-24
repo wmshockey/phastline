@@ -1,7 +1,9 @@
 <%= render 'pipelines/show_one' %>
 <%= render 'show_one' %>
 
-<nav class="navbar navbar-default small">
+<div class="col-sm-2"></div>
+<div class="col-sm-10">
+<nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
 		<li><%= link_to 'Edit Elevation', edit_pipeline_elevation_path(@elevation.pipeline_id, @elevation.id) %> </li>
@@ -10,3 +12,4 @@
 	</ul>
   </div>
 </nav>
+</div>

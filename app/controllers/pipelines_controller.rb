@@ -79,7 +79,7 @@ class PipelinesController < ApplicationController
   def destroy
     @pipeline.destroy
     respond_to do |format|
-      format.html { redirect_to pipelines_url, notice: 'Pipeline was successfully destroyed.' }
+      format.html { redirect_to pipelines_url, notice: 'Pipeline was successfully deleted.' }
       format.json { head :no_content }
     end
   end

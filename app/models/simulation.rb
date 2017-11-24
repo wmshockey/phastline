@@ -52,6 +52,7 @@ class Simulation < ActiveRecord::Base
         @tempar = @pipeline.get_all_temps
         @maxpressar = @pipeline.get_all_maxpress
         @elevar = @pipeline.get_all_elevations
+        @draar = @pipeline.get_all_dras
         @statar = @pipeline.get_all_stations(@volmar)
 #       Get the combined station curves
         @statcv = @pipeline.get_station_curves(@statar, @units, @pumpar)
@@ -90,7 +91,7 @@ class Simulation < ActiveRecord::Base
             flow = new_flow
             @flowar = calc_flowrates(flow, ratear)
             @headar = head_calc(@statar, @statcv, @flowar, @densar)
-            @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar)
+            @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar, @draar)
             steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
 #           Adjust the flowrate to converge on the capacity flow rate
             new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
@@ -851,7 +852,7 @@ class Simulation < ActiveRecord::Base
     return sl
   end
 
-  def dynamic_loss(flowar, segmar, viscar, densar)
+  def dynamic_loss(flowar, segmar, viscar, densar, draar)
 # Calculate the dynamic pressure loss profile (profile of pressure loss due to flowrate friction in pipe)
     dl = Profile.new
     kmp = flowar.first.kmp
@@ -863,7 +864,9 @@ class Simulation < ActiveRecord::Base
       ruff = segm.roughness
       visc = viscar.get_y(kmp)
       dens = densar.get_y(kmp)
+      dra = draar.get_y(kmp)/100.0
       dloss = cole_loss(flow, visc, dens, diam, thick, ruff)
+      dloss = dloss - dloss*dra
       dl.add_point(kmp,dloss)
       kmp = [flowar.next_x(kmp), next_record(@segmar,kmp), viscar.next_x(kmp), densar.next_x(kmp)].compact.min
     end

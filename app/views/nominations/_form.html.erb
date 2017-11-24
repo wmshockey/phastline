@@ -1,10 +1,11 @@
-<h2>Nomination</h2>
-<%= form_for(@nomination) do |f| %>
-  <p>
-  <% if @nomination.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
-      <%= pluralize(@nomination.errors.count, "error") %> prohibited this nomination from being saved:
+<h2>Nomination  <%= image_tag("nomination-icon.png") %></h2>
 
+<%= form_for(@nomination) do |f| %>
+
+<p>
+  <% if @nomination.errors.any? %>
+    <div id="error_explanation", class="alert alert-danger">
+      <%= pluralize(@nomination.errors.count, "error") %> prohibited this nomination from being saved:
       <ul>
       <% @nomination.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -12,7 +13,7 @@
       </ul>
     </div>
   <% end %>
-  </p>
+</p>
 
 	<table class="table table-bordered table-hover table-condensed">
 	  <thead>
@@ -35,7 +36,9 @@
 	      </tr>
 	  </tbody>
 	</table>
-  <div class="actions">
-    <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>
-  </div>
+
+<%= f.submit :Submit, class: 'btn btn-success' %>
+<%= link_to 'Back', :back, class: 'btn btn-default' %>
+
+
 <% end %>

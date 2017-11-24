@@ -1,4 +1,6 @@
-<h2>Simulations</h2>
+<h2 class="col-sm-4">Simulations <%= image_tag("simulation-icon.png") %></h2>
+<h2 class="col-sm-8 text-right"><span data-toggle="tooltip" title="Show form to create a new simulation record"><%= link_to 'Add Simulation', new_simulation_path, class: 'btn btn-success' %></span></h2>
+
 <table class="table table-bordered table-hover table-condensed">
   <thead>
    <tr>
@@ -43,6 +45,6 @@
 		<td><%= simulation.max_steptime %></td>
       </tr>
 	<% end %>
-	<td colspan="8"><%= link_to 'Add Simulation', new_simulation_path %></td>
   </tbody>
 </table>
+

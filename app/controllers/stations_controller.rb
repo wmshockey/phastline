@@ -32,7 +32,7 @@ class StationsController < ApplicationController
 
     respond_to do |format|
       if @station.save
-        format.html { redirect_to new_pipeline_station_path(@pipeline), notice: 'Station was successfully created.' }
+        format.html { redirect_to pipeline_stations_path(@pipeline), notice: 'Station was successfully created.' }
         format.json { render :show, status: :created, location: @station }
       else
         format.html { render :new }
@@ -46,7 +46,7 @@ class StationsController < ApplicationController
   def update
     respond_to do |format|
       if @station.update(station_params)
-        format.html { redirect_to pipeline_path(@pipeline), notice: 'Station was successfully updated.' }
+        format.html { redirect_to pipeline_stations_path(@pipeline), notice: 'Station was successfully updated.' }
         format.json { render :show, status: :ok, location: @station }
       else
         format.html { render :edit }
@@ -60,7 +60,7 @@ class StationsController < ApplicationController
   def destroy
       respond_to do |format|
         if @station.destroy
-          format.html { redirect_to pipeline_path(@pipeline), notice: 'Station was successfully deleted.' }
+          format.html { redirect_to pipeline_stations_path(@pipeline), notice: 'Station was successfully deleted.' }
           format.json { render :show, status: :destroyed, location: @pipeline }
         else
           format.html { render :delete }
@@ -81,7 +81,7 @@ class StationsController < ApplicationController
         @station = nil
         flash[:error] = "Station #{params[:id]} cannot be found or no longer exists."
         respond_to do |format|
-          format.html { redirect_to pipeline_path(@pipeline), notice: "Station with id #{params[:id]} not found." }
+          format.html { redirect_to pipeline_stations_path(@pipeline), notice: "Station with id #{params[:id]} not found." }
           format.json { head :no_content }
         end
       end      

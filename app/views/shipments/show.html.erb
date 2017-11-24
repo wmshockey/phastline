@@ -1,6 +1,8 @@
 <%= render 'nominations/show_one' %>
 
-<h3>Shipment</h3>
+<div class="col-sm-2"></div>
+<div class="col-sm-10">
+<h3>Shipment  <%= image_tag("shipment-icon.png") %></h3>
 <table class="table table-bordered table-hover table-condensed">
   <thead>
     <tr>
@@ -23,7 +25,7 @@
   </tbody>
 </table>
 
-<nav class="navbar navbar-default small">
+<nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
 		<li><%= link_to 'Edit Shipment', edit_nomination_shipment_path(@shipment.nomination_id, @shipment.id) %> </li>
@@ -32,3 +34,4 @@
 	</ul>
   </div>
 </nav>
+</div>

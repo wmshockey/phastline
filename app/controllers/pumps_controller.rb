@@ -80,7 +80,7 @@ class PumpsController < ApplicationController
   def destroy
     @pump.destroy
     respond_to do |format|
-      format.html { redirect_to pumps_url, notice: 'Pump was successfully destroyed.' }
+      format.html { redirect_to pumps_url, notice: 'Pump was successfully deleted.' }
       format.json { head :no_content }
     end
   end

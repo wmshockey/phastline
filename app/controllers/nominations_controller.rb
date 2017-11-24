@@ -83,7 +83,7 @@ class NominationsController < ApplicationController
   def destroy
     @nomination.destroy
     respond_to do |format|
-      format.html { redirect_to nominations_url, notice: 'Nomination was successfully destroyed.' }
+      format.html { redirect_to nominations_url, notice: 'Nomination was successfully deleted.' }
       format.json { head :no_content }
     end
   end

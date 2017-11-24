@@ -1,8 +1,8 @@
-<h2>Pump</h2>
+<h2>Pump  <%= image_tag "pump-icon.png"%></h2>
 <%= form_for(@pump) do |f| %>
   <p>
   <% if @pump.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@pump.errors.count, "error") %> prohibited this pump from being saved:
 
       <ul>
@@ -28,7 +28,6 @@
 			<tr><td><%= f.label "Head Correction Factor" %></td><td><%= f.number_field :head_correction_factor,  :step => "any"  %></td></tr>
 	  </tbody>
 	</table>
-  <div class="actions">
-    <span class="col-sm-2"><%= f.submit %></span><span class="col-sm-2"><%= link_to 'Back', :back %></span>  
-  </div>
+<%= f.submit :Submit, class: 'btn btn-success' %>
+<%= link_to 'Back', :back, class: 'btn btn-default' %>
 <% end %>

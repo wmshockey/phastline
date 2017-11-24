@@ -1,0 +1,25 @@
+<div class="col-sm-2"></div>
+<div class="col-sm-10">
+<h3 class="col-sm-4">DRA Regions  <%= image_tag("dra-icon.png") %></h3>
+<h3 class="col-sm-8 text-right"><%= link_to 'Add DRA Region', new_pipeline_dra_path(@pipeline), class: 'btn btn-success' %></h3>
+
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+	  <th>DRA Injection point (kmp)</th>
+      <th>DRA End point (kmp)</th>
+	  <th>DRA Percentage</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+	<% @pipeline.dras.order(start_kmp: :asc).each do |dra| %>
+      <tr>
+		<td><%= link_to dra.start_kmp, pipeline_dra_path(dra.pipeline_id, dra.id) %></td>
+        <td><%= '%.2f' % dra.end_kmp %></td>
+		<td><%= '%.2f' % dra.dra_percent %></td>
+      </tr>
+	<% end %>
+  </tbody>
+</table>
+</div>

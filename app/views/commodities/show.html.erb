@@ -1,4 +1,4 @@
-<h2>Commodity</h2>
+<h2>Commodity  <%= image_tag "commodity-icon.png"%></h2>
 <table class="table table-bordered table-hover table-condensed">
   <tbody>
 		<% if current_user.admin? then %>
@@ -16,7 +16,7 @@
   </tbody>
 </table>
 
-<nav class="navbar navbar-default small">
+<nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
 		<li><%= link_to 'Edit Commodity', edit_commodity_path(@commodity) %> </li>
