@@ -4,7 +4,7 @@
 <%= form_for([@pipeline, @station]) do |f| %>
   <p>
   <% if @station.errors.any? %>
-    <div id="error_explanation", class="bg-danger">
+    <div id="error_explanation", class="alert alert-danger">
       <%= pluralize(@station.errors.count, "error") %> prohibited this station from being saved:
 
       <ul>
