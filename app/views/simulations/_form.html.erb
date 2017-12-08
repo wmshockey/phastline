@@ -27,7 +27,7 @@
 				<td><strong>Name: </strong></td><td><%= f.text_field :name  %></td>
 			</tr>
 			<tr>
-				<td><strong>Description: </strong></td><td><%= f.text_field :description %></td>
+				<td><strong>Description: </strong></td><td><%= f.text_field :description, :size=>"120" %></td>
 			</tr>
 			<tr>
 				<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id , current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>

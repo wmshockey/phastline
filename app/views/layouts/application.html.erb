@@ -9,6 +9,19 @@
 
 	<div class="container">
 
+		<% if !success.nil? %>
+		  <p class = "alert alert-success"><%= success %></p>
+		<% end %>
+		<% if !notice.nil? %>
+		  <p class="alert alert-info"><%= notice %></p>
+		<% end %>
+		<% if !alert.nil? %>
+		  <p class="alert alert-warning"><%= alert %></p>
+		<% end %>
+		<% if !error.nil? %>
+		  <p class="alert alert-danger"><%= error %></p>
+		<% end %>
+
 		<body>
 			<div class="row col-sm-12">
 				<div class="col-sm-4"><h3><%= link_to 'Phastware', '/pages/home' %><span class="text-left copyright" %> &copy; 2017 Seraphim Consulting Company.</span></h3></div>			
@@ -20,7 +33,7 @@
 				<nav class="navbar navbar-custom col-sm-2">
 					<ul class="nav navbar-nav pull-right">
 						<li class="dropdown">
-					        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= image_tag("user-icon-small.png") %><span class="caret"></span></a>
+					        <a class="dropdown-toggle" data-toggle="dropdown" href="#", data-toggle="tooltip" title="Edit user profile, change password or signout from application."><%= image_tag("user-icon-small.png") %><span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li><%= link_to "Profile / Change Password", edit_user_registration_path %> </li>
 								<li><%= link_to 'Sign Out', destroy_user_session_path, :method => :delete %></li>
@@ -53,24 +66,10 @@
 			</div>	
 			<% end %>
 			
-
-			<% if !success.nil? %>
-			  <p class = "alert alert-success"><%= success %></p>
-			<% end %>
-			<% if !notice.nil? %>
-			  <p class="alert alert-info"><%= notice %></p>
-			<% end %>
-			<% if !alert.nil? %>
-			  <p class="alert alert-warning"><%= alert %></p>
-			<% end %>
-			<% if !error.nil? %>
-			  <p class="alert alert-danger"><%= error %></p>
-			<% end %>
-
 		    <div class="col-sm-12">
 			  <%= yield %>
 			</div>
-	
+		
 		</body>
 	</div>
 

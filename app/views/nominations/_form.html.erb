@@ -18,22 +18,27 @@
 	<table class="table table-bordered table-hover table-condensed">
 	  <thead>
 	    <tr>
-	      <th>Nomination Name</th>
-		  <th>Description</th>
-		  <th>Pipeline</th>
-		  <th>Nomination Date</th>
-		  <th>Period (days)</th>
+	      <th>Nomination</th>
+		  <th></th>
 	    </tr>
 	  </thead>
 
 	  <tbody>
 	      <tr>
-	        <td><%= f.text_field :name %></td>
-	        <td><%= f.text_field :description %></td>
-			<td><%= f.select :pipeline_id, current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>
-			<td><%= f.date_select :nom_date %>
-			<td><%= f.text_field :period %>
-	      </tr>
+	          <td><strong>Name: </strong></td><td><%= f.text_field :name %></td>
+		  </tr>
+		  <tr>
+			  <td><strong>Description: </strong></td><td><%= f.text_field :description, :size=>"120" %></td>
+		  </tr>
+		  <tr>
+			<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id, current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>
+		  </tr>
+		  <tr>
+			<td><strong>Nomination Date: </strong></td><td><%= f.date_select :nom_date %></td>
+		  </tr>
+		  <tr>
+			<td><strong>Period (days): </strong></td><td><%= f.text_field :period %></td>
+		  </tr>
 	  </tbody>
 	</table>
 
