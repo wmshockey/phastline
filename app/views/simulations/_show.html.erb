@@ -48,7 +48,7 @@
 <nav class="navbar navbar-default">
   <div class="container-fluid">
 	<ul class="nav navbar-nav">
-		<li id="runSim", data-toggle="tooltip" title="Start a simulation of the pipeline."><%= link_to 'Run Simulation', url_for(action: 'run', controller: 'simulations'), remote: true, :method => :get%> </li>
+		<li id="runSim"><%= link_to 'Run Simulation', url_for(action: 'run', controller: 'simulations'), remote: true, :method => :get%> </li>
 		<li class="dropdown">
 	        <a id="showResults", class="dropdown-toggle" data-toggle="dropdown" href="#">Results<span class="caret"></span></a>
 			<ul class="dropdown-menu">
