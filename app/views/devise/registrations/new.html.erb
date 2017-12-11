@@ -3,6 +3,11 @@
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
   <%= render "shared/error_messages", object: f.object %>
 
+  <%= link_to 'Terms of Service', '/pages/terms' %>
+  <div class="checkbox">
+	    <label><%= f.check_box :terms_of_service %><strong> I accept the terms of service<strong></label>
+  </div>
+
   <div class="field">
     <%= f.label :email %><br />
     <%= f.email_field :email, autofocus: true %>
@@ -20,6 +25,8 @@
     <%= f.label :password_confirmation %><br />
     <%= f.password_field :password_confirmation, autocomplete: "off" %>
   </div>
+  <br>
+
 <br>
   <div class="actions">
     <%= f.submit "Sign up", class: "btn btn-primary"%>
