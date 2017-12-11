@@ -111,13 +111,13 @@ class Simulation < ActiveRecord::Base
           steprecs.first.linefill = @lfill
           @stepar = @stepar + steprecs
           $step = $step + 1
-          if $step > 1000 then
-            self.errors.add(:base, "Number of steps exceeds 1000.  Simulation stopped at step 1000")
-            logger.error("Number of steps exceeds 1000.  Simulation stopped at step 1000")
+          if $step > 10000 then
+            self.errors.add(:base, "Number of steps exceeds 10,000.  Simulation stopped at step 10,000")
+            logger.error("Number of steps exceeds 10,000.  Simulation stopped at step 10,000")
             raise "Error occurred - too many steps"
           end
           percent_complete = percent_calc(@statar)
-          @progress_bar.update_attributes!(message: "step: #{$step},", percent: "#{percent_complete}")        
+          @progress_bar.update_attributes!(message: "step: #{$step}", percent: "#{percent_complete}")        
         end
         if self.errors.any?
           raise "Errors occurred during step processing"
@@ -126,7 +126,7 @@ class Simulation < ActiveRecord::Base
 #       Clean up batch sequence and remove batches that had non activity in the simulation
         clean_batch_sequence(@btsqar)
 #       Save step results in database table for user viewing
-        @progress_bar.update_attributes!(message: "Saving step results...", percent: "#{percent_complete}")        
+        @progress_bar.update_attributes!(message: "Saving step results, please wait, this may take a while depending on number of steps...", percent: "#{percent_complete}")        
         save_results
         if self.errors.empty? then
           @progress_bar.update_attributes!(message: "Successful Simulation!  You can now view the results. <br>", percent: "#{percent_complete}")        
