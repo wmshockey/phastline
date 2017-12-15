@@ -33,6 +33,12 @@ $(document).ready(() => {
       check_steps();
   })
   
+  if ($("#simulation_nomination_id").length > 0){
+	  $(function() {
+		  check_steps();
+	  })
+  }
+  
   $('#estimate_steps').click(function() {
 	  check_steps();
 	  var max_flowrate = $("#max_flowrate").val();
@@ -59,12 +65,6 @@ $(document).ready(() => {
 	  };
 	  $("#warning_message").text(message);	  
   })
-
-  if ($("#simulation_nomination_id").length > 0){
-	  $(function() {
-		  check_steps();
-	  })
-  }
   
   function check_steps() {
 	  var nom = $("#simulation_nomination_id :selected").val();
