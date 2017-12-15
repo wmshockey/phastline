@@ -1,16 +1,17 @@
 <%= render 'top' %>
 
 <% stepresults = @results.select {|r| r.simulation_id == @sim_id and r.step == @step} %>
+<% maxsteps = (@results.map {|r| r.step}).max %>
 
 <div id="results">
 <h3>Details for Step <%= @step %> duration <%= stepresults[0].step_time.round(2) %> hrs ----
 	<% if @step == 1 then %>
-		<%= link_to "Prev", step_detail_result_path(:id => @sim_id, :step => $maxsteps) %>
+		<%= link_to "Prev", step_detail_result_path(:id => @sim_id, :step => maxsteps) %>
 	<% else %>
 		<%= link_to "Prev", step_detail_result_path(:id => @sim_id, :step => @step-1) %>
 	<% end %>
 	<%= " | " %>
-	<% if @step == $maxsteps %>
+	<% if @step == maxsteps %>
 		 <%= link_to "Next", step_detail_result_path(:id => @sim_id, :step => 1) %>
 	<% else %>
 		<%= link_to "Next", step_detail_result_path(:id => @sim_id, :step => @step+1) %>

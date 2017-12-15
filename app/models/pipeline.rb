@@ -10,6 +10,15 @@ class Pipeline < ActiveRecord::Base
   validates :name, :presence => true
   validates_uniqueness_of :name, scope: :user_id
   default_scope { order(user_id: :asc, name: :asc) }
+  before_save :count_number_stations
+
+  def count_number_stations
+    station_count = self.stations.count
+    if station_count.nil? then
+      station_count = 0
+    end
+    self.number_stations = station_count
+  end
 
   def copy(pipelines, pipeline)
     pipeline_copy = pipeline.dup

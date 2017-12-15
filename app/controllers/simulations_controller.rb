@@ -110,7 +110,6 @@ class SimulationsController < ApplicationController
         end
       end
     end
-      
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def simulation_params

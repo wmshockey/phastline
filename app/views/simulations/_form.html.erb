@@ -1,6 +1,7 @@
 <h2>Simulation  <%= image_tag("simulation-icon.png") %></h2>
 
 <%= form_for(@simulation) do |f| %>
+
 	 <p>
 	 <% if @simulation.errors.any? %>
 	   <div id="error_explanation", class="alert alert-danger">
@@ -24,29 +25,41 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td><strong>Name: </strong></td><td><%= f.text_field :name  %></td>
+				<td><strong>Name: </strong></td><td><%= f.text_field :name %></td>
 			</tr>
 			<tr>
 				<td><strong>Description: </strong></td><td><%= f.text_field :description, :size=>"120" %></td>
 			</tr>
 			<tr>
-				<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id , current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>
+				<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id , current_user.pipelines.all.collect {|p| [p.name, p.id]} %>
+				<span id="number_stations" class="hidden"></span></td>
 			</tr>
 			<tr>
-				<td><strong>Nomination: </strong></td><td><%= f.select :nomination_id , current_user.nominations.all.collect {|n| [n.name, n.id]} %></td>
+				<td><strong>Nomination: </strong></td><td><%= f.select :nomination_id , current_user.nominations.all.collect {|n| [n.name, n.id]} %>
+				<span id="total_volume" class="hidden"></span></td>
 			</tr>
 			<tr>
-				<td><strong>Max Flowrate (m3/hr): </strong></td><td><%= f.number_field :max_flowrate, :step => "any"  %></td>
+				<td><strong>Max Flowrate (m3/hr): </strong></td><td><%= f.number_field :max_flowrate, :step => "any", id: "max_flowrate" %></td>
 			</tr>
 			<tr>
-				<td><strong>Max Batch Size (m3): </strong></td><td><%= f.number_field :max_batchsize, :step => "any"  %></td>
+				<td><strong>Max Batch Size (m3): </strong></td><td><%= f.number_field :max_batchsize, :step => "any", id: "max_batchsize" %>
+				<span id="number_batches" class="hidden"></span></td>
 			</tr>
 			<tr>
-				<td><strong>Max Step Time (hrs): </strong></td><td><%= f.number_field :max_steptime, :step => "any"  %></td>
+				<td><strong>Max Step Time (hrs): </strong></td><td><%= f.number_field :max_steptime, :step => "any", id: "max_steptime" %></td>
+			</tr>
+			<tr>
+				<td><button type="button" id="estimate_steps" class="btn btn-info" data-toggle="tooltip" title="Estimates the number of time steps in the simulation which is an indication of how long it will take the simulation to complete.  Steps over 1000 will generally take over a minute to complete.">Estimate Steps</button></td>
+				<td class="alert alert-warning">Estimated number of steps:  <span id="number_steps"></span>
+				<div id="warning_message"></div>
+				</td>
 			</tr>
 		</tbody>
 	</table>
 
-<%= f.submit :Submit, class: 'btn btn-success' %>
+
+<%= f.submit :Save, class: 'btn btn-success' %>
 <%= link_to 'Back', :back, class: 'btn btn-default' %>
 <% end %>
+
+

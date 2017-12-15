@@ -10,17 +10,19 @@
 	<% stn_ix = stn_ix + 1 %>
 <% end %>
 <% steprecs = @results.select {|r| r.step == @step} %>
+<% maxsteps = (@results.map {|r| r.step}).max %>
 <% linefill = steprecs[0].linefill %>
+
 
 <div id="results">
 <h3>Linefill for step <%= @step.to_s %> duration <%= steprecs[0].step_time.round(2) %> hrs ----
 	<% if @step == 1 then %>
-		<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => $maxsteps) %>
+		<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => maxsteps) %>
 	<% else %>
 		<%= link_to "Prev", step_linefill_result_path(:id => @sim_id, :step => @step-1) %>
 	<% end %>
 	<%= " | " %>
-	<% if @step == $maxsteps %>
+	<% if @step == maxsteps %>
 		 <%= link_to "Next", step_linefill_result_path(:id => @sim_id, :step => 1) %>
 	<% else %>
 		<%= link_to "Next", step_linefill_result_path(:id => @sim_id, :step => @step+1) %>

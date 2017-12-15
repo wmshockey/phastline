@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171211152410) do
+ActiveRecord::Schema.define(version: 20171214194637) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -60,21 +60,23 @@ ActiveRecord::Schema.define(version: 20171211152410) do
   add_index "headpoints", ["pump_id"], name: "index_headpoints_on_pump_id", using: :btree
 
   create_table "nominations", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.string   "description", limit: 255
+    t.string   "name",         limit: 255
+    t.string   "description",  limit: 255
     t.date     "nom_date"
-    t.float    "period",      limit: 24
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.integer  "pipeline_id", limit: 4
+    t.float    "period",       limit: 24
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "pipeline_id",  limit: 4
+    t.float    "total_volume", limit: 24
   end
 
   create_table "pipelines", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.integer  "user_id",     limit: 4
+    t.string   "name",            limit: 255
+    t.text     "description",     limit: 65535
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "user_id",         limit: 4
+    t.integer  "number_stations", limit: 4
   end
 
   create_table "progressbars", force: :cascade do |t|

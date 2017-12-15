@@ -28,7 +28,7 @@ class Simulation < ActiveRecord::Base
     validates :nomination_id, :presence => true
     validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
     validates :max_batchsize, :presence => true, numericality: {:greater_than => 1000, :less_than => 500000}
-    validates :max_steptime, :presence => true, numericality: {:greater_than => 0, :less_than => 1000}
+    validates :max_steptime, :presence => true, numericality: {:greater_than => 0.5, :less_than => 1000}
     validates_uniqueness_of :name, scope: :user_id
     default_scope { order(user_id: :asc, pipeline_id: :asc) }
 
@@ -1096,14 +1096,14 @@ class Simulation < ActiveRecord::Base
   def summary_results_calc(results)
 #   Get the list of stations from the saved step results.  @results is the only data available at this point.
     stations = results.map {|s| [s.station_id, s.kmp, s.stat]}.uniq
-    $maxsteps = results.map {|s| s.step}.max
+    maxsteps = results.map {|s| s.step}.max
     $initial_timestamp = results.first.timestamp
     $timestamp = results.last.timestamp + results.last.step_time * 3600.0
     stations.sort_by! {|s| s[1]}
 #   Find the bottleneck points for each step on the line
-    bottlenecks = Array[$maxsteps]
+    bottlenecks = Array[maxsteps]
     step_ix = 0
-    while step_ix <= $maxsteps-1
+    while step_ix <= maxsteps-1
       max_viol = -9e9
       bottleneck_station = "  "
       results.select {|s| s.step - 1 == step_ix}.each do |r|

@@ -1,1 +1,1 @@
-json.extract! @pipeline, :id, :name, :description, :created_at, :updated_at
+json.extract! @pipeline, :id, :name, :description, :number_stations, :created_at, :updated_at

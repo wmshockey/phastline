@@ -26,6 +26,7 @@ class Nomination < ActiveRecord::Base
     validates_uniqueness_of :name, scope: :pipeline_id
     validates_with NominationValidator
     default_scope { order('name ASC') }
+    before_save :calc_total_volume
     
     def copy(nominations, nomination)
       nomination_copy = nomination.dup
@@ -48,5 +49,18 @@ class Nomination < ActiveRecord::Base
       end
       return nomination_copy
     end
+
+    def calc_total_volume
+      volume = 0.0
+      shipments = self.shipments
+      if shipments.any? then
+        shipments.each do |a|
+          volume = volume + a.volume
+        end
+      end
+      self.total_volume = volume
+    end
         
 end
+
+
