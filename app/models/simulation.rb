@@ -1221,12 +1221,11 @@ class Simulation < ActiveRecord::Base
   end
 
   def get_record(record_array, kmp)
-    i = 0
+    i = 0    
     until i == record_array.count - 1
-      if record_array[i].kmp > kmp then break end
+      if(kmp >= record_array[i].kmp and kmp < record_array[i+1].kmp) then break end
       i = i + 1
     end
-    i = i - 1
     return record_array[i]
   end
 
