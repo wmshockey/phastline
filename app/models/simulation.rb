@@ -248,7 +248,7 @@ class Simulation < ActiveRecord::Base
       kdarc = 6.25439455e-8
       diam = diam - 2*thick
       reynl = kreyn*flow/(diam*visc)
-      if reynl>40000.0 then
+      if reynl>4000.0 then
         tcons = ruff/diam/3.7
         estim = 1/(-2*Math.log10(tcons + 5.74/(reynl**0.9)))
         diff = 10000.0
