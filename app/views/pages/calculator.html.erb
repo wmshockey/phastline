@@ -9,7 +9,8 @@
 	<div class="form-group">
 
 		<div class="row">
-		   <label class="col-sm-2" for="flowrate" data-toggle="tooltip" title="Typical flowrate values range anywhere from 0 to over 6000 m3/hr">Flowrate:</label>
+		   <label class="col-sm-2" for="flowrate" data-toggle="tooltip" title="Typical flowrate values range
+		    anywhere from 0 to over 6000 m3/hr">Flowrate:</label>
 		   <input class="col-sm-2" type="text" class="form-control" id="flowrate">
 		   <div class="col-sm-1">
 		   		<select id="flowUnits" name="flowUnits" tabindex="-1">
@@ -24,12 +25,13 @@
 		<div class="col-xs-12" style="height:10px;"></div>
 
 		<div class="row">
-		   <label class="col-sm-2" for="viscosity" data-toggle="tooltip" title="Typical viscosities range from 0.29 cst for gasoline and 1.0 cst for condensate 
+		   <label class="col-sm-2" for="viscosity" data-toggle="tooltip" title="Typical kinematic viscosities range from
+		    0.29 cst (mm**2/s) for gasoline and 1.0 cst for condensate 
 		   up to about 300.0 cst for heavy crude">Fluid Viscosity:</label>
 		   <input class="col-sm-2" type="text" class="form-control" id="viscosity">
 		   <div class="col-sm-1">
 		   		<select id="viscUnits" name="viscUnits" tabindex="-1">
-					<option selected="selected" value="cst" name="viscUnits" tabindex="-1">cst</option>
+					<option selected="selected" value="cst" name="viscUnits" tabindex="-1">Centistokes (cst)</option>
 					<option value="S" name="viscUnits" tabindex="-1">Stokes</option>
 				</select>
 		   </div>
@@ -53,11 +55,13 @@
 		<div class="col-xs-12" style="height:10px;"></div>
 		
 		 <div class="row">
-		   <label class="col-sm-2" for="diameter" data-toggle="tooltip" title="Typical outside diameters range from about 10.29 millimeters (0.405 inch) up to about 1.829 meters (72 inch)">Pipe Diameter:</label>
+		   <label class="col-sm-2" for="diameter" data-toggle="tooltip" title="Typical outside diameters range from about 10.29
+		    millimeters (0.405 inch) up to about 1.829 meters (72 inch)">Pipe Diameter:</label>
 		   <input class="col-sm-2" type="text" class="form-control" id="diameter">
 		   <div class="col-sm-1">
 		   		<select id="diamUnits" name="diamUnits" tabindex="-1">
 					<option selected="selected" value="meters" name="diamUnits" tabindex="-1">meters</option>
+					<option value="millimeters" name="diamUnits" tabindex="-1">millimeters (mm)</option>
 					<option value="inches" name="diamUnits" tabindex="-1">inches</option>
 				</select>
 			</div>
@@ -65,6 +69,19 @@
 		 </div>
 		<div class="col-xs-12" style="height:10px;"></div>
 		
+		 <div class="row">
+		   <label class="col-sm-2" for="length" data-toggle="tooltip" title="Typical lengths range from about 0 to hundreds of km or miles">Pipe Length:</label>
+		   <input class="col-sm-2" type="text" class="form-control" id="length">
+		   <div class="col-sm-1">
+		   		<select id="lengthUnits" name="lengthUnits" tabindex="-1">
+					<option selected="selected" value="km" name="lengthUnits" tabindex="-1">kilometers (km)</option>
+					<option value="miles" name="lengthUnits" tabindex="-1">miles</option>
+				</select>
+			</div>
+		   <div class="col-sm-7"></div>		   
+		 </div>
+		<div class="col-xs-12" style="height:10px;"></div>
+
 		 <div class="row">
 		   <label class="col-sm-2" for="thickness" data-toggle="tooltip" title="Typical pipe wall thicknesses range from
 		    about 1.24 mm to 59.54 mm">Pipe Wall Thickness:</label>
@@ -96,12 +113,13 @@
 		<div class="col-xs-12" style="height:10px;"></div>
 		
 		<div class="row">
-			<label class="col-sm-2 text-success" for="result">Pressure Loss Result:</label>
+			<label class="col-sm-2 text-success" for="result" data-toggle="tooltip" title="The result is the total pressure loss over the length of the pipe either in
+			 kpa (kilopascals) or psi (lbs per square inch)">Pressure Loss Result:</label>
 			<div class="well col-sm-2" type="text"><output id="result"></output></div>
 			<div class="col-sm-1">
 		   		<select id="resultUnits" name="resultUnits" tabindex="-1">
-					<option value="kpa/km" name="resultUnits" tabindex="-1">kpa/km</option>
-					<option value="psi/mile" name="resultUnits" tabindex="-1">psi/mile</option>
+					<option selected="selected" value="kpa" name="resultUnits" tabindex="-1">kpa</option>
+					<option value="psi" name="resultUnits" tabindex="-1">psi</option>
 				</select>
 			</div>
 		    <div class="col-sm-7"></div>
@@ -123,8 +141,7 @@
 	
 	<div class="row">
 		<h4 class="col-sm-12">Session Calculation Log:</h4>
-		<pre type="text" class="col-sm-10" id="logpanel"></pre>
-		<span class="col-sm-2"></span>
+		<pre type="text" class="col-sm-12" id="logpanel"></pre>
 	</div>
 		
 </div>
@@ -167,7 +184,7 @@
 	  const mm_m = 0.001;				//{conversion from millimeters to meters}
 
 // If any changes have been made to the form and there is a previous value in the result, warn the user they should do a re-calculation
-	  $('#flowrate, #viscosity, #density, #diameter, #thickness, #roughness').on("change", function(){
+	  $('#flowrate, #viscosity, #density, #diameter, #length, #thickness, #roughness').on("change", function(){
 		  $("#error_message").addClass("hidden");
 		  var res = $("#result").val();
 	      if ((res == "") || (res == "NaN")) {
@@ -212,6 +229,12 @@
 		  val = $("#diameter").val();
 		  if ((val < 0) || (isNaN(val))) {
 			  alert("diameter is invalid");
+		  };
+	  })
+	  $("#length").on("change", function(){
+		  val = $("#length").val();
+		  if ((val < 0) || (isNaN(val))) {
+			  alert("length is invalid");
 		  };
 	  })
 	  $("#thickness").on("change", function(){
@@ -266,9 +289,19 @@
 		var diamval = parseFloat($("#diameter").val());
 		var units = $("#diamUnits option:selected").val();
 		if (units == "inches") {diam = diamval * in_m}
+		else if (units == "millimeters") {diam = diamval * mm_m}
 		else {diam = diamval};
 		if ((diam < 0.01) || (diam > 6) || (isNaN(diam))) {
 			errors = errors + "Diameter is invalid or unreasonable.\n"
+		}
+
+		var len = 0.0;
+		var lenval = parseFloat($("#length").val());
+		var units = $("#lengthUnits option:selected").val();
+		if (units == "miles") {len = lenval * miles_km}
+		else {len = lenval};
+		if ((len < 0) || (isNaN(diam))) {
+			errors = errors + "Length is invalid or unreasonable.\n"
 		}
 		
 		var thick = 0.0;
@@ -296,16 +329,20 @@
 			$("#error_message").removeClass("hidden");
 		}
 		else {
-	        var resultval = cole_loss(flow, visc, dens, diam, thick, ruff);
+	        var resultarray = cole_loss(flow, visc, dens, diam, thick, ruff);
+			var resultval = resultarray[0];
+			var reynl = resultarray[1];
+			var frict = resultarray[2];
 			var units = $("#resultUnits option:selected").val();
-			if (units == "psi/mile") {result = resultval * kpa_psig / km_miles}
+			if (units == "psi") {result = resultval * len * kpa_psig }
 			else {
-				result = resultval;
+				result = resultval * len;
 			};	
-			$("#result").text(result.toPrecision(8));
+			$("#result").text(result.toFixed(2));
 			$("#error_message").addClass("hidden");
 			calccount = calccount + 1;
-			var logline = "Calculation #"+calccount+" Flow:"+flowval+" Visc:"+viscval+" Dens:"+densval+" Diam:"+diamval+" Thick:"+thickval+" Roughness:"+ruffval+" Result: "+result.toPrecision(8)+" "+units+"\n";
+			var logline = "Calculation #"+calccount+" Flow:"+flowval+" Visc:"+viscval+" Dens:"+densval+" Diam:"+diamval+" Thick:"+thickval+" Roughness:"+ruffval+
+			" Reynolds#:"+reynl.toFixed(2)+" FrictionFctr:"+frict.toFixed(4)+" Result: "+result.toFixed(2)+" "+units+"\n";
 			calclog = calclog + logline;
 			$("#logpanel").text(calclog);
 		}
@@ -336,7 +373,8 @@
         else if ((reynl>2000) && (reynl<=2500)) {frict = (reynl**1.596)/5700000.0}
         else if ((reynl>0.01) && (reynl<=2000)) {frict = 64.0/reynl}
         else if (reynl<=0.01) {frict = 10000.0}
-        return kdarc*dens*frict*flow**2/(diam**5);
+		var loss = kdarc*dens*frict*flow**2/(diam**5);
+        return [loss, reynl, frict];
 	}	
 
 	function conv_apigrav(densval){
