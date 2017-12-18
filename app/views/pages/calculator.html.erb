@@ -10,7 +10,7 @@
 
 		<div class="row">
 		   <label class="col-sm-2" for="flowrate" data-toggle="tooltip" title="Typical flowrate values range
-		    anywhere from 0 to over 6000 m3/hr">Flowrate:</label>
+		    anywhere from 0 to over 6000 m3/hr">Flowrate<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="flowrate">
 		   <div class="col-sm-1">
 		   		<select id="flowUnits" name="flowUnits" tabindex="-1">
@@ -27,7 +27,7 @@
 		<div class="row">
 		   <label class="col-sm-2" for="viscosity" data-toggle="tooltip" title="Typical kinematic viscosities range from
 		    0.29 cst (mm**2/s) for gasoline and 1.0 cst for condensate 
-		   up to about 300.0 cst for heavy crude">Fluid Viscosity:</label>
+		   up to about 300.0 cst for heavy crude">Fluid Viscosity<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="viscosity">
 		   <div class="col-sm-1">
 		   		<select id="viscUnits" name="viscUnits" tabindex="-1">
@@ -41,7 +41,7 @@
 		
 		 <div class="row">
 		   <label class="col-sm-2" for="density" data-toggle="tooltip" title="Typical densities range from about 550 kg/m3 for NGL up 
-		   to over 900.0 kg/m3 for heavy crude">Fluid Density:</label>
+		   to over 900.0 kg/m3 for heavy crude">Fluid Density<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="density">
 		   <div class="col-sm-1">
 		   		<select id="densUnits" name="densUnits" tabindex="-1">
@@ -56,7 +56,7 @@
 		
 		 <div class="row">
 		   <label class="col-sm-2" for="diameter" data-toggle="tooltip" title="Typical outside diameters range from about 10.29
-		    millimeters (0.405 inch) up to about 1.829 meters (72 inch)">Pipe Diameter:</label>
+		    millimeters (0.405 inch) up to about 1.829 meters (72 inch)">Pipe Diameter<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="diameter">
 		   <div class="col-sm-1">
 		   		<select id="diamUnits" name="diamUnits" tabindex="-1">
@@ -70,7 +70,8 @@
 		<div class="col-xs-12" style="height:10px;"></div>
 		
 		 <div class="row">
-		   <label class="col-sm-2" for="length" data-toggle="tooltip" title="Typical lengths range from about 0 to hundreds of km or miles">Pipe Length:</label>
+		   <label class="col-sm-2" for="length" data-toggle="tooltip" title="Typical lengths range from about 0 to hundreds of km or miles">
+			   Pipe Length<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="length">
 		   <div class="col-sm-1">
 		   		<select id="lengthUnits" name="lengthUnits" tabindex="-1">
@@ -84,7 +85,7 @@
 
 		 <div class="row">
 		   <label class="col-sm-2" for="thickness" data-toggle="tooltip" title="Typical pipe wall thicknesses range from
-		    about 1.24 mm to 59.54 mm">Pipe Wall Thickness:</label>
+		    about 1.24 mm to 59.54 mm">Pipe Wall Thickness<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="thickness">
 		   <div class="col-sm-1">
 		   		<select id="thickUnits" name="thickUnits" tabindex="-1">
@@ -99,7 +100,7 @@
 		
 		 <div class="row">
 		   <label class="col-sm-2" for="roughness" data-toggle="tooltip" title="Typical pipe roughness values range from 0.0015 mm for
-		    plastic pipe up to about 0.045 mm for commercial welded steel and 0.26 mm for cast iron pipe">Pipe Roughness:</label>
+		    plastic pipe up to about 0.045 mm for commercial welded steel and 0.26 mm for cast iron pipe">Pipe Roughness<%= image_tag "information_icon16.png"%></label>
 		   <input class="col-sm-2" type="text" class="form-control" id="roughness">
 		   <div class="col-sm-1">
 		   		<select id="ruffUnits" name=" ruffUnits" tabindex="-1">
@@ -114,7 +115,7 @@
 		
 		<div class="row">
 			<label class="col-sm-2 text-success" for="result" data-toggle="tooltip" title="The result is the total pressure loss over the length of the pipe either in
-			 kpa (kilopascals) or psi (lbs per square inch)">Pressure Loss Result:</label>
+			 kpa (kilopascals) or psi (lbs per square inch)">Pressure Loss Result<%= image_tag "information_icon16.png"%></label>
 			<div class="well col-sm-2" type="text"><output id="result"></output></div>
 			<div class="col-sm-1">
 		   		<select id="resultUnits" name="resultUnits" tabindex="-1">
@@ -140,7 +141,8 @@
 	</div>
 	
 	<div class="row">
-		<h4 class="col-sm-12">Session Calculation Log:</h4>
+		<h4 class="col-sm-5" data-toggle="tooltip" title="Log of results calculated so far in this session.  Input values are shown along with output values for Reynolds number, friction factor and the amount of pressure loss over the specified length of the pipe.">Session Calculation Log<%= image_tag "information_icon16.png"%></h4>
+		<span class="col-sm-7"></span>
 		<pre type="text" class="col-sm-12" id="logpanel"></pre>
 	</div>
 		
