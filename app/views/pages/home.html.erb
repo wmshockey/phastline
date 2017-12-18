@@ -1,13 +1,19 @@
 <title>Phastline Pipeline Hydraulics Simulation Program.  Free of charge and available to anyone interested in learning more about how a pipeline is constructed and operated.</title>
 <meta name="A batched pipeline hydraulics simulation application available to the general public free of charge.  This application models the operation of a pipeline by accepting a user specified pipeline configuration with pipe segments, stations with pumps and a set of nominations specifying the volume and types of products desired to be pumped through the line.  It will calculate pressures, capacity flowrates, bottlenecks and power usage at all significant times steps during the simulation." CONTENT="Developer: Warren Shockey, Seraphim Consulting Company December 2017.">
-<h1>Welcome to phastware.com</h1>
 
-<div class="col-sm-12">Phastware is a suite of pipeline hydraulics simulation and modelling software tools for pipeline operators, engineers or analysts.  Phastware is an acronym for "Pipeline Hydraulics Application Software Tools".  The Phastline application is one of the products that is available to the general public free of charge so if interested, use the "Sign-Up" link provided below to register for an account.  Please contact me at <%= mail_to "wmshockey@gmail.com" %> for any feedback, questions or if you require support on how to use the application.  Thank-you.</div>
+<div class="container">
+	<h1>Welcome to phastware.com</h1>
 
-<h3 class="col-sm-12"><%= link_to 'Sign-In', user_session_path %> to run the Phastline application or <%= link_to 'Sign-Up', new_user_registration_path %> to request a user account</h3>
+	<div class="col-sm-12">Phastware is a suite of pipeline hydraulics simulation and modelling software tools for pipeline operators, engineers or analysts.  Phastware is an acronym for "Pipeline Hydraulics Application Software Tools".  The Phastline application is one of the products that is available to the general public free of charge so if interested, use the "Sign-Up" link provided below to register for an account.  Please contact me at <%= mail_to "wmshockey@gmail.com" %> for any feedback, questions or if you require support on how to use the application.  Thank-you.</div>
 
-<h3 class="col-sm-12">View the <%= link_to 'documentation', "/pages/help" %></h3>
-<br>
-<center>
-<%= image_tag "pipeline-in-winter.jpg", alt: "Pipeline View"%>
-</center>
+	<h4 class="col-sm-12"><%= link_to 'Sign-In', user_session_path %> to run the Phastline application if you already have an account</h4>
+	<h4 class="col-sm-12"><%= link_to 'Sign-Up', new_user_registration_path %> to request a user account</h4>
+	<h4 class="col-sm-12">View the Phastline <%= link_to 'documentation', "/pages/help" %> to see what this program does and how to run it</h4>
+	<h4 class="col-sm-12">Run the <%= link_to 'Lineloss Calculator', "/pages/calculator"%> program</h4>
+
+	<br>
+	<center>
+	<%= image_tag "pipeline-in-winter.jpg", alt: "Pipeline View"%>
+	</center>
+
+</container>
