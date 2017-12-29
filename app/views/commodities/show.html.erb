@@ -6,13 +6,13 @@
 		<% end %>
 		<tr><td><strong>Commodity ID:</strong></td><td><%= @commodity.commodity_id %></td></tr>
         <tr><td><strong>Commodity Name:</strong></td><td><%= @commodity.commodity_name %></td></tr>
-	    <tr><td><strong>Temperature point 1 (Dec C):</strong></td><td><%= @commodity.temp1 %></td></tr>
-		<tr><td><strong>Viscosity point 1 (cst):</strong></td><td><%= @commodity.visc1 %></td></tr>
-		<tr><td><strong>Temperature point 2 (Deg C):</strong></td><td><%= @commodity.temp2 %></td></tr>
-		<tr><td><strong>Viscosity point 2 (cst):</strong></td><td><%= @commodity.visc2 %></td></tr>
-		<tr><td><strong>Density (kg/m3):</strong></td><td><%= @commodity.density %></td></tr>
+	    <tr><td><strong>Temperature point 1:</strong></td><td><%= @commodity.temp1 %> <%= @commodity.temp_unit%></td></tr>
+		<tr><td><strong>Viscosity point 1:</strong></td><td><%= @commodity.visc1 %> <%= @commodity.visc_unit%></td></tr>
+		<tr><td><strong>Temperature point 2:</strong></td><td><%= @commodity.temp2 %> <%= @commodity.temp_unit%></td></tr>
+		<tr><td><strong>Viscosity point 2:</strong></td><td><%= @commodity.visc2 %> <%= @commodity.visc_unit%></td></tr>
+		<tr><td><strong>Density:</strong></td><td><%= @commodity.density %> <%= @commodity.dens_unit%></td></tr>
 		<tr><td><strong>Density Conversion Factor:</strong></td><td><%= @commodity.density_cf %></td></tr>
-		<tr><td><strong>Vapor Pressure (kpa):</strong></td><td><%= @commodity.vapor %></td></tr>
+		<tr><td><strong>Vapor Pressure:</strong></td><td><%= @commodity.vapor %> <%= @commodity.pres_unit%></td></tr>
   </tbody>
 </table>
 

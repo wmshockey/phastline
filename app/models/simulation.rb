@@ -1,4 +1,6 @@
 class Simulation < ActiveRecord::Base
+    require 'phast_utilities'
+    include Conversions
     include ActionView::Helpers::NumberHelper
     attr_accessor :lfill
     attr_accessor :viscar
@@ -26,29 +28,30 @@ class Simulation < ActiveRecord::Base
     validates :name, :presence => true
     validates :pipeline_id, :presence => true
     validates :nomination_id, :presence => true
-    validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 100000}
-    validates :max_batchsize, :presence => true, numericality: {:greater_than => 1000, :less_than => 500000}
+    validates :max_flowrate, :presence => true, numericality: {:greater_than => 0, :less_than => 1000000}
+    validates :max_batchsize, :presence => true, numericality: {:greater_than => 500, :less_than => 500000}
     validates :max_steptime, :presence => true, numericality: {:greater_than => 0.5, :less_than => 1000}
     validates_uniqueness_of :name, scope: :user_id
     default_scope { order(user_id: :asc, pipeline_id: :asc) }
+
 
 # Mainline driver code
     def run(progress_bar, pipeline, nomination, commodities, units, pumpar)
         percent_complete = 0
         @progress_bar = progress_bar
-        @progress_bar.update_attributes!(message: "Initializing simulation...", percent: "#{percent_complete}")        
+        @progress_bar.update_attributes!(message: "Initializing simulation...", percent: "#{percent_complete}")       
         @pipeline = pipeline
         @nomination = nomination
-        @commodities = commodities
+        @commodities = get_commodities(commodities)
         @pumpar = pumpar
         @units = units
         @progress_bar.update_attributes!(message: "Clearing out previous results...", percent: "#{percent_complete}")        
         Result.destroy_all(simulation_id: id)
         @progress_bar.update_attributes!(message: "Gathering up all input data...", percent: "#{percent_complete}")        
-        @shipments = @nomination.shipments
+        @shipments = @nomination.get_shipments
         @stations = @pipeline.stations
-        @segmar = @pipeline.segments.sort_by { |a| a.kmp}
-        @volmar = @pipeline.get_volumes
+        @segmar = @pipeline.get_all_segments
+        @volmar = @pipeline.get_volumes(@segmar)
         @tempar = @pipeline.get_all_temps
         @maxpressar = @pipeline.get_all_maxpress
         @elevar = @pipeline.get_all_elevations
@@ -63,6 +66,8 @@ class Simulation < ActiveRecord::Base
         end
         $initial_timestamp = Time.now
         $timestamp = $initial_timestamp
+        max_batchsize = convert_to_si(self.max_batchsize, vol_unit)
+        max_flowrate = convert_to_si(self.max_flowrate, flow_unit)
 #       Generate the new period batches
         @progress_bar.update_attributes!(message: "Generating batches...", percent: "#{percent_complete}")        
         batches = generate_batches(max_batchsize, @nomination.name, @shipments)
@@ -147,6 +152,7 @@ class Simulation < ActiveRecord::Base
 #      self.errors.add(:base, e.backtrace)
       return false
     end
+
 
     def data_integrity_checks(pipeline)
 #     Check for any missing or empty input data
@@ -1162,12 +1168,14 @@ class Simulation < ActiveRecord::Base
 
   def save_results
     @results = Array.new
+    max_step = 0
     @stepar.each do |s|
         result = Result.new
         station = @pipeline.stations.find{|i| i.name == s.stat}
         result.simulation_id = self.id
         result.simulation_name = self.name
         result.step = s.step
+        max_step = s.step
         result.timestamp = s.timestamp
         result.step_time = s.step_time
         result.kmp = s.kmp
@@ -1201,7 +1209,11 @@ class Simulation < ActiveRecord::Base
         end
         @results << result
     end
-    Result.import @results, validate: false
+    @results.each do |r|
+       @progress_bar.update_attributes!(message: "saving results for step #{r.step} of #{max_step} total steps", percent: "100")
+      r.save
+    end
+#    Result.import @results, validate: false
   end
 
   def copy(simulations, simulation)
@@ -1241,6 +1253,27 @@ class Simulation < ActiveRecord::Base
     end
     return np
   end
+
+  def get_commodities(commodities)
+    if commodities.any? then
+      commodities.each do |c|
+        visc1 = convert_to_si(c.visc1, c.visc_unit)
+        visc2 = convert_to_si(c.visc1, c.visc_unit)
+        temp1 = convert_to_si(c.temp1, c.temp_unit)
+        temp2 = convert_to_si(c.temp2, c.temp_unit)
+        density = convert_to_si(c.density, c.dens_unit)
+        vapor = convert_to_si(c.vapor, c.pres_unit)
+        c.visc1 = visc1
+        c.visc2 = visc2
+        c.temp1 = temp1
+        c.temp2 = temp2
+        c.density = density
+        c.vapor = vapor
+      end
+    end
+    return commodities
+  end
+
 
 end
 
@@ -1370,6 +1403,22 @@ class Statrec
   end
 end
 
+class Segmrec
+  attr_accessor :pipeline_id
+  attr_accessor :kmp
+  attr_accessor :diameter
+  attr_accessor :thickness
+  attr_accessor :roughness
+  attr_accessor :mawp
+  def initialize (pipeline_id, kmp, diam, thick, ruff, mawp)
+    @pipeline_id = pipeline_id
+    @kmp = kmp
+    @diameter = diam
+    @thickness = thick
+    @roughness = ruff
+    @mawp = mawp
+  end
+end
 
 class Steprec
   attr_accessor :step

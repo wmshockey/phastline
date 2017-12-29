@@ -15,18 +15,28 @@
   </p>
 
 	<table class="table table-bordered table-hover table-condensed">
-	  <thead>
-	    <tr>
-	      <th>Pipeline Name</th>
-		    <th>Description</th>
-	    </tr>
-	  </thead>
-
 	  <tbody>
-	      <tr>
-	        <td><%= f.text_field :name %></td>
-	        <td><%= f.text_field :description, :size=>"120" %></td>
-	      </tr>
+	        <tr><td><%= f.label "Name" %></td><td><%= f.text_field :name %></td></tr>
+	        <tr><td><%= f.label "Description" %></td>
+				<td display="inline-block">
+					<%= f.text_field :description, :size=>"120" %><br>
+					Stations: <span id="stations"><%= @pipeline.number_stations %></span> 
+					Segments: <span id="segments"><%= @pipeline.number_segments%></span> 
+					Elevations: <span id="elevations"><%= @pipeline.number_elevations%></span>
+					Temps: <span id="temperatures"><%= @pipeline.number_temperatures%></span>
+					DRAs: <span id="dras"><%= @pipeline.number_dras%></span>
+				</td></tr>
+			<tr><td><%= f.label "Units Used For Input:" %></td>
+				<td>
+					<div class="col-sm-3">Distances along pipeline: </div><div class="col-sm-9 unit_field_dist"><%= f.select :dist_unit, ["km", "mile"]%> post</div>
+					<div class="col-sm-3">Pipe diameters: </div><div class="col-sm-9 unit_field_diam"><%= f.select :diam_unit, ["m", "in", "ft"]%></div>
+					<div class="col-sm-3">Wall thickness of pipe: </div><div class="col-sm-9 unit_field_thick"><%= f.select :thick_unit, ["mm", "m", "in"]%></div>
+					<div class="col-sm-3">Pipe roughness: </div><div class="col-sm-9 unit_field_ruff"><%= f.select :ruff_unit, ["mm", "m", "in"]%></div>
+					<div class="col-sm-3">Pressures: </div><div class="col-sm-9 unit_field_pres"><%= f.select :pres_unit, ["kpa", "psi"]%></div>
+					<div class="col-sm-3">Elevations: </div><div class="col-sm-9 unit_field_elev"><%= f.select :elev_unit, ["m", "ft"]%></div>
+					<div class="col-sm-3">Temperatures: </div><div class="col-sm-9 unit_field_temp">deg <%= f.select :temp_unit, ["C", "F"]%></div>
+				</td>
+			</tr>
 	  </tbody>
 	</table>
 <%= f.submit :Submit, class: 'btn btn-success' %>

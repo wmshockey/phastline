@@ -11,6 +11,8 @@ class Commodity < ActiveRecord::Base
     validates :vapor, numericality: {:greater_than_or_equal_to => 0, :less_than => 10000}
     validates_uniqueness_of :commodity_id, scope: :user_id
     default_scope { order(user_id: :asc, commodity_id: :asc) }
+    require 'phast_utilities'
+    include Conversions
 
   def copy(commodities, commodity)     
     commodity_copy = commodity.dup
@@ -70,5 +72,6 @@ class Commodity < ActiveRecord::Base
     self.acoef = coefs[0]
     self.bcoef = coefs[1]
   end
+  
   
 end

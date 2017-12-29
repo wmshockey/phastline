@@ -21,18 +21,19 @@
 <table class="table table-bordered table-hover table-condensed">
   <thead>
    <tr>
+ 	  <% punit = @simulation.pres_unit %>
       <th>Station</th>
-	  <th>Kmp</th>
-	  <th>Flowrate<br>(m3/hr)</th>
-	  <th>Pumped<br>Volume (m3)</th>
+	  <th><%= @simulation.dist_unit%>post</th>
+	  <th>Flowrate<br>(<%=@simulation.flow_unit%>)</th>
+	  <th>Pumped<br>Volume (<%=@simulation.vol_unit%>)</th>
 	  <th>Upstream<br>Batch</th>
 	  <th>Downstream<br> Batch</th>
-	  <th>Holding<br>(kpa)</th>
-	  <th>Suction<br>(kpa)</th>
-	  <th>Head<br>(kpa)</th>
-	  <th>Case<br>(kpa)</th>
-	  <th>Discharge<br>(kpa)</th>
-	  <th>HHP<br>(KW)</th>
+	  <th>Holding<br>(<%=punit%>)</th>
+	  <th>Suction<br>(<%=punit%>)</th>
+	  <th>Head<br>(<%=punit%>)</th>
+	  <th>Case<br>(<%=punit%>)</th>
+	  <th>Discharge<br>(<%=punit%>)</th>
+	  <th>Energy<br>(<%=@simulation.energy_unit%>)</th>
     </tr>
   </thead>
 
@@ -40,17 +41,26 @@
 	<% stepresults.each do | i | %>
       <tr>
 		<td><%= i.stat %></td>
-        <td><%= '%.2f'% i.kmp %></td>
-		<td><%= '%8.1f'% i.flow %></td>
-		<td><%= number_with_precision(i.pumped_volume, :precision => 1, :delimiter => ',') %></td>
+		<% dist = @simulation.convert_from_si(i.kmp, @simulation.dist_unit)%>
+		<% flow = @simulation.convert_from_si(i.flow, @simulation.flow_unit)%>		
+		<% pumped_vol = @simulation.convert_from_si(i.pumped_volume, @simulation.vol_unit)%>
+		<% hold = @simulation.convert_from_si(i.hold, punit)%>
+		<% suct = @simulation.convert_from_si(i.suct, punit)%>
+		<% head = @simulation.convert_from_si(i.suct, punit)%>
+		<% casep = @simulation.convert_from_si(i.head, punit)%>
+		<% disc = @simulation.convert_from_si(i.disc, punit)%>
+		<% energy = @simulation.convert_from_si(i.hhp, @simulation.energy_unit)%>		
+        <td><%= '%.2f'% dist %></td>
+		<td><%= number_with_precision(flow, :precision => 1, :delimiter => ',') %></td>
+		<td><%= number_with_precision(pumped_vol, :precision => 1, :delimiter => ',') %></td>
 		<td><%= i.upstream_batch %></td>
 		<td><%= i.downstream_batch %></td>
-		<td><%= '%.1f'% i.hold %></td>
-		<td><%= '%.1f'% i.suct %></td>
-        <td><%= '%.1f'% i.head %></td>
-        <td><%= '%.1f'% i.casep %></td>
-        <td><%= '%.1f'% i.disc %></td>
-		<td><%= '%.1f'% i.hhp %></td>
+		<td><%= '%.1f'% hold %></td>
+		<td><%= '%.1f'% suct %></td>
+        <td><%= '%.1f'% head %></td>
+        <td><%= '%.1f'% casep %></td>
+        <td><%= '%.1f'% disc %></td>
+		<td><%= number_with_precision(energy, :precision => 0, :delimiter => ',') %></td>
       </tr>
 	<% end %>
   </tbody>

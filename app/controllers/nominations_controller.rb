@@ -108,6 +108,6 @@ class NominationsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def nomination_params
-      params.require(:nomination).permit(:name, :description, :nom_date, :period, :pipeline_id, :total_volume)
+      params.require(:nomination).permit(:name, :description, :nom_date, :period, :pipeline_id, :vol_unit, :total_volume)
     end
 end

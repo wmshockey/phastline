@@ -7,11 +7,13 @@ class Station < ActiveRecord::Base
   validates :pipeline_id, :presence => true
   validates_uniqueness_of :kmp, scope: :pipeline_id
   default_scope { order(pipeline_id: :asc, kmp: :asc) }
-  after_commit :update_pipeline
+  after_commit :update_pipeline, on: [:create, :update, :destroy]
 
   def update_pipeline
-    self.pipeline.touch
-    self.pipeline.save
+    if self.pipeline.persisted?
+      self.pipeline.save
+      self.pipeline.touch
+    end
   end
         
   

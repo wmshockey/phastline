@@ -113,6 +113,6 @@ class SimulationsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def simulation_params
-      params.require(:simulation).permit(:name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime)
+      params.require(:simulation).permit(:name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime, :flow_unit, :vol_unit, :dist_unit, :pres_unit, :energy_unit, :power_unit, :pmphead_unit, :pmpflow_unit)
     end
 end

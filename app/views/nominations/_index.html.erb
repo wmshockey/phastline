@@ -12,6 +12,7 @@
 	  <th>Pipeline</th>
 	  <th>Nomination Date</th>
 	  <th>Period (days)</th>
+	  <th>Volume Unit</th>
     </tr>
   </thead>
 
@@ -38,6 +39,7 @@
 			<td><%= @pipelines.find {|p| p.id == nomination.pipeline_id}.name %></td>
 			<td><%= nomination.nom_date %></td>
 			<td><%= nomination.period %></td>
+			<td><%= nomination.vol_unit %></td>
 	      </tr>
 	  <% end %>
 	<% end %>

@@ -8,6 +8,15 @@ class Dra < ActiveRecord::Base
   validate  :within_pipeline
   validates_uniqueness_of :start_kmp, scope: :pipeline_id
   default_scope { order(pipeline_id: :asc, start_kmp: :asc) }
+  after_commit :update_pipeline, on: [:create, :update, :destroy]
+
+  def update_pipeline
+    if self.pipeline.persisted?
+      self.pipeline.save
+      self.pipeline.touch
+    end
+  end
+        
 
   def end_greater_than_start
       self.errors[:base] << "End kmp of region must be greater than injection start kmp." unless end_kmp > start_kmp

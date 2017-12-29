@@ -7,7 +7,6 @@
 	  <% end %>
       <th>Pipeline Name</th>
 	  <th>Description</th>
-	  <th>Stations</th>
     </tr>
   </thead>
 
@@ -17,8 +16,13 @@
 		<td><%= (User.find {|u| u.id == @pipeline.user_id}).email %></td>
 	  <% end %>
       <td><%= @pipeline.name %></td>
-      <td><%= @pipeline.description %></td>
-	  <td><%= @pipeline.number_stations %></td>
+      <td display="inline-block"><%= @pipeline.description %><br>
+            <%= link_to "Stations: #{@pipeline.number_stations}", pipeline_stations_path(@pipeline)%>
+            <%= link_to "Segments: #{@pipeline.number_segments}", pipeline_segments_path(@pipeline)%>
+            <%= link_to "Elevations: #{@pipeline.number_elevations}", pipeline_elevations_path(@pipeline)%>
+			<%= link_to "Temperatures: #{@pipeline.number_temperatures}", pipeline_temperatures_path(@pipeline)%>
+			<%= link_to "DRA Regions: #{@pipeline.number_dras}", pipeline_dras_path(@pipeline)%>
+	  </td>
     </tr>
   </tbody>
 </table>

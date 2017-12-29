@@ -102,6 +102,6 @@ class PipelinesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def pipeline_params
-      params.require(:pipeline).permit(:name, :description, :length, :flowrate, :diameter, :roughness, :viscosity, :density, :lineloss, :total_loss, :number_stations)
+      params.require(:pipeline).permit(:name, :description, :dist_unit, :diam_unit, :thick_unit, :ruff_unit, :pres_unit, :elev_unit, :temp_unit, :number_stations, :number_segments, :number_elevations, :number_temperatures, :number_dras)
     end
 end

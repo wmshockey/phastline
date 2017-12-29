@@ -7,9 +7,9 @@
   <thead>
    <tr>
       <th>Station</th>
-	  <th>Total<br>Energy Consumption<br>(KwH)</th>
-	  <th>Peak<br>Power<br>(KW)</th>
-	  <th>Minimum<br>Power<br>(KW)</th>
+	  <th>Total<br>Energy Consumption<br>(<%= @simulation.energy_unit%>)</th>
+	  <th>Peak<br>Power<br>(<%= @simulation.power_unit%>)</th>
+	  <th>Minimum<br>Power<br>(<%= @simulation.power_unit%>)</th>
     </tr>
   </thead>
 
@@ -19,14 +19,15 @@
 	    <% station_results = @results.select {|r| r.station_id == s} %>
 		<% station_name = station_results[0].stat %>
 		<% station_powers = station_results.map {|r| r.hhp} %>
-		<% total_power = station_powers.sum %>
+		<% station_energies = station_results.map {|r| r.hhp * r.step_time} %>
+		<% total_energy = station_energies.sum %>
 		<% peak_power = station_powers.max %>
 		<% min_power = station_powers.min %>
 		<tr>
 			<td><%= station_name %></td>
-			<td><%= number_with_precision(total_power, :precision => 1, :delimiter => ',') %></td>
-			<td><%= number_with_precision(peak_power, :precision => 1, :delimiter => ',') %></td>
-			<td><%= number_with_precision(min_power, :precision => 1, :delimiter => ',') %></td>
+			<td><%= number_with_precision(@simulation.convert_from_si(total_energy, @simulation.energy_unit), :precision => 1, :delimiter => ',') %></td>
+			<td><%= number_with_precision(@simulation.convert_from_si(peak_power, @simulation.power_unit), :precision => 1, :delimiter => ',') %></td>
+			<td><%= number_with_precision(@simulation.convert_from_si(min_power, @simulation.power_unit), :precision => 1, :delimiter => ',') %></td>
 		</tr>
 	<% end %>
   </tbody>

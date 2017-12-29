@@ -27,6 +27,8 @@ class Nomination < ActiveRecord::Base
     validates_with NominationValidator
     default_scope { order('name ASC') }
     before_save :calc_total_volume
+    require 'phast_utilities'
+    include Conversions
     
     def copy(nominations, nomination)
       nomination_copy = nomination.dup
@@ -59,6 +61,17 @@ class Nomination < ActiveRecord::Base
         end
       end
       self.total_volume = volume
+    end
+    
+    def get_shipments
+      shipments = self.shipments
+      if shipments.any? then
+        unit = self.vol_unit
+        shipments.each do |s|
+          s.volume = convert_to_si(s.volume, unit)
+        end
+      end
+      return shipments
     end
         
 end

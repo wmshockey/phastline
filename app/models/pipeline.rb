@@ -1,4 +1,6 @@
 class Pipeline < ActiveRecord::Base
+  require 'phast_utilities'
+  include Conversions
   belongs_to :user
   has_many :segments, dependent: :destroy
   has_many :stations, dependent: :destroy
@@ -10,14 +12,39 @@ class Pipeline < ActiveRecord::Base
   validates :name, :presence => true
   validates_uniqueness_of :name, scope: :user_id
   default_scope { order(user_id: :asc, name: :asc) }
-  before_save :count_number_stations
+  before_save :count_number_child_records, on: [:create, :update]
 
-  def count_number_stations
+  def count_number_child_records
+    # Count number of stations
     station_count = self.stations.count
     if station_count.nil? then
       station_count = 0
     end
-    self.number_stations = station_count
+    self.number_stations = station_count unless !self.persisted?
+    # Count number of segments
+    segment_count = self.segments.count
+    if segment_count.nil? then
+      segment_count = 0
+    end
+    self.number_segments = segment_count unless !self.persisted?
+    # Count number of elevations
+    elevation_count = self.elevations.count
+    if elevation_count.nil? then
+      elevation_count = 0
+    end
+    self.number_elevations = elevation_count unless !self.persisted?
+    # Count number of temperatures
+    temperature_count = self.temperatures.count
+    if temperature_count.nil? then
+      temperature_count = 0
+    end
+    self.number_temperatures = temperature_count unless !self.persisted?
+    # Count number of DRA records
+    dra_count = self.dras.count
+    if dra_count.nil? then
+      dra_count = 0
+    end
+    self.number_dras = dra_count unless !self.persisted?
   end
 
   def copy(pipelines, pipeline)
@@ -66,21 +93,20 @@ class Pipeline < ActiveRecord::Base
     return pipeline_copy
   end
 
-  def get_volumes
+  def get_volumes(segmar)
 # Calculate the pipeline volumes to each kmp point into a profile array
 # Note that user input for segments must include an entry for the last point on the line.
     volumes = Profile.new
-    segs_sorted = segments.sort_by {|a| a.kmp}
 #   Record volume of first kmp on the line as 0
     i = 0
-    kmp = segs_sorted[i].kmp
+    kmp = segmar[i].kmp
     volumes.add_point(kmp,0)
 #   Record volume points for remaining segments on the line
     i = 1
-    while i <= segs_sorted.count-1
-      kmp = segs_sorted[i].kmp
-      diam = segs_sorted[i-1].diameter - 2*segs_sorted[i-1].thickness
-      length = kmp - segs_sorted[i-1].kmp
+    while i <= segmar.count-1
+      kmp = segmar[i].kmp
+      diam = segmar[i-1].diameter - 2*segmar[i-1].thickness
+      length = kmp - segmar[i-1].kmp
       volm = 1000 * length * Math::PI * (diam/2)**2 + volumes[i-1].val
       volumes.add_point(kmp,volm)
       i = i + 1
@@ -94,7 +120,9 @@ class Pipeline < ActiveRecord::Base
     temp_profile = Profile.new
     temp_array = temperatures.sort_by { |a| a.kmp}
     temp_array.each do |i|
-      temp_profile.add_point(i.kmp, i.temperature)
+      kmp = convert_to_si(i.kmp, self.dist_unit)
+      temp = convert_to_si(i.temperature, self.temp_unit)      
+      temp_profile.add_point(kmp, temp)
     end
     return temp_profile
   end
@@ -104,11 +132,28 @@ class Pipeline < ActiveRecord::Base
     elev_profile = Profile.new
     elev_array = elevations.sort_by { |a| a.kmp}
     elev_array.each do |i|
-      elev_profile.add_point(i.kmp, i.elevation)
+      kmp = convert_to_si(i.kmp, self.dist_unit)
+      elev = convert_to_si(i.elevation, self.elev_unit)
+      elev_profile.add_point(kmp, elev)
     end
     return elev_profile
   end
   
+  def get_all_segments
+    segmar = Array.new
+    segments_sorted = self.segments.sort_by { |a| a.kmp}
+    segments_sorted.each do |s|
+      id = s.id
+      kmp = convert_to_si(s.kmp, self.dist_unit)
+      diam = convert_to_si(s.diameter, self.diam_unit)
+      thick = convert_to_si(s.thickness, self.thick_unit)
+      ruff = convert_to_si(s.roughness, self.ruff_unit)
+      mawp = convert_to_si(s.mawp, self.pres_unit)
+      segmar << Segmrec.new(id, kmp, diam, thick, ruff, mawp)
+    end
+    return segmar
+  end
+
   def get_all_dras
 # Get all dras into a profile array
     dra_profile = Profile.new
@@ -131,10 +176,10 @@ class Pipeline < ActiveRecord::Base
     stn_ix = 0
     max_ix = stat_array.count - 1
     while stn_ix <= max_ix
-      start_kmp = stat_array[stn_ix].kmp
+      start_kmp = convert_to_si(stat_array[stn_ix].kmp, self.dist_unit)
       start_vol = volmar.interpolate_y(start_kmp)
       if stn_ix < max_ix then
-        end_kmp = stat_array[stn_ix + 1].kmp
+        end_kmp = convert_to_si(stat_array[stn_ix + 1].kmp, self.dist_unit)
         end_vol = volmar.interpolate_y(end_kmp)
         pipe_vol = end_vol - start_vol
       else
@@ -151,7 +196,9 @@ class Pipeline < ActiveRecord::Base
     mp = Profile.new
     segm_array = segments.sort_by { |a| a.kmp}
     segm_array.each do |i|
-      mp.add_point(i.kmp, i.mawp)
+      kmp = convert_to_si(i.kmp, self.dist_unit)
+      mawp = convert_to_si(i.mawp, self.pres_unit)
+      mp.add_point(kmp, mawp)
     end
     return mp
   end
@@ -174,13 +221,13 @@ class Pipeline < ActiveRecord::Base
 #         Get the common flowrate values list
           row_units.each do |u|
             pmp = pumpar.find {|p| p.pump_id == u.pump_id}
+            flow_units = pmp.flow_units
             pmp.headpoints.each do |h|
-              row_flow_values << h.flow
+              row_flow_values << convert_to_si(h.flow, flow_units)
             end
           end
           row_flow_values.uniq!
           row_flow_values.sort!
-          row_flow_values.map! {|e| e * $Gpm_m3hr}
 #         Add heads for all units on the same row in series
           row_flow_values.each do |v|
             flow = v
@@ -189,16 +236,18 @@ class Pipeline < ActiveRecord::Base
 #             Get the headpoints for this unit as a Profile array
               unit_head_curve = Profile.new
               pmp = pumpar.find {|p| p.pump_id == u.pump_id}
+              flow_units = pmp.flow_units
+              head_units = pmp.head_units
               pmp.headpoints.each do |h|
-                rate = h.flow * $Gpm_m3hr
-                head = h.head * $Ft_m
+                rate = convert_to_si(h.flow, flow_units)
+                head = convert_to_si(h.head, head_units)
                 unit_head_curve << Profile_point.new(rate, head)
               end
               unit_head_curve.sort_by! {|t| t.flow}
   #           Check if the flowrate is outside the bounds of this unit's pump curve
               if flow < unit_head_curve.first.flow then
                 head = unit_head_curve.first.val
-                logger.info "flowrate is below first head point for #{pmp.pump_id}, setting head to #{head}"
+                logger.info "flowrate #{flow} is below first head point for #{pmp.pump_id}, setting head to #{head}"
               elsif flow > unit_head_curve.last.flow
                 head = 0.0
               else

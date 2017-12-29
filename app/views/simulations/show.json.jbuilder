@@ -1,1 +1,2 @@
-json.extract! @simulation, :id, :name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime, :created_at, :updated_at
+json.extract! @simulation, :id, :name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime, :flow_unit, :vol_unit,  
+  :dist_unit, :pres_unit, :energy_unit, :power_unit, :pmphead_unit, :pmpflow_unit, :created_at, :updated_at

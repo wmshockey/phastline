@@ -31,6 +31,9 @@
 			  <td><strong>Description: </strong></td><td><%= f.text_field :description, :size=>"120" %></td>
 		  </tr>
 		  <tr>
+			 <td><strong>Units Used: </strong></td><td><%= f.select :vol_unit, ["m3", "bbls"] %></td>
+		  </tr>
+		  <tr>
 			<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id, current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>
 		  </tr>
 		  <tr>

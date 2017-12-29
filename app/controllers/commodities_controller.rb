@@ -105,6 +105,6 @@ class CommoditiesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def commodity_params
-      params.require(:commodity).permit(:commodity_id, :commodity_name, :temp1, :visc1, :temp2, :visc2, :density, :density_cf, :vapor)
+      params.require(:commodity).permit(:commodity_id, :commodity_name, :temp1, :visc1, :temp2, :visc2, :density, :density_cf, :vapor, :visc_unit, :dens_unit, :temp_unit, :pres_unit)
     end
 end

@@ -115,6 +115,7 @@ class ResultsController < ApplicationController
     def check_for_results
       @sim_id = params[:id].to_i
       @simulation = Simulation.find(params[:id])
+      @pipeline = Pipeline.find(@simulation.pipeline_id)
       @results = Result.select {|r| r.simulation_id == @sim_id}
       if @results.empty?
         respond_to do |format|

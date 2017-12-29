@@ -35,7 +35,7 @@
       <th>Upstream Station</th>
 	  <th>Kmp</th>
 	  <th>Batch</th>
-	  <th>Volume (m3)</th>
+	  <th>Volume (<%= @simulation.vol_unit%>)</th>
     </tr>
   </thead>
 
@@ -49,7 +49,8 @@
 		<td style="width: 25%;"><%= i.stat %></td>
 		<td style="width: 25%;"><%= '%8.2f'% i.kmp %></td>
 		<td style="width: 25%;"><%= batch_id %></td>
-		<td style="width: 25%;"><%= number_with_precision(i.batch_vol, :precision => 1, :delimiter => ',') %></td>
+		<% vol = @simulation.convert_from_si(i.batch_vol, @simulation.vol_unit)%>
+		<td style="width: 25%;"><%= number_with_precision(vol, :precision => 1, :delimiter => ',') %></td>
 	  </tr>
 	<% end %>
 

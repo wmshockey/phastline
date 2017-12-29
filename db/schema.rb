@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171214194637) do
+ActiveRecord::Schema.define(version: 20171228152730) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -28,6 +28,10 @@ ActiveRecord::Schema.define(version: 20171214194637) do
     t.float    "acoef",          limit: 24
     t.float    "bcoef",          limit: 24
     t.integer  "user_id",        limit: 4
+    t.string   "visc_unit",      limit: 12
+    t.string   "dens_unit",      limit: 12
+    t.string   "temp_unit",      limit: 12
+    t.string   "pres_unit",      limit: 12
   end
 
   create_table "dras", force: :cascade do |t|
@@ -68,15 +72,27 @@ ActiveRecord::Schema.define(version: 20171214194637) do
     t.datetime "updated_at",               null: false
     t.integer  "pipeline_id",  limit: 4
     t.float    "total_volume", limit: 24
+    t.string   "vol_unit",     limit: 12
   end
 
   create_table "pipelines", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.text     "description",     limit: 65535
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-    t.integer  "user_id",         limit: 4
-    t.integer  "number_stations", limit: 4
+    t.string   "name",                limit: 255
+    t.text     "description",         limit: 65535
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.integer  "user_id",             limit: 4
+    t.integer  "number_stations",     limit: 4
+    t.string   "dist_unit",           limit: 12
+    t.string   "diam_unit",           limit: 12
+    t.string   "thick_unit",          limit: 12
+    t.string   "ruff_unit",           limit: 12
+    t.string   "pres_unit",           limit: 12
+    t.string   "elev_unit",           limit: 12
+    t.string   "temp_unit",           limit: 12
+    t.integer  "number_segments",     limit: 4
+    t.integer  "number_elevations",   limit: 4
+    t.integer  "number_temperatures", limit: 4
+    t.integer  "number_dras",         limit: 4
   end
 
   create_table "progressbars", force: :cascade do |t|
@@ -92,9 +108,9 @@ ActiveRecord::Schema.define(version: 20171214194637) do
   create_table "pumps", force: :cascade do |t|
     t.string   "pump_id",                      limit: 255
     t.text     "description",                  limit: 65535
-    t.string   "flow_units",                   limit: 255
-    t.string   "head_units",                   limit: 255
-    t.string   "pressure_units",               limit: 255
+    t.string   "flow_units",                   limit: 12
+    t.string   "head_units",                   limit: 12
+    t.string   "pressure_units",               limit: 12
     t.float    "minimum_suction",              limit: 24
     t.integer  "stages",                       limit: 4
     t.float    "impeller_diameter",            limit: 24
@@ -179,6 +195,14 @@ ActiveRecord::Schema.define(version: 20171214194637) do
     t.integer  "nomination_id", limit: 4
     t.integer  "user_id",       limit: 4
     t.float    "max_steptime",  limit: 24
+    t.string   "flow_unit",     limit: 12
+    t.string   "vol_unit",      limit: 12
+    t.string   "dist_unit",     limit: 12
+    t.string   "pres_unit",     limit: 12
+    t.string   "energy_unit",   limit: 12
+    t.string   "power_unit",    limit: 12
+    t.string   "pmphead_unit",  limit: 12
+    t.string   "pmpflow_unit",  limit: 12
   end
 
   create_table "stations", force: :cascade do |t|

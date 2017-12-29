@@ -9,16 +9,17 @@
   <thead>
    <tr>
     <th>Step</th>
-	  <th>Flowrate</th>
-	  <th>Pumped<br>Volume</th>
+	  <% punit = @simulation.pres_unit %>
+	  <th>Flowrate (<%= @simulation.flow_unit%>)</th>
+	  <th>Pumped<br>Volume (<%= @simulation.vol_unit%>)</th>
 	  <th>Up<br>stream<br>Batch</th>
 	  <th>Down<br>stream<br>Batch</th>
-	  <th>Holding</th>
-	  <th>Suction</th>
-	  <th>Head</th>
-	  <th>Case</th>
-	  <th>Discharge</th>
-	  <th>HHP<br>(KW)</th>
+	  <th>Holding (<%= punit%>)</th>
+	  <th>Suction (<%= punit%>)</th>
+	  <th>Head (<%= punit%>)</th>
+	  <th>Case (<%= punit%>)</th>
+	  <th>Discharge (<%= punit%>)</th>
+	  <th>Power<br>(<%= @simulation.power_unit%>)</th>
     </tr>
   </thead>
 
@@ -28,16 +29,24 @@
       <tr>
 		<% step_string = "#{i.step} @ #{i.step_time.round(2)} hrs" %>
 		<td><%= link_to step_string, step_detail_result_path(:id => @sim_id, :step => i.step) %></td>
-		<td><%= '%8.1f'% i.flow %></td>
-		<td><%= '%10.1f'% i.pumped_volume %></td>
+		<% flow = @simulation.convert_from_si(i.flow, @simulation.flow_unit)%>
+		<% pumped_vol = @simulation.convert_from_si(i.pumped_volume, @simulation.vol_unit)%>
+		<% hold = @simulation.convert_from_si(i.hold, @simulation.pres_unit)%>
+		<% suct = @simulation.convert_from_si(i.suct, @simulation.pres_unit)%>
+		<% head = @simulation.convert_from_si(i.head, @simulation.pres_unit)%>
+		<% casep = @simulation.convert_from_si(i.casep, @simulation.pres_unit)%>
+		<% disc = @simulation.convert_from_si(i.disc, @simulation.pres_unit)%>
+		<% power = @simulation.convert_from_si(i.hhp, @simulation.power_unit)%>
+		<td><%= '%8.1f'% flow %></td>
+		<td><%= number_with_precision(pumped_vol, :precision => 1, :delimiter => ',') %></td>
 		<td><%= i.upstream_batch %></td>
 		<td><%= i.downstream_batch %></td>
-		<td><%= '%.1f'% i.hold %>
-		<td><%= '%.1f'% i.suct %>
-        <td><%= '%.1f'% i.head %></td>
-        <td><%= '%.1f'% i.casep %></td>
-        <td><%= '%.1f'% i.disc %></td>
-		<td><%= '%.1f'% i.hhp %></td>
+		<td><%= '%.1f'%  hold %></td>
+		<td><%= '%.1f'%  suct %></td>
+        <td><%= '%.1f'%  head %></td>
+        <td><%= '%.1f'%  casep %></td>
+        <td><%= '%.1f'%  disc%></td>
+		<td><%= '%.1f'%  power%></td>
       </tr>
 	<% end %>
   </tbody>

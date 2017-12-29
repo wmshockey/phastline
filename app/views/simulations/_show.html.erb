@@ -6,12 +6,12 @@
 			<th>User</th>
 		<% end %>
 	   <th>Name</th>
-	   <th>Description</th>
 	   <th>Pipeline</th>
 	   <th>Nomination</th>
-	   <th>Max Flowrate (m3/hr)</th>
-	   <th>Max Batchsize (m3)</th>
+	   <th>Max Flowrate</th>
+	   <th>Max Batchsize</th>
 	   <th>Max Steptime (hrs)</th>
+	   <th>Last Run On</th>
 	 </tr>
   </thead>
 	<% if current_user.admin? then %>
@@ -21,13 +21,22 @@
 		<% pipeline = current_user.pipelines.find {|p| p.id == @simulation.pipeline_id} %>
 		<% nomination = current_user.nominations.find {|n| n.id == @simulation.nomination_id} %>
     <% end %>
+	
+	<% sim_id = @simulation.id%>
+	<% result_records = Result.where(["step = ? and simulation_id = (?)", 1, sim_id]) %>
+	<% if result_records.any? then %>
+		<% result_record_first = result_records.first %>
+		<% last_runtime = result_record_first.created_at.strftime("%Y-%m-%d %H:%M") %>
+	<% else %>
+		<% last_runtime = "" %>
+	<% end %>
+	
   <tbody>
       <tr>
 		<% if current_user.admin? then %>
 			<td><%= (User.find {|u| u.id == @simulation.user_id}).email %></td>
 		<% end %>
         <td><%= link_to @simulation.name, @simulation %></td>
-        <td><%= @simulation.description %></td>
 		<% if pipeline then %>
         	<td><%= link_to pipeline.name, pipeline %></td>
 		<% else %>
@@ -38,9 +47,10 @@
 		<% else %>
 			<td><%= "Nomination missing " %></td>
 		<% end %>
-    <td><%= @simulation.max_flowrate %></td>
-    <td><%= @simulation.max_batchsize %></td>
+        <td><%= @simulation.max_flowrate %> <%= @simulation.flow_unit%></td>
+        <td><%= @simulation.max_batchsize %> <%= @simulation.vol_unit%></td>
 		<td><%= @simulation.max_steptime %></td>
+		<td><%= last_runtime %>
     </tr>
   </tbody>
 </table>

@@ -1,7 +1,7 @@
 <%= render 'top' %>
 
 <div id="results">
-<h3>Flow Rates (m3/hr)</h3>
+<h3>Flow Rates (<%= @simulation.flow_unit%>)</h3>
 <table class="table table-bordered table-hover table-condensed">
   <tbody>
 	  <% stn_ix = 0 %>
@@ -26,7 +26,8 @@
 		  <td><%= @results[steprec].timestamp.strftime("%d-%m-%Y %H:%M") %></td>
 		  <td><%= @results[steprec].step_time.round(2) %> hrs</td>
 	      <% while stn_ix < num_stations %>
-		    <td><%= '%8.1f'% @results[steprec].flow %></td>
+		    <% flow = @simulation.convert_from_si(@results[steprec].flow, @simulation.flow_unit)%>
+		    <td><%= number_with_precision(flow, :precision => 1, :delimiter => ',') %></td>
 		    <% stn_ix = stn_ix + 1 %>
 			<% steprec = steprec + 1 %>
 	      <% end %>

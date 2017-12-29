@@ -21,7 +21,7 @@
 		  <tr>
 		    <th>Batch</th>
 		    <% while stn_ix < num_stations %>
-		      <th> <%= stations[stn_ix] %> </th>
+		      <th> <%= stations[stn_ix] %> (<%= @simulation.vol_unit%>) </th>
 			  <% stn_ix = stn_ix + 1 %>
 			<% end %>
 		  </tr>
@@ -34,9 +34,9 @@
 		  <td><%= batch_id %></td>
 	      <% while stn_ix < num_stations %>
 			    <% if btsqar[stn_ix][batch].activity_type == "DELIVERY" or btsqar[stn_ix][batch].activity_type == "LANDING" then %>
-				    <% volume = btsqar[stn_ix - 1][batch].volume %>
+				    <% volume = @simulation.convert_from_si(btsqar[stn_ix - 1][batch].volume, @simulation.vol_unit) %>
 			    <% else %>
-				    <% volume = btsqar[stn_ix][batch].volume %>
+				    <% volume = @simulation.convert_from_si(btsqar[stn_ix][batch].volume, @simulation.vol_unit) %>
 			    <% end %>
 			    <% if (volume > 0) then %>
 				    <td><%= number_with_precision(volume, :precision => 1, :delimiter => ',') %></td>

@@ -8,13 +8,13 @@
 	  <% end %>
 	  <th>ID</th>
       <th>Name</th>
-	  <th>Temperature point 1 (deg C)</th>
-      <th>Viscosity point 1 (cst)</th>
-	  <th>Temperature point 2 (deg C)</th>
-	  <th>Viscosity point 2 (cst)</th>
-	  <th>Density (kg/m3)</th>
+	  <th>Temperature point 1</th>
+      <th>Viscosity point 1</th>
+	  <th>Temperature point 2</th>
+	  <th>Viscosity point 2</th>
+	  <th>Density</th>
 	  <th>Density Temp Conv Factor</th>
-	  <th>Vapor Pressure (kpa)</th>
+	  <th>Vapor Pressure</th>
     </tr>
   </thead>
 
@@ -29,13 +29,13 @@
 				<td><%= link_to commodity.commodity_id, commodity_path(commodity) %></td>
 			<% end %>
 	        <td><%= commodity.commodity_name %></td>
-	        <td><%= commodity.temp1 %></td>
-	        <td><%= commodity.visc1 %></td>
-	        <td><%= commodity.temp2 %></td>
-	        <td><%= commodity.visc2 %></td>
-	        <td><%= commodity.density %></td>
+	        <td><%= commodity.temp1 %> <%= commodity.temp_unit%></td>
+	        <td><%= commodity.visc1 %> <%= commodity.visc_unit%></td>
+	        <td><%= commodity.temp2 %> <%= commodity.temp_unit%></td>
+	        <td><%= commodity.visc2 %> <%= commodity.visc_unit%></td>
+	        <td><%= commodity.density %> <%= commodity.dens_unit%></td>
 	        <td><%= commodity.density_cf %></td>
-	        <td><%= commodity.vapor %></td>
+	        <td><%= commodity.vapor %> <%= commodity.pres_unit%></td>
 	      </tr>
 		<% end %>
 	<% end %>

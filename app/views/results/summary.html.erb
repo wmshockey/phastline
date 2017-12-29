@@ -8,17 +8,18 @@
 <table class="table table-bordered table-hover table-condensed">
 	<thead>
 		<tr>
+			<% punit = @simulation.pres_unit%>
 			<th>Station</th>
-			<th>Kmp</th>
-			<th>Flowrate<br>(m3/hr)</th>
-			<th>Pumped<br>Volume (m3)</th>
-			<th>Holding<br>Pressure (kpa)</th>
-			<th>Suction<br>Pressure (kpa)</th>
-			<th>Head<br>Pressure (kpa)</th>
-			<th>Case<br>Pressure (kpa)</th>
-			<th>Discharge<br>Pressure (kpa)</th>
+			<th><%= @simulation.dist_unit%>post</th>
+			<th>Flowrate<br>(<%= @simulation.flow_unit%>)</th>
+			<th>Pumped<br>Volume (<%= @simulation.vol_unit%>)</th>
+			<th>Holding<br>Pressure (<%=punit%>)</th>
+			<th>Suction<br>Pressure (<%=punit%>)</th>
+			<th>Head<br>Pressure (<%=punit%>)</th>
+			<th>Case<br>Pressure (<%=punit%>)</th>
+			<th>Discharge<br>Pressure (<%=punit%>)</th>
 			<th>Bottleneck<br>Percent (%)</th>
-			<th>Energy<br>(KwH)</th>
+			<th>Energy<br>(<%= @simulation.energy_unit%>)</th>
 		</tr>
 	</thead>
 	
@@ -28,16 +29,25 @@
 		    <% station = Station.find {|i| i.id == station_id} %>
 			<tr>
 				<td><%= link_to s.stat, station_detail_result_path(:id => @sim_id, :station_id => s.station_id) %></td>
-				<td><%= '%8.2f'% station.kmp %></td>
-				<td><%= '%8.1f'% s.flow %></td>
-				<td><%= number_with_precision(s.pumped_volume, :precision => 0, :delimiter => ',') %></td>
-				<td><%= '%.1f'% s.hold %></td>
-				<td><%= '%.1f'% s.suct %></td>
-				<td><%= '%.1f'% s.head %></td>
-				<td><%= '%.1f'% s.casep %></td>
-				<td><%= '%.1f'% s.disc %></td>
+				<% dist = @simulation.convert_from_si(station.kmp, @simulation.dist_unit)%>
+				<% flow = @simulation.convert_from_si(s.flow, @simulation.flow_unit)%>
+				<% pumped_vol = @simulation.convert_from_si(s.pumped_volume, @simulation.vol_unit)%>
+				<% hold = @simulation.convert_from_si(s.hold, punit)%>
+				<% suct = @simulation.convert_from_si(s.suct, punit)%>
+				<% head = @simulation.convert_from_si(s.head, punit)%>
+				<% casep = @simulation.convert_from_si(s.casep, punit)%>
+				<% disc = @simulation.convert_from_si(s.disc, punit)%>
+				<% energy = @simulation.convert_from_si(s.kwh, @simulation.energy_unit)%>
+				<td><%= '%8.2f'% dist %></td>
+				<td><%= number_with_precision(flow, :precision => 1, :delimiter => ',') %></td>
+				<td><%= number_with_precision(pumped_vol, :precision => 0, :delimiter => ',') %></td>
+				<td><%= '%.1f'% hold %></td>
+				<td><%= '%.1f'% suct %></td>
+				<td><%= '%.1f'% head %></td>
+				<td><%= '%.1f'% casep %></td>
+				<td><%= '%.1f'% disc %></td>
 				<td><%= '%-8.1f'% s.bottleneck_pct.round(2) %></td>
-				<td><%= '%9.0f'% s.kwh %></td>
+				<td><%= number_with_precision(energy, :precision => 0, :delimiter => ',') %></td>
 			</tr>
 		<% end %>
 	</tbody>

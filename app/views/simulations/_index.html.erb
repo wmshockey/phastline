@@ -8,17 +8,25 @@
 		<th>User</th>
 	  <% end %>
       <th>Name</th>
-	  <th>Description</th>
+	  <th>Last Run On</th>
       <th>Pipeline</th>
 	  <th>Nomination</th>
-	  <th>Max Flowrate (m3/hr)</th>
-	  <th>Max Batchsize (m3)</th>
-	  <th>Max Steptime (hrs)</th>
+	  <th>Max Flowrate</th>
+	  <th>Max Batchsize</th>
+	  <th>Max<br>Steptime<br>(hrs)</th>
     </tr>
   </thead>
 
   <tbody>
 	<% @simulations.order(name: :asc).each do |simulation| %>
+		<% sim_id = simulation.id%>
+		<% result_records = Result.where(["step = ? and simulation_id = (?)", 1, sim_id]) %>
+		<% if result_records.any? then%>
+			<% result_record_first = result_records.first %>
+			<% last_runtime = result_record_first.created_at.strftime("%Y-%m-%d %H:%M") %>
+		<% else %>	
+			<% last_runtime = ""%>
+		<% end%>
       <tr>
 		<% if current_user.admin? then %>
 			<% pipeline = Pipeline.find {|p| p.id == simulation.pipeline_id} %>
@@ -29,7 +37,7 @@
 			<% nomination = current_user.nominations.find {|n| n.id == simulation.nomination_id} %>
 		<% end %>
         <td><%= link_to simulation.name, simulation_path(simulation) %></td>
-		<td><%= simulation.description %></td>
+		<td><%= last_runtime %></td>
 		<% if pipeline then %>
         	<td><%= link_to pipeline.name, pipeline %></td>
 		<% else %>
@@ -40,8 +48,8 @@
 		<% else %>
 			<td><%= "Nomination missing " %></td>
 		<% end %>
-        <td><%= simulation.max_flowrate %></td>
-        <td><%= simulation.max_batchsize %></td>
+        <td><%= simulation.max_flowrate %> <%= simulation.flow_unit%></td>
+        <td><%= simulation.max_batchsize %> <%= simulation.vol_unit%></td>
 		<td><%= simulation.max_steptime %></td>
       </tr>
 	<% end %>

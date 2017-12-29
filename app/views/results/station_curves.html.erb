@@ -18,13 +18,15 @@
 					<% end %>
 				<% end %>
 			</tr></td>
-			<td>Flowrate (m3/hr)</td>
-			<td>Head (meters)</td>
+			<td>Flowrate (<%= @simulation.pmpflow_unit%>)</td>
+			<td>Head (<%= @simulation.pmphead_unit%>)</td>
 			<% station_curve = r.station_curve_data %>
 			<% station_curve.each do |c| %>
 				  <tr>
-			      <td><%= '%6.1f' % c.flow %></td>
-				  <td><%= '%6.1f' % c.head %></td>
+					  <% flowpt = @simulation.convert_from_si(c.flow, @simulation.pmpflow_unit) %>
+					  <% headpt = @simulation.convert_from_si(c.head, @simulation.pmphead_unit) %>
+			          <td><%= number_with_precision(flowpt, :precision => 1, :delimiter => ',') %></td>
+				      <td><%= '%6.1f' % headpt %></td>
 				  </tr>
 			<% end %>
 		<% end %>
