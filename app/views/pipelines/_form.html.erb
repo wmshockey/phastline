@@ -1,4 +1,6 @@
 <h2>Pipeline  <%= image_tag "pipeline-icon.png"%></h2>
+<div id="form_name", class="hidden"><%= "pipeline" %></div>
+	
 <%= form_for(@pipeline) do |f| %>
   <p>
   <% if @pipeline.errors.any? %>
@@ -16,15 +18,16 @@
 
 	<table class="table table-bordered table-hover table-condensed">
 	  <tbody>
-	        <tr><td><%= f.label "Name" %></td><td><%= f.text_field :name %></td></tr>
+	        <tr><td><%= f.label "Name" %></td><td><div class="col-sm-3", style="dislay:inline-block"><%= f.text_field :name %></div>
+				Number of Stations: <span id="stations"><%= @pipeline.stations.count %></span> 
+				Segments: <span id="segments"><%= @pipeline.segments.count%></span> 
+				Elevations: <span id="elevations"><%= @pipeline.elevations.count%></span>
+				Temps: <span id="temperatures"><%= @pipeline.temperatures.count%></span>
+				DRAs: <span id="dras"><%= @pipeline.dras.count%></span></td>
+			</tr>
 	        <tr><td><%= f.label "Description" %></td>
 				<td display="inline-block">
 					<%= f.text_field :description, :size=>"120" %><br>
-					Stations: <span id="stations"><%= @pipeline.number_stations %></span> 
-					Segments: <span id="segments"><%= @pipeline.number_segments%></span> 
-					Elevations: <span id="elevations"><%= @pipeline.number_elevations%></span>
-					Temps: <span id="temperatures"><%= @pipeline.number_temperatures%></span>
-					DRAs: <span id="dras"><%= @pipeline.number_dras%></span>
 				</td></tr>
 			<tr><td><%= f.label "Units Used For Input:" %></td>
 				<td>

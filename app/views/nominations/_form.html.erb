@@ -1,4 +1,5 @@
 <h2>Nomination  <%= image_tag("nomination-icon.png") %></h2>
+<div id="form_name", class="hidden"><%= "nomination" %></div>
 
 <%= form_for(@nomination) do |f| %>
 
@@ -25,13 +26,14 @@
 
 	  <tbody>
 	      <tr>
-	          <td><strong>Name: </strong></td><td><%= f.text_field :name %></td>
+	          <td><strong>Name: </strong></td><td><div style="display:inline-block", class="col-sm-3"><%= f.text_field :name %> </div>
+			  Number of shipments: <span id="shipments"><%= @nomination.shipments.count %></span></td>
 		  </tr>
 		  <tr>
 			  <td><strong>Description: </strong></td><td><%= f.text_field :description, :size=>"120" %></td>
 		  </tr>
 		  <tr>
-			 <td><strong>Units Used: </strong></td><td><%= f.select :vol_unit, ["m3", "bbls"] %></td>
+			 <td><strong>Units Used: </strong></td><td><span id="unit_vol"><%= f.select :vol_unit, ["m3", "bbls"] %></span></td>
 		  </tr>
 		  <tr>
 			<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id, current_user.pipelines.all.collect {|p| [p.name, p.id]} %></td>

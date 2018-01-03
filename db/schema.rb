@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171228152730) do
+ActiveRecord::Schema.define(version: 20180102204453) do
 
   create_table "commodities", force: :cascade do |t|
     t.string   "commodity_id",   limit: 255
@@ -76,23 +76,18 @@ ActiveRecord::Schema.define(version: 20171228152730) do
   end
 
   create_table "pipelines", force: :cascade do |t|
-    t.string   "name",                limit: 255
-    t.text     "description",         limit: 65535
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "user_id",             limit: 4
-    t.integer  "number_stations",     limit: 4
-    t.string   "dist_unit",           limit: 12
-    t.string   "diam_unit",           limit: 12
-    t.string   "thick_unit",          limit: 12
-    t.string   "ruff_unit",           limit: 12
-    t.string   "pres_unit",           limit: 12
-    t.string   "elev_unit",           limit: 12
-    t.string   "temp_unit",           limit: 12
-    t.integer  "number_segments",     limit: 4
-    t.integer  "number_elevations",   limit: 4
-    t.integer  "number_temperatures", limit: 4
-    t.integer  "number_dras",         limit: 4
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "user_id",     limit: 4
+    t.string   "dist_unit",   limit: 12
+    t.string   "diam_unit",   limit: 12
+    t.string   "thick_unit",  limit: 12
+    t.string   "ruff_unit",   limit: 12
+    t.string   "pres_unit",   limit: 12
+    t.string   "elev_unit",   limit: 12
+    t.string   "temp_unit",   limit: 12
   end
 
   create_table "progressbars", force: :cascade do |t|

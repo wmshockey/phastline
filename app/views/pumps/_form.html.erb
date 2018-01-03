@@ -1,4 +1,6 @@
 <h2>Pump  <%= image_tag "pump-icon.png"%></h2>
+<div id="form_name", class="hidden"><%= "pump" %></div>
+
 <%= form_for(@pump) do |f| %>
   <p>
   <% if @pump.errors.any? %>
@@ -15,11 +17,14 @@
   </p>
 	<table class="table table-bordered table-hover table-condensed">
 	  <tbody>
-			<tr><td><%= f.label "Pump ID" %></td><td><%= f.text_field :pump_id, :autofocus => true %></td></tr>
+			<tr><td><%= f.label "Pump ID" %></td><td><div id="pump_id", style="display:inline-block", class="col-sm-3"><%= f.text_field :pump_id, :autofocus => true %></div> 
+				    Number of Headpoints: <span id="headpoints"><%= @pump.headpoints.count %></span></td></tr>
 	        <tr><td><%= f.label "Description" %></td><td><%= f.text_field :description, :size=>"120" %></tr>
-			<tr><td><strong>Units Used:</strong></td><td>Flow: <%= f.select :flow_units, ["gal/min", "m3/hr", "m3/day", "bbls/hr", "bbls/day"] %> 
-				Head: <%= f.select :head_units, ["m", "ft"] %> Pressure: <%= f.select :pressure_units, ["kpa", "psi"] %> </td></tr>
-			<tr><td><%= f.label "Minimum suction" %></td><td><%= f.text_field :minimum_suction %></td></tr>
+			<tr><td><strong>Units Used:</strong></td>
+				<td>Flow: <span class="unit_field_flow"><%= f.select :flow_units, ["gal/min", "m3/hr", "m3/day", "bbls/hr", "bbls/day"] %> </span>
+				    Head: <span class="unit_field_head"><%= f.select :head_units, ["m", "ft"] %> </span>
+					Pressure: <span class="unit_field_vaporpres"><%= f.select :pressure_units, ["kpa", "psi"] %> </span></td></tr>
+			<tr><td><%= f.label "Minimum suction" %></td><td><%= f.text_field :minimum_suction %> </span></td></tr>
 			<tr><td><%= f.label "Stages" %></td><td><%= f.number_field :stages %></td></tr>
 			<tr><td><%= f.label "Impeller diameter" %></td><td><%= f.number_field :impeller_diameter,  :step => "any"  %></td></tr>
 			<tr><td><%= f.label "Efficiency Correction Factor" %></td><td><%= f.number_field :efficiency_correction_factor, :step => "any" %></td></tr>

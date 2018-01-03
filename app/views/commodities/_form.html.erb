@@ -1,4 +1,6 @@
 <h2>Commodity <%= image_tag "commodity-icon.png"%></h2>
+<div id="form_name", class="hidden"><%= "commodity" %></div>
+
 <%= form_for(@commodity) do |f| %>
   <p>
   <% if @commodity.errors.any? %>
@@ -19,15 +21,17 @@
 			<tr><td><%= f.label "Commodity ID" %></td><td><%= f.text_field :commodity_id %></td></tr>
 	        <tr><td><%= f.label "Commodity Name" %></td><td><%= f.text_field :commodity_name %></td></tr>
 			<tr><td><strong>Units Used:</strong></td>
-				<td>Viscosity: <%= f.select :visc_unit, ["cst", "Stokes"]%> Density: <%= f.select :dens_unit, ["kg/m3", "degAPI", "SpecGrav"]%> 
-				Temperature: deg <%= f.select :temp_unit, ["C", "F"] %> Vapor Pressure: <%= f.select :pres_unit, ["kpa", "psi"]%></td></tr>
-		    <tr><td><%= f.label "Temperature point 1 (Deg C)" %></td><td><%= f.number_field :temp1,  :step => "any"  %></td></tr>
-			<tr><td><%= f.label "Viscosity point 1 (cst)" %></td><td><%= f.number_field :visc1,  :step => "any"  %></td></tr>
-			<tr><td><%= f.label "Temperature point 2 (Deg C)" %></td><td><%= f.number_field :temp2,  :step => "any"  %></td></tr>
-			<tr><td><%= f.label "Viscosity point 2 (cst)" %></td><td><%= f.number_field :visc2,  :step => "any"  %></td></tr>
-			<tr><td><%= f.label "Density (kg/m3)" %></td><td><%= f.number_field :density,  :step => "any"  %></td></tr>
+				<td>Viscosity: <div id="visc_unit" style="display:inline-block"><%= f.select :visc_unit, ["cst", "Stokes"]%></div> 
+					Density: <div id="dens_unit" style="display:inline-block"><%= f.select :dens_unit, ["kg/m3", "degAPI", "SpecGrav"]%></div> 
+				    Temperature: deg <div id="temp_unit" style="display:inline-block"><%= f.select :temp_unit, ["C", "F"] %></div> 
+					Vapor Pressure: <div id="pres_unit" style="display:inline-block"><%= f.select :pres_unit, ["kpa", "psi"]%></div></td></tr>
+		    <tr><td><%= f.label "Temperature point 1 (Deg C)" %></td><td><%= f.number_field :temp1,  :step => "any", :id => "temp1"  %></td></tr>
+			<tr><td><%= f.label "Viscosity point 1 (cst)" %></td><td><%= f.number_field :visc1,  :step => "any", :id => "visc1"  %></td></tr>
+			<tr><td><%= f.label "Temperature point 2 (Deg C)" %></td><td><%= f.number_field :temp2,  :step => "any", :id => "temp2"  %></td></tr>
+			<tr><td><%= f.label "Viscosity point 2 (cst)" %></td><td><%= f.number_field :visc2,  :step => "any", :id => "visc2"  %></td></tr>
+			<tr><td><%= f.label "Density (kg/m3)" %></td><td><%= f.number_field :density,  :step => "any", :id => "dens"  %></td></tr>
 			<tr><td><%= f.label "Density conversion factor" %></td><td><%= f.number_field :density_cf,   :step => "any" %></td></tr>
-			<tr><td><%= f.label "Vapour pressure (kpa)" %></td><td><%= f.number_field :vapor,  :step => "any"  %></td></tr>
+			<tr><td><%= f.label "Vapour pressure (kpa)" %></td><td><%= f.number_field :vapor,  :step => "any", :id => "vapor"  %></td></tr>
 	  </tbody>
 	</table>
 <%= f.submit :Submit, class: 'btn btn-success' %>

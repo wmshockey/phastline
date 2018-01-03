@@ -12,40 +12,6 @@ class Pipeline < ActiveRecord::Base
   validates :name, :presence => true
   validates_uniqueness_of :name, scope: :user_id
   default_scope { order(user_id: :asc, name: :asc) }
-  before_save :count_number_child_records, on: [:create, :update]
-
-  def count_number_child_records
-    # Count number of stations
-    station_count = self.stations.count
-    if station_count.nil? then
-      station_count = 0
-    end
-    self.number_stations = station_count unless !self.persisted?
-    # Count number of segments
-    segment_count = self.segments.count
-    if segment_count.nil? then
-      segment_count = 0
-    end
-    self.number_segments = segment_count unless !self.persisted?
-    # Count number of elevations
-    elevation_count = self.elevations.count
-    if elevation_count.nil? then
-      elevation_count = 0
-    end
-    self.number_elevations = elevation_count unless !self.persisted?
-    # Count number of temperatures
-    temperature_count = self.temperatures.count
-    if temperature_count.nil? then
-      temperature_count = 0
-    end
-    self.number_temperatures = temperature_count unless !self.persisted?
-    # Count number of DRA records
-    dra_count = self.dras.count
-    if dra_count.nil? then
-      dra_count = 0
-    end
-    self.number_dras = dra_count unless !self.persisted?
-  end
 
   def copy(pipelines, pipeline)
     pipeline_copy = pipeline.dup

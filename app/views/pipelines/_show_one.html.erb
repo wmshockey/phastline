@@ -17,11 +17,11 @@
 	  <% end %>
       <td><%= @pipeline.name %></td>
       <td display="inline-block"><%= @pipeline.description %><br>
-            <%= link_to "Stations: #{@pipeline.number_stations}", pipeline_stations_path(@pipeline)%>
-            <%= link_to "Segments: #{@pipeline.number_segments}", pipeline_segments_path(@pipeline)%>
-            <%= link_to "Elevations: #{@pipeline.number_elevations}", pipeline_elevations_path(@pipeline)%>
-			<%= link_to "Temperatures: #{@pipeline.number_temperatures}", pipeline_temperatures_path(@pipeline)%>
-			<%= link_to "DRA Regions: #{@pipeline.number_dras}", pipeline_dras_path(@pipeline)%>
+            <%= link_to "Stations: #{@pipeline.stations.count}", pipeline_stations_path(@pipeline)%>
+            <%= link_to "Segments: #{@pipeline.segments.count}", pipeline_segments_path(@pipeline)%>
+            <%= link_to "Elevations: #{@pipeline.elevations.count}", pipeline_elevations_path(@pipeline)%>
+			<%= link_to "Temperatures: #{@pipeline.temperatures.count}", pipeline_temperatures_path(@pipeline)%>
+			<%= link_to "DRA Regions: #{@pipeline.dras.count}", pipeline_dras_path(@pipeline)%>
 	  </td>
     </tr>
   </tbody>

@@ -3,41 +3,41 @@
 
 $(document).ready(() => {
 	
-  $('.copyright').on('mouseenter', event => {
-    $(event.currentTarget).css({color: 'red'})
-  });
+	  $('.copyright').on('mouseenter', event => {
+	    $(event.currentTarget).css({color: 'red'})
+	  });
 	
-  $('.copyright').on('mouseleave', event => {
-  	$(event.currentTarget).css({color: 'black'})
-  });
+	  $('.copyright').on('mouseleave', event => {
+	  	$(event.currentTarget).css({color: 'black'})
+	  });
 
-  $('nav li').on('mouseenter', event => {
-	  $(event.currentTarget).css({fontWeight: 'bolder'})	 
-  });
+	  $('nav li').on('mouseenter', event => {
+		  $(event.currentTarget).css({fontWeight: 'bolder'})	 
+	  });
 	
-  $('nav li').on('mouseleave', event => {
-	  $(event.currentTarget).css({fontWeight: ''})
-  })
-  
-  $('#runSim').click(function() {
-	  $("#simulation").removeClass("hidden")
-  })
-  
-  $('#showResults').click(function() {
-	  $('#simulation').addClass("hidden")
-  })
-  
-  $('[data-toggle="tooltip"]').tooltip();
-  
-  $('#max_flowrate, #max_batchsize, #max_steptime, #simulation_nomination_id, #simulation_pipeline_id').on("change", function(){
-      check_steps();
-  })
-  
-  if ($("#simulation_nomination_id").length > 0){
-	  $(function() {
-		  check_steps();
+	  $('nav li').on('mouseleave', event => {
+		  $(event.currentTarget).css({fontWeight: ''})
 	  })
-  }
+  
+	  $('#runSim').click(function() {
+		  $("#simulation").removeClass("hidden")
+	  })
+  
+	  $('#showResults').click(function() {
+		  $('#simulation').addClass("hidden")
+	  })
+  
+	  $('[data-toggle="tooltip"]').tooltip();
+  
+	  $('#max_flowrate, #max_batchsize, #max_steptime, #simulation_nomination_id, #simulation_pipeline_id').on("change", function(){
+	      check_steps();
+	  })
+  
+	  if ($("#simulation_nomination_id").length > 0){
+		  $(function() {
+			  check_steps();
+		  })
+	  }
   
   $('#estimate_steps').click(function() {
 	  check_steps();
