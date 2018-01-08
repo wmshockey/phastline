@@ -27,9 +27,13 @@
 			</tr>
 			<tr>
 				<td><strong>Pipeline: </strong></td><td><%= f.select :pipeline_id , current_user.pipelines.all.collect {|p| [p.name, p.id]} %>
-				<% pipeline_id = @simulation.pipeline_id %>
-				<% @pipeline = Pipeline.find(pipeline_id) %>
-				<% number_stations = @pipeline.stations.count %>
+				<% if @simulation.pipeline_id != nil then %>
+					<% pipeline_id = @simulation.pipeline_id %>
+					<% @pipeline = Pipeline.find(pipeline_id) %>
+					<% number_stations = @pipeline.stations.count %>
+				<% else %>
+					<% number_stations = 0 %>
+				<% end %>
 				<span id="number_stations" class="hidden"><%= number_stations %></span></td>
 			</tr>
 			<tr>
@@ -66,8 +70,9 @@
 					<div class="col-sm-3">Pump Curve Flow: </div><div class="col-sm-9"><%= f.select :pmpflow_unit, ["m3/hr", "gal/min", "m3/day", "bbls/day", "bbls/hr"]%></div>
 				</td>
 			<tr>
-				<td><button type="button" id="estimate_steps" class="btn btn-info" data-toggle="tooltip" title="Estimates the number of time steps in the simulation which is an indication of how long it will take the simulation to complete.  Steps over 1000 will generally take over a minute to complete.">Estimate Steps</button></td>
-				<td class="alert alert-warning">Estimated number of steps:  <span id="number_steps"></span>
+				<td><button type="button" id="estimate_steps" class="btn btn-info hidden" data-toggle="tooltip"
+					 title="Estimates the number of time steps in the simulation which is an indication of how long it will take the simulation to complete.  Steps over 1000 will generally take over a minute to complete.">Estimate Steps</button></td>
+				<td class="alert alert-warning hidden">Estimated number of steps:  <span id="number_steps"></span>
 				<div id="warning_message"></div>
 				</td>
 			</tr>
