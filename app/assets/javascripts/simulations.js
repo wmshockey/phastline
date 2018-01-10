@@ -30,17 +30,31 @@ $(document).ready(() => {
 	  $('[data-toggle="tooltip"]').tooltip();
   
 	  $('#max_flowrate, #max_batchsize, #max_steptime, #simulation_nomination_id, #simulation_pipeline_id').on("change", function(){
-	      check_steps();
+	      get_step_info(calc_steps);
 	  })
-  
-	  if ($("#simulation_nomination_id").length > 0){
-		  $(function() {
-			  check_steps();
-		  })
-	  }
+
+      if ($("#form_name").text() == "simulation"){
+		  get_step_info();
+    	  $('#vol_unit').on('change', event => {
+  		  var maxbatchsize = $("#max_batchsize").val();
+    	  if ( !(maxbatchsize == "") ) {
+    		    alert('Warning: There is a value entered for the max batchsize already on this form.  Changing volume units will require re-entry of this value.');	
+    		  }	  
+    	  });
+    	  $('#flow_unit').on('change', event => {
+  		  var maxflowrate = $("#max_flowrate").val();
+    	  if ( !(maxflowrate == "") ) {
+    		    alert('Warning: There is a value entered for the max flowrate already on this form.  Changing flow rate units will require re-entry of this value.');	
+    		  }	  
+    	  });
+      };
   
   $('#estimate_steps').click(function() {
-	  check_steps();
+	  calc_steps();
+  });	  
+	  
+  function calc_steps() {
+	  get_step_info();
 	  var max_flowrate = $("#max_flowrate").val();
 	  var max_batchsize = $("#max_batchsize").val();
 	  var max_steptime = $("#max_steptime").val();
@@ -58,15 +72,15 @@ $(document).ready(() => {
 	  var nsteps2 = stations * number_batches;
 	  var nsteps = Math.max(nsteps1, nsteps2);
 	  $("#number_steps").text(nsteps);
-	  var message = "Total nominated volume is "+volume+".\  Number of pipeline stations is "+stations+".\  Number of batches is "+number_batches+".";
+	  var message = "Total nominated volume is "+volume+".  Number of pipeline stations is "+stations+".  Number of batches is "+number_batches+".";
 	  if (nsteps > 3000) {
-		  message = message+"Warning: The estimated number of steps is over 3000.  Running this simulation will take several minutes to complete.   \
+		  message = message+" Warning: The estimated number of steps is over 3000.  Running this simulation will take several minutes to complete.   \
 		  You can reduce the number of steps by increasing the maximum step time, increasing maximum flowrate or decreasing the total volume of shipments in the nomination.";
 	  };
 	  $("#warning_message").text(message);	  
-  })
+  }
   
-  function check_steps() {
+  function get_step_info() {
 	  var nom = $("#simulation_nomination_id :selected").val();
 	  var pline = $("#simulation_pipeline_id :selected").val();
 	  
@@ -79,16 +93,16 @@ $(document).ready(() => {
 	    }
 	  });
 	  $.ajax({
-		  url: "/pipelines/"+pline,
+		  url: "/pipelines/"+pline+"/stations",
 		  dataType: 'json',
 		  success: function(data) {
-			  var nstations = data.number_stations;
+			  var nstations = data.length;
 			  $("#number_stations").text(nstations);		
 		  }
-	  }); 
+	  });
   
   }
  
-}); 
+});
 
   

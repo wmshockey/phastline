@@ -43,26 +43,26 @@
 			<tr>
 				<td><strong>Max Flowrate: </strong></td>
 				<td>
-					<%= f.number_field :max_flowrate, :step => "any", id: "max_flowrate" %>
+					<%= f.number_field :max_flowrate, :step => "any", id: "max_flowrate", :value => 1000 %>
 					<%= (@simulation.flow_unit)%>
 				</td>
 			</tr>
 			<tr>
 				<td><strong>Max Batch Size: </strong></td>
 				<td>
-					<%= f.number_field :max_batchsize, :step => "any", id: "max_batchsize" %>
+					<%= f.number_field :max_batchsize, :step => "any", id: "max_batchsize", :value => 10000 %>
 					<%= (@simulation.vol_unit) %>
 				<span id="number_batches" class="hidden"></span></td>
 			</tr>
 			<tr>
-				<td><strong>Max Step Time (hrs): </strong></td><td><%= f.number_field :max_steptime, :step => "any", id: "max_steptime" %></td>
+				<td><strong>Max Step Time (hrs): </strong></td><td><%= f.number_field :max_steptime, :step => "any", id: "max_steptime", :value => 12 %></td>
 			</tr>
 			<tr>
 				<td><strong>Output Units:</strong></td>
 				<td><strong>Results will be displayed in the following units:</strong><br>
 					<div class="col-sm-3">Distances along pipeline: </div><div class="col-sm-9"><%= f.select :dist_unit, ["km", "mile"]%> post</div>
-					<div class="col-sm-3">Flow rates: </div><div class="col-sm-9"><%= f.select :flow_unit, ["m3/hr", "m3/day", "bbls/hr", "bbls/day"]%></div>
-					<div class="col-sm-3">Volumes: </div><div class="col-sm-9"><%= f.select :vol_unit, ["m3", "bbls"]%></div>
+					<div class="col-sm-3">Flow rates: </div><div class="col-sm-9" , id="flow_unit"><%= f.select :flow_unit, ["m3/hr", "m3/day", "bbls/hr", "bbls/day"]%></div>
+					<div class="col-sm-3">Volumes: </div><div class="col-sm-9" id="vol_unit"><%= f.select :vol_unit, ["m3", "bbls"]%></div>
 					<div class="col-sm-3">Pressures: </div><div class="col-sm-9"><%= f.select :pres_unit, ["kpa", "psi"]%></div>
 					<div class="col-sm-3">Energy: </div><div class="col-sm-9"><%= f.select :energy_unit, ["kwh", "ft-lbs"]%></div>
 					<div class="col-sm-3">Power: </div><div class="col-sm-9"><%= f.select :power_unit, ["kw", "hhp"]%></div>
@@ -70,9 +70,9 @@
 					<div class="col-sm-3">Pump Curve Flow: </div><div class="col-sm-9"><%= f.select :pmpflow_unit, ["m3/hr", "gal/min", "m3/day", "bbls/day", "bbls/hr"]%></div>
 				</td>
 			<tr>
-				<td><button type="button" id="estimate_steps" class="btn btn-info hidden" data-toggle="tooltip"
+				<td><button type="button" id="estimate_steps" class="btn btn-info" data-toggle="tooltip"
 					 title="Estimates the number of time steps in the simulation which is an indication of how long it will take the simulation to complete.  Steps over 1000 will generally take over a minute to complete.">Estimate Steps</button></td>
-				<td class="alert alert-warning hidden">Estimated number of steps:  <span id="number_steps"></span>
+				<td class="alert alert-warning">Estimated number of steps:  <span id="number_steps"></span>
 				<div id="warning_message"></div>
 				</td>
 			</tr>
