@@ -1,4 +1,4 @@
-class Pump < ActiveRecord::Base
+class Pump < ApplicationRecord
   belongs_to :user
   has_many :headpoints, dependent: :destroy
   validates :pump_id, :presence => true

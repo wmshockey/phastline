@@ -1,4 +1,4 @@
-class Elevation < ActiveRecord::Base
+class Elevation < ApplicationRecord
   belongs_to :pipeline
   validates :kmp, :presence => true, numericality: {:greater_than_or_equal_to => 0}
   validates :elevation, :presence => true, numericality: {:greater_than_or_equal_to => -2000, :less_than => 10000}

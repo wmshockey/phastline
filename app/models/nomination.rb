@@ -16,7 +16,7 @@ class NominationValidator < ActiveModel::Validator
   end
 end
 
-class Nomination < ActiveRecord::Base
+class Nomination < ApplicationRecord
     belongs_to :pipeline
     has_many :shipments, dependent: :destroy
     validates :name, :presence => true

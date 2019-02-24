@@ -1,4 +1,4 @@
-class Commodity < ActiveRecord::Base
+class Commodity < ApplicationRecord
     belongs_to :user
     before_save :coefficient_calc
     validates :commodity_id, :presence => true

@@ -1,4 +1,4 @@
-class Progressbar < ActiveRecord::Base
+class Progressbar < ApplicationRecord
   belongs_to :user
   validates_presence_of :user_id, :message
   validates_numericality_of :percent,

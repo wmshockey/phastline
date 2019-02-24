@@ -1,4 +1,4 @@
-class Segment < ActiveRecord::Base
+class Segment < ApplicationRecord
   belongs_to :pipeline
   validates :kmp, :presence => true, numericality: {:greater_than_or_equal_to => 0}
   validates :diameter, :presence => true, numericality: {:greater_than => 0, :less_than => 10}

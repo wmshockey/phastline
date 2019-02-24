@@ -1,4 +1,4 @@
-class Shipment < ActiveRecord::Base
+class Shipment < ApplicationRecord
     belongs_to :nomination
     validates :start_location, :presence => true
     validates :end_location, :presence => true

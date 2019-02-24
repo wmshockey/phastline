@@ -1,4 +1,4 @@
-class Station < ActiveRecord::Base
+class Station < ApplicationRecord
   belongs_to :pipeline
   has_many :units, dependent: :destroy
   has_many :results, dependent: :destroy

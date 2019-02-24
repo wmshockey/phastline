@@ -1,4 +1,4 @@
-class Pipeline < ActiveRecord::Base
+class Pipeline < ApplicationRecord
   require 'phast_utilities'
   include Conversions
   belongs_to :user

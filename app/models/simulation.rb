@@ -1,4 +1,4 @@
-class Simulation < ActiveRecord::Base
+class Simulation < ApplicationRecord
     require 'phast_utilities'
     include Conversions
     include ActionView::Helpers::NumberHelper
@@ -45,8 +45,8 @@ class Simulation < ActiveRecord::Base
         @commodities = get_commodities(commodities)
         @pumpar = pumpar
         @units = units
-        @progress_bar.update_attributes!(message: "Clearing out previous results...", percent: "#{percent_complete}")        
-        Result.destroy_all(simulation_id: id)
+        @progress_bar.update_attributes!(message: "Clearing out previous results...", percent: "#{percent_complete}")   
+        Result.where(simulation_id: id).destroy_all
         @progress_bar.update_attributes!(message: "Gathering up all input data...", percent: "#{percent_complete}")        
         @shipments = @nomination.get_shipments
         @stations = @pipeline.stations
@@ -78,7 +78,7 @@ class Simulation < ActiveRecord::Base
         $step = 1; stepdone = false
         @stepar = Array.new
 #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
-        @progress_bar.update_attributes!(message: "Starting step processing...", percent: "#{percent_complete}")        
+        @progress_bar.update_attributes!(message: "Starting step processing...", percent: "#{percent_complete}")      
         while not stepdone
           @lfill = linefill(@statar, @btsqar, @volmar)
           @viscar = visc_profile(@lfill, @tempar)

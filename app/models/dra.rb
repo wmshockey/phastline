@@ -1,4 +1,4 @@
-class Dra < ActiveRecord::Base
+class Dra < ApplicationRecord
   belongs_to :pipeline
   validates :start_kmp, :presence => true, numericality: {:greater_than_or_equal_to => 0}
   validates :end_kmp, :presence => true, numericality: {:greater_than_or_equal_to => 0}
