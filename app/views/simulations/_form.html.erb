@@ -43,19 +43,19 @@
 			<tr>
 				<td><strong>Max Flowrate: </strong></td>
 				<td>
-					<%= f.number_field :max_flowrate, :step => "any", id: "max_flowrate", :value => 1000 %>
+					<%= f.number_field :max_flowrate, :step => "any", id: "max_flowrate" %>
 					<%= (@simulation.flow_unit)%>
 				</td>
 			</tr>
 			<tr>
 				<td><strong>Max Batch Size: </strong></td>
 				<td>
-					<%= f.number_field :max_batchsize, :step => "any", id: "max_batchsize", :value => 10000 %>
+					<%= f.number_field :max_batchsize, :step => "any", id: "max_batchsize" %>
 					<%= (@simulation.vol_unit) %>
 				<span id="number_batches" class="hidden"></span></td>
 			</tr>
 			<tr>
-				<td><strong>Max Step Time (hrs): </strong></td><td><%= f.number_field :max_steptime, :step => "any", id: "max_steptime", :value => 12 %></td>
+				<td><strong>Max Step Time (hrs): </strong></td><td><%= f.number_field :max_steptime, :step => "any", id: "max_steptime" %></td>
 			</tr>
 			<tr>
 				<td><strong>Output Units:</strong></td>
