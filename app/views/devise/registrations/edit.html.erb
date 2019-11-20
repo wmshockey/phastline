@@ -6,6 +6,7 @@
   <div class="field">
     <%= f.label :email %><br />
     <%= f.email_field :email, autofocus: true %>
+	<br>Note: Must be a valid email address or the account will be removed<br><br>
   </div>
   <br>
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
