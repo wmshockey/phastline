@@ -4,7 +4,9 @@ Rails.application.routes.draw do
 
   resources :users, :only => [:index]
 
-  devise_for :users
+  devise_for :users, :skip => [:registrations] , controllers: {
+      sessions: 'users/sessions'
+    }
 
 #  as :user do
 #    get 'users/edit' => 'devise/registrations#edit', :as => 'edit_user_registration'
