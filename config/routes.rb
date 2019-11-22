@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   get 'users/index'
   get "/pages/:page" => "pages#show"
+  get '/sitemap' => 'sitemaps#index'
 
   resources :users, :only => [:index]
 
