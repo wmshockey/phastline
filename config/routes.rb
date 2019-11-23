@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   get 'users/index'
   get "/pages/:page" => "pages#show"
-  get '/sitemap' => 'sitemaps#index'
+  get "/sitemap.xml" => "sitemaps#index", :format => "xml", :as => :sitemap
 
   resources :users, :only => [:index]
 
@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 #    get 'users/edit' => 'devise/registrations#edit', :as => 'edit_user_registration'
 #   patch 'users' => 'devise/registrations#update', :as => 'user_registration'
 #  end
-
+  
   resources :results do
     member do
       get 'summary'
