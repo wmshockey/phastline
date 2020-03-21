@@ -5,13 +5,10 @@
 <div class="container">
 	<h1>Welcome to phastware.com</h1>
 
-	<div class="col-sm-12">Phastware is a suite of pipeline hydraulics simulation and modelling software tools for pipeline operators, engineers or analysts.  Phastware is an acronym for "Pipeline Hydraulics Application Software Tools".  The Phastline application is one of the products that is available to the general public free of charge so if interested, please contact me at <%= mail_to "wmshockey@gmail.com" %> so that I can create an account for you.  Please also get in touch with me for any feedback, questions or if you require support on how to use the application. I am based in Calgary, Alberta, Canada. Thank-you.</div>
+	<div class="col-sm-12">Phastware is a suite of pipeline hydraulics simulation and modelling software tools for pipeline operators, engineers or analysts.  Phastware is an acronym for "Pipeline Hydraulics Application Software Tools".  The Phastline application is one of the products that is available to the general public free of charge so if interested, use the "Sign-Up" link provided below to register for an account.  Please also get in touch with me for any feedback, questions or if you require support on how to use the application. I am based in Calgary, Alberta, Canada. Thank-you.</div>
 
 	<h4 class="col-sm-12"><%= link_to 'Sign-In', user_session_path %> to run the Phastline application if you already have an account</h4>
-	<h5 class="col-sm-12">To request an account, please contact me at <%= mail_to "wmshockey@gmail.com" %></h5>
-	<% if false %>
-		<h4 class="col-sm-12"><%= link_to 'Sign-Up', new_user_registration_path %> to request a user account</h4>
-	<% end %>
+	<h4 class="col-sm-12"><%= link_to 'Sign-Up', new_user_registration_path %> to request a user account</h4>
 	<h4 class="col-sm-12">View the Phastline <%= link_to 'documentation', "/pages/help" %> to see what this program does and how to run it</h4>
 	<h4 class="col-sm-12">Run the <%= link_to 'Lineloss Calculator', "/pages/calculator"%> program</h4>
 	<br>
