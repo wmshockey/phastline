@@ -4,7 +4,6 @@
 <% @nomination = Nomination.find {|n| n.id == @simulation.nomination_id} %>
 
 <% if @simulation.errors.empty? then %>
-    <%= render 'sim_result_links' %>
 	<h2>Simulation Ran Successfully</h2>
 	Duration: <%= (($timestamp - $initial_timestamp)/3600.0).round(2) %> hours<br>
 	Number of steps: <%=  $maxsteps %>

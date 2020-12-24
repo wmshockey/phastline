@@ -1,5 +1,4 @@
 <%= render 'top' %>
-<%= render 'simulations/sim_result_links' %>
 
 <% stepresults = @results.select {|r| r.simulation_id == @sim_id and r.step == @step} %>
 <% maxsteps = (@results.map {|r| r.step}).max %>

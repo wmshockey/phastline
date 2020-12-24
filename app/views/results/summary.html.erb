@@ -1,5 +1,4 @@
 <%= render 'top' %>
-<%= render 'simulations/sim_result_links' %>
 
 <% @pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
 <% @nomination = Nomination.find {|n| n.name == @simulation.nomination_id} %>
