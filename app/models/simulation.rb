@@ -36,18 +36,14 @@ class Simulation < ApplicationRecord
 
 
 # Mainline driver code
-    def run(progress_bar, pipeline, nomination, commodities, units, pumpar)
+    def run(pipeline, nomination, commodities, units, pumpar)
         percent_complete = 0
-        @progress_bar = progress_bar
-        @progress_bar.update_attributes!(message: "Initializing simulation...", percent: "#{percent_complete}")       
         @pipeline = pipeline
         @nomination = nomination
         @commodities = get_commodities(commodities)
         @pumpar = pumpar
         @units = units
-        @progress_bar.update_attributes!(message: "Clearing out previous results...", percent: "#{percent_complete}")   
         Result.where(simulation_id: id).destroy_all
-        @progress_bar.update_attributes!(message: "Gathering up all input data...", percent: "#{percent_complete}")        
         @shipments = @nomination.get_shipments
         @stations = @pipeline.stations
         @segmar = @pipeline.get_all_segments
@@ -59,7 +55,6 @@ class Simulation < ApplicationRecord
         @statar = @pipeline.get_all_stations(@volmar)
 #       Get the combined station curves
         @statcv = @pipeline.get_station_curves(@statar, @units, @pumpar)
-        @progress_bar.update_attributes!(message: "Performing data integrity checks...", percent: "#{percent_complete}")        
         data_integrity_checks(@pipeline)
         if self.errors.any? then
           raise "Errors occurred during processing of input data"
@@ -69,7 +64,6 @@ class Simulation < ApplicationRecord
         max_batchsize = convert_to_si(self.max_batchsize, vol_unit)
         max_flowrate = convert_to_si(self.max_flowrate, flow_unit)
 #       Generate the new period batches
-        @progress_bar.update_attributes!(message: "Generating batches...", percent: "#{percent_complete}")        
         batches = generate_batches(max_batchsize, @nomination.name, @shipments)
 #       Construct the new period batch sequence
         @btsqar = construct_batch_sequence(batches, @statar)
@@ -78,7 +72,6 @@ class Simulation < ApplicationRecord
         $step = 1; stepdone = false
         @stepar = Array.new
 #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
-        @progress_bar.update_attributes!(message: "Starting step processing...", percent: "#{percent_complete}")      
         while not stepdone
           @lfill = linefill(@statar, @btsqar, @volmar)
           @viscar = visc_profile(@lfill, @tempar)
@@ -122,7 +115,6 @@ class Simulation < ApplicationRecord
             raise "Error occurred - too many steps"
           end
           percent_complete = percent_calc(@statar)
-          @progress_bar.update_attributes!(message: "step: #{$step}", percent: "#{percent_complete}")        
         end
         if self.errors.any?
           raise "Errors occurred during step processing"
@@ -131,10 +123,8 @@ class Simulation < ApplicationRecord
 #       Clean up batch sequence and remove batches that had non activity in the simulation
         clean_batch_sequence(@btsqar)
 #       Save step results in database table for user viewing
-        @progress_bar.update_attributes!(message: "Saving step results, please wait, this may take a while depending on number of steps...", percent: "#{percent_complete}")        
         save_results
         if self.errors.empty? then
-          @progress_bar.update_attributes!(message: "Successful Simulation!  You can now view the results. <br>", percent: "#{percent_complete}")        
           return true
         else
           raise "Errors occurred during final cleanup and saving of results"
@@ -146,10 +136,6 @@ class Simulation < ApplicationRecord
       self.errors.each do |n, msg|
         message_text = message_text + msg + "<br>"
       end
-      @progress_bar.update_attributes!(message: message_text, percent: "#{percent_complete}")
-#     Now wait 2 seconds so that client side progressbar javascript routine can pick up and record the error messages.
-      sleep(2)
-#      self.errors.add(:base, e.backtrace)
       return false
     end
 
@@ -1210,7 +1196,6 @@ class Simulation < ApplicationRecord
         @results << result
     end
     @results.each do |r|
-       @progress_bar.update_attributes!(message: "saving results for step #{r.step} of #{max_step} total steps", percent: "100")
       r.save
     end
 #    Result.import @results, validate: false

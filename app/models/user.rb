@@ -8,7 +8,6 @@ class User < ApplicationRecord
   has_many :simulations, dependent: :destroy
   has_many :commodities, dependent: :destroy
   has_many :pumps, dependent: :destroy
-  has_many :progressbars, dependent: :destroy
   validates_acceptance_of :terms_of_service, :allow_nil => false, :message => "must be accepted", :on => :create  
   after_create :populate_seed_data
 

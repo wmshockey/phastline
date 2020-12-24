@@ -1,4 +1,5 @@
 <%= render 'top' %>
+<%= render 'simulations/sim_result_links' %>
 
 <% @pipeline = Pipeline.find {|p| p.id == @simulation.pipeline_id} %>
 <% @nomination = Nomination.find {|n| n.name == @simulation.nomination_id} %>
@@ -38,16 +39,16 @@
 				<% casep = @simulation.convert_from_si(s.casep, punit)%>
 				<% disc = @simulation.convert_from_si(s.disc, punit)%>
 				<% energy = @simulation.convert_from_si(s.kwh, @simulation.energy_unit)%>
-				<td><%= '%8.2f'% dist %></td>
-				<td><%= number_with_precision(flow, :precision => 1, :delimiter => ',') %></td>
-				<td><%= number_with_precision(pumped_vol, :precision => 0, :delimiter => ',') %></td>
-				<td><%= '%.1f'% hold %></td>
-				<td><%= '%.1f'% suct %></td>
-				<td><%= '%.1f'% head %></td>
-				<td><%= '%.1f'% casep %></td>
-				<td><%= '%.1f'% disc %></td>
-				<td><%= '%-8.1f'% s.bottleneck_pct.round(2) %></td>
-				<td><%= number_with_precision(energy, :precision => 0, :delimiter => ',') %></td>
+				<td class="text-right"><%= '%8.2f'% dist %></td>
+				<td class="text-right"><%= number_with_precision(flow, :precision => 0, :delimiter => ',') %></td>
+				<td class="text-right"><%= number_with_precision(pumped_vol, :precision => 0, :delimiter => ',') %></td>
+				<td class="text-right"><%= '%.0f'% hold %></td>
+				<td class="text-right"><%= '%.0f'% suct %></td>
+				<td class="text-right"><%= '%.0f'% head %></td>
+				<td class="text-right"><%= '%.0f'% casep %></td>
+				<td class="text-right"><%= '%.0f'% disc %></td>
+				<td class="text-right"><%= '%-8.1f'% s.bottleneck_pct.round(2) %></td>
+				<td class="text-right"><%= number_with_precision(energy, :precision => 0, :delimiter => ',') %></td>
 			</tr>
 		<% end %>
 	</tbody>
