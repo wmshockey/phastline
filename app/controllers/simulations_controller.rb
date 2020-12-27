@@ -1,5 +1,5 @@
 class SimulationsController < ApplicationController
-  before_action :set_simulation, only: [:show, :edit, :update, :destroy, :run]
+  before_action :set_simulation, only: [:show, :edit, :update, :destroy, :run, :query]
   before_action :authenticate_user!
 
   # GET /simulations
@@ -15,6 +15,10 @@ class SimulationsController < ApplicationController
   # GET /simulations/1
   # GET /simulations/1.json
   def show
+  end
+
+  def query
+    render json: @simulation
   end
 
   # GET /simulations/new
@@ -134,6 +138,6 @@ class SimulationsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def simulation_params
-      params.require(:simulation).permit(:name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime, :flow_unit, :vol_unit, :dist_unit, :pres_unit, :energy_unit, :power_unit, :pmphead_unit, :pmpflow_unit)
+      params.require(:simulation).permit(:id, :name, :description, :pipeline_id, :nomination_id, :max_flowrate, :max_batchsize, :max_steptime, :flow_unit, :vol_unit, :dist_unit, :pres_unit, :energy_unit, :power_unit, :pmphead_unit, :pmpflow_unit)
     end
 end

@@ -1,3 +1,4 @@
+<span class="hidden" id="header">Run Simulation</span>
 <%= render 'shared/error_messages', :object => @simulation %>
 
 <%= render 'show' %>
@@ -8,7 +9,12 @@
 <%= link_to 'Back', simulations_path %>
 <br><br>
 
-<%= button_to "Run Simulation", {:controller => :simulations, :action => 'run'}, :method => :get %>
+<div id="simulation_id" class="hidden"><%= @simulation.id %></div>
+<div class="progress" style="width: 800px">
+  <div id="progressbar" class="progress-bar" role="progressbar" style="width: 0%" >"0%"</div>
+</div>
+<div id="simulation_status" class="text-success bg-success"></div>
+<%= button_to "Run Simulation", {:controller => :simulations, :action => 'run'}, :method => :get, :id => "runSim" %>
 
 
 

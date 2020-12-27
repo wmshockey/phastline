@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     member do
       get 'run'
       get 'copy'
+      get 'query'
     end
   end
   resources :commodities do

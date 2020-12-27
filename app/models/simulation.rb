@@ -13,14 +13,12 @@ class Simulation < ApplicationRecord
     attr_accessor :flowar
     attr_accessor :suctar
     attr_accessor :headar
-    attr_accessor :stepar
     attr_accessor :elevar
     attr_accessor :volmar
     attr_accessor :statar
     attr_accessor :btsqar
     attr_accessor :ratear
     attr_accessor :flowar
-    attr_accessor :stepar
     attr_accessor :statcv
     attr_accessor :summary_results
     belongs_to :user
@@ -38,12 +36,15 @@ class Simulation < ApplicationRecord
 # Mainline driver code
     def run(pipeline, nomination, commodities, units, pumpar)
         percent_complete = 0
+        self.update_attributes!(status: "Initializing simulation... percent complete: #{percent_complete}")
         @pipeline = pipeline
         @nomination = nomination
         @commodities = get_commodities(commodities)
         @pumpar = pumpar
         @units = units
+        self.update_attributes!(status: "Cleaning out previous resuts... percent complete: #{percent_complete}")
         Result.where(simulation_id: id).destroy_all
+        self.update_attributes!(status: "Gathering up all input data... percent complete: #{percent_complete}")
         @shipments = @nomination.get_shipments
         @stations = @pipeline.stations
         @segmar = @pipeline.get_all_segments
@@ -55,6 +56,7 @@ class Simulation < ApplicationRecord
         @statar = @pipeline.get_all_stations(@volmar)
 #       Get the combined station curves
         @statcv = @pipeline.get_station_curves(@statar, @units, @pumpar)
+        self.update_attributes!(status: "Generating batches... percent complete: #{percent_complete}")
         data_integrity_checks(@pipeline)
         if self.errors.any? then
           raise "Errors occurred during processing of input data"
@@ -70,8 +72,8 @@ class Simulation < ApplicationRecord
 #       Set initial positioning of batches in the line (linefill) by setting the initial_volumes in statar
         initial_batch_positioning(@statar, @btsqar, @volmar)
         $step = 1; stepdone = false
-        @stepar = Array.new
 #       Perform each step, iterating on flowrate to find the maximum, then shifting the linefill ahead to the next time-step
+        self.update_attributes!(status: "Starting step processing... percent complete: #{percent_complete}")
         while not stepdone
           @lfill = linefill(@statar, @btsqar, @volmar)
           @viscar = visc_profile(@lfill, @tempar)
@@ -107,24 +109,26 @@ class Simulation < ApplicationRecord
           steprecs.each {|r| r.step_time = time_shift}
 #         Save the linefill in the results
           steprecs.first.linefill = @lfill
-          @stepar = @stepar + steprecs
+#         Save step results in database table for user viewing
+          save_results(steprecs)
+          percent_complete = percent_calc(@statar)
+          self.update_attributes!(status: "step: #{$step}... percent complete: #{percent_complete}")
           $step = $step + 1
           if $step > 10000 then
             self.errors.add(:base, "Number of steps exceeds 10,000.  Simulation stopped at step 10,000")
             logger.error("Number of steps exceeds 10,000.  Simulation stopped at step 10,000")
             raise "Error occurred - too many steps"
           end
-          percent_complete = percent_calc(@statar)
         end
+        self.update_attributes!(status: "step: #{$step}... percent complete: 100")
         if self.errors.any?
           raise "Errors occurred during step processing"
         end
         $maxsteps = $step - 1
 #       Clean up batch sequence and remove batches that had non activity in the simulation
         clean_batch_sequence(@btsqar)
-#       Save step results in database table for user viewing
-        save_results
         if self.errors.empty? then
+          self.update_attributes!(status: "")
           return true
         else
           raise "Errors occurred during final cleanup and saving of results"
@@ -132,10 +136,13 @@ class Simulation < ApplicationRecord
         end
     rescue Exception => e
       self.errors.add(:base, e.message)
-      message_text = "Failed Simulation.  Please see error messages below.<br>"
+      message_text = "Failed Simulation.  Please see error messages below."
       self.errors.each do |n, msg|
         message_text = message_text + msg + "<br>"
       end
+      self.update_attributes!(status: message_text+"100")
+#     Now wait 2 seconds so that client side progressbar javascript routine can pick up and record the error messages.
+      sleep(2)
       return false
     end
 
@@ -1151,11 +1158,10 @@ class Simulation < ApplicationRecord
     return summary_results
   end
 
-
-  def save_results
+  def save_results(steprecs)
     @results = Array.new
     max_step = 0
-    @stepar.each do |s|
+    steprecs.each do |s|
         result = Result.new
         station = @pipeline.stations.find{|i| i.name == s.stat}
         result.simulation_id = self.id
@@ -1195,10 +1201,9 @@ class Simulation < ApplicationRecord
         end
         @results << result
     end
-    @results.each do |r|
+    @results.each do |r|     
       r.save
     end
-#    Result.import @results, validate: false
   end
 
   def copy(simulations, simulation)

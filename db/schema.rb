@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,244 +10,235 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180102204453) do
+ActiveRecord::Schema.define(version: 2020_12_26_151425) do
 
-  create_table "commodities", force: :cascade do |t|
-    t.string   "commodity_id",   limit: 255
-    t.string   "commodity_name", limit: 255
-    t.float    "temp1",          limit: 24
-    t.float    "visc1",          limit: 24
-    t.float    "temp2",          limit: 24
-    t.float    "visc2",          limit: 24
-    t.float    "density",        limit: 24
-    t.float    "density_cf",     limit: 24
-    t.float    "vapor",          limit: 24
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.float    "acoef",          limit: 24
-    t.float    "bcoef",          limit: 24
-    t.integer  "user_id",        limit: 4
-    t.string   "visc_unit",      limit: 12
-    t.string   "dens_unit",      limit: 12
-    t.string   "temp_unit",      limit: 12
-    t.string   "pres_unit",      limit: 12
+  create_table "commodities", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "commodity_id"
+    t.string "commodity_name"
+    t.float "temp1"
+    t.float "visc1"
+    t.float "temp2"
+    t.float "visc2"
+    t.float "density"
+    t.float "density_cf"
+    t.float "vapor"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float "acoef"
+    t.float "bcoef"
+    t.integer "user_id"
+    t.string "visc_unit", limit: 12
+    t.string "dens_unit", limit: 12
+    t.string "temp_unit", limit: 12
+    t.string "pres_unit", limit: 12
   end
 
-  create_table "dras", force: :cascade do |t|
-    t.float    "start_kmp",   limit: 24
-    t.float    "end_kmp",     limit: 24
-    t.float    "dra_percent", limit: 24
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "pipeline_id", limit: 4
+  create_table "dras", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.float "start_kmp"
+    t.float "end_kmp"
+    t.float "dra_percent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "pipeline_id"
   end
 
-  create_table "elevations", force: :cascade do |t|
-    t.float    "kmp",         limit: 24
-    t.float    "elevation",   limit: 24
-    t.integer  "pipeline_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+  create_table "elevations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.float "kmp"
+    t.float "elevation"
+    t.integer "pipeline_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pipeline_id"], name: "index_elevations_on_pipeline_id"
   end
 
-  add_index "elevations", ["pipeline_id"], name: "index_elevations_on_pipeline_id", using: :btree
-
-  create_table "headpoints", force: :cascade do |t|
-    t.string   "pump_id",    limit: 255
-    t.float    "flow",       limit: 24
-    t.float    "head",       limit: 24
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+  create_table "headpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "pump_id"
+    t.float "flow"
+    t.float "head"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pump_id"], name: "index_headpoints_on_pump_id"
   end
 
-  add_index "headpoints", ["pump_id"], name: "index_headpoints_on_pump_id", using: :btree
-
-  create_table "nominations", force: :cascade do |t|
-    t.string   "name",         limit: 255
-    t.string   "description",  limit: 255
-    t.date     "nom_date"
-    t.float    "period",       limit: 24
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.integer  "pipeline_id",  limit: 4
-    t.float    "total_volume", limit: 24
-    t.string   "vol_unit",     limit: 12
+  create_table "nominations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.date "nom_date"
+    t.float "period"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "pipeline_id"
+    t.float "total_volume"
+    t.string "vol_unit", limit: 12
   end
 
-  create_table "pipelines", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.integer  "user_id",     limit: 4
-    t.string   "dist_unit",   limit: 12
-    t.string   "diam_unit",   limit: 12
-    t.string   "thick_unit",  limit: 12
-    t.string   "ruff_unit",   limit: 12
-    t.string   "pres_unit",   limit: 12
-    t.string   "elev_unit",   limit: 12
-    t.string   "temp_unit",   limit: 12
+  create_table "pipelines", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.string "dist_unit", limit: 12
+    t.string "diam_unit", limit: 12
+    t.string "thick_unit", limit: 12
+    t.string "ruff_unit", limit: 12
+    t.string "pres_unit", limit: 12
+    t.string "elev_unit", limit: 12
+    t.string "temp_unit", limit: 12
   end
 
-  create_table "progressbars", force: :cascade do |t|
-    t.text     "message",    limit: 65535
-    t.integer  "percent",    limit: 4
-    t.integer  "user_id",    limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+  create_table "progressbars", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.text "message"
+    t.integer "percent"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_progressbars_on_user_id"
   end
 
-  add_index "progressbars", ["user_id"], name: "index_progressbars_on_user_id", using: :btree
-
-  create_table "pumps", force: :cascade do |t|
-    t.string   "pump_id",                      limit: 255
-    t.text     "description",                  limit: 65535
-    t.string   "flow_units",                   limit: 12
-    t.string   "head_units",                   limit: 12
-    t.string   "pressure_units",               limit: 12
-    t.float    "minimum_suction",              limit: 24
-    t.integer  "stages",                       limit: 4
-    t.float    "impeller_diameter",            limit: 24
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.float    "efficiency_correction_factor", limit: 24
-    t.float    "capacity_correction_factor",   limit: 24
-    t.float    "head_correction_factor",       limit: 24
-    t.integer  "user_id",                      limit: 4
+  create_table "pumps", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "pump_id"
+    t.text "description"
+    t.string "flow_units"
+    t.string "head_units"
+    t.string "pressure_units"
+    t.float "minimum_suction"
+    t.integer "stages"
+    t.float "impeller_diameter"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float "efficiency_correction_factor"
+    t.float "capacity_correction_factor"
+    t.float "head_correction_factor"
+    t.integer "user_id"
   end
 
-  create_table "results", force: :cascade do |t|
-    t.integer  "simulation_id",          limit: 4
-    t.string   "simulation_name",        limit: 255
-    t.integer  "step",                   limit: 4
+  create_table "results", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "simulation_id"
+    t.string "simulation_name"
+    t.integer "step"
     t.datetime "timestamp"
-    t.float    "kmp",                    limit: 24
-    t.integer  "station_id",             limit: 4
-    t.string   "stat",                   limit: 255
-    t.float    "flow",                   limit: 24
-    t.float    "pumped_volume",          limit: 24
-    t.string   "upstream_batch",         limit: 255
-    t.string   "downstream_batch",       limit: 255
-    t.float    "hold",                   limit: 24
-    t.float    "suct",                   limit: 24
-    t.float    "head",                   limit: 24
-    t.float    "casep",                  limit: 24
-    t.float    "disc",                   limit: 24
-    t.float    "max_disc_pressure",      limit: 24
-    t.float    "min_pressure_violation", limit: 24
-    t.float    "min_pressure_point",     limit: 24
-    t.float    "max_pressure_violation", limit: 24
-    t.float    "max_pressure_point",     limit: 24
-    t.float    "total_static_loss",      limit: 24
-    t.float    "total_dynamic_loss",     limit: 24
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
-    t.text     "station_curve_data",     limit: 65535
-    t.text     "batch_sequence_data",    limit: 65535
-    t.float    "hhp",                    limit: 24
-    t.float    "step_time",              limit: 24
-    t.text     "linefill",               limit: 65535
+    t.float "kmp"
+    t.integer "station_id"
+    t.string "stat"
+    t.float "flow"
+    t.float "pumped_volume"
+    t.string "upstream_batch"
+    t.string "downstream_batch"
+    t.float "hold"
+    t.float "suct"
+    t.float "head"
+    t.float "casep"
+    t.float "disc"
+    t.float "max_disc_pressure"
+    t.float "min_pressure_violation"
+    t.float "min_pressure_point"
+    t.float "max_pressure_violation"
+    t.float "max_pressure_point"
+    t.float "total_static_loss"
+    t.float "total_dynamic_loss"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "station_curve_data"
+    t.text "batch_sequence_data"
+    t.float "hhp"
+    t.float "step_time"
+    t.text "linefill"
+    t.index ["simulation_id"], name: "index_results_on_simulation_id"
   end
 
-  add_index "results", ["simulation_id"], name: "index_results_on_simulation_id", using: :btree
-
-  create_table "segments", force: :cascade do |t|
-    t.float    "diameter",    limit: 24
-    t.float    "thickness",   limit: 24
-    t.float    "roughness",   limit: 24
-    t.float    "mawp",        limit: 24
-    t.integer  "pipeline_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.float    "kmp",         limit: 24
+  create_table "segments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.float "diameter"
+    t.float "thickness"
+    t.float "roughness"
+    t.float "mawp"
+    t.integer "pipeline_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float "kmp"
+    t.index ["pipeline_id"], name: "index_segments_on_pipeline_id"
   end
 
-  add_index "segments", ["pipeline_id"], name: "index_segments_on_pipeline_id", using: :btree
-
-  create_table "shipments", force: :cascade do |t|
-    t.string   "start_location", limit: 255
-    t.string   "end_location",   limit: 255
-    t.string   "shipper",        limit: 255
-    t.string   "commodity_id",   limit: 255
-    t.float    "volume",         limit: 24
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.integer  "nomination_id",  limit: 4
+  create_table "shipments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "start_location"
+    t.string "end_location"
+    t.string "shipper"
+    t.string "commodity_id"
+    t.float "volume"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "nomination_id"
+    t.index ["nomination_id"], name: "index_shipments_on_nomination_id"
   end
 
-  add_index "shipments", ["nomination_id"], name: "index_shipments_on_nomination_id", using: :btree
-
-  create_table "simulations", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.string   "description",   limit: 255
-    t.float    "max_flowrate",  limit: 24
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.float    "max_batchsize", limit: 24
-    t.integer  "pipeline_id",   limit: 4
-    t.integer  "schedule_id",   limit: 4
-    t.integer  "nomination_id", limit: 4
-    t.integer  "user_id",       limit: 4
-    t.float    "max_steptime",  limit: 24
-    t.string   "flow_unit",     limit: 12
-    t.string   "vol_unit",      limit: 12
-    t.string   "dist_unit",     limit: 12
-    t.string   "pres_unit",     limit: 12
-    t.string   "energy_unit",   limit: 12
-    t.string   "power_unit",    limit: 12
-    t.string   "pmphead_unit",  limit: 12
-    t.string   "pmpflow_unit",  limit: 12
+  create_table "simulations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.float "max_flowrate"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float "max_batchsize"
+    t.integer "pipeline_id"
+    t.integer "schedule_id"
+    t.integer "nomination_id"
+    t.integer "user_id"
+    t.float "max_steptime"
+    t.string "flow_unit", limit: 12
+    t.string "vol_unit", limit: 12
+    t.string "dist_unit", limit: 12
+    t.string "pres_unit", limit: 12
+    t.string "energy_unit", limit: 12
+    t.string "power_unit", limit: 12
+    t.string "pmphead_unit", limit: 12
+    t.string "pmpflow_unit", limit: 12
+    t.string "status"
   end
 
-  create_table "stations", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.float    "kmp",         limit: 24
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.integer  "pipeline_id", limit: 4
+  create_table "stations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.float "kmp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "pipeline_id"
+    t.index ["pipeline_id"], name: "index_stations_on_pipeline_id"
   end
 
-  add_index "stations", ["pipeline_id"], name: "index_stations_on_pipeline_id", using: :btree
-
-  create_table "temperatures", force: :cascade do |t|
-    t.float    "kmp",         limit: 24
-    t.float    "temperature", limit: 24
-    t.integer  "pipeline_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+  create_table "temperatures", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.float "kmp"
+    t.float "temperature"
+    t.integer "pipeline_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pipeline_id"], name: "index_temperatures_on_pipeline_id"
   end
 
-  add_index "temperatures", ["pipeline_id"], name: "index_temperatures_on_pipeline_id", using: :btree
-
-  create_table "units", force: :cascade do |t|
-    t.integer  "station_id",  limit: 4
-    t.string   "pump_id",     limit: 255
-    t.integer  "unit_row",    limit: 4
-    t.integer  "unit_column", limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+  create_table "units", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "station_id"
+    t.string "pump_id"
+    t.integer "unit_row"
+    t.integer "unit_column"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["station_id"], name: "index_units_on_station_id"
   end
 
-  add_index "units", ["station_id"], name: "index_units_on_station_id", using: :btree
-
-  create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255, default: "",    null: false
-    t.string   "encrypted_password",     limit: 255, default: "",    null: false
-    t.string   "reset_password_token",   limit: 255
+  create_table "users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
+    t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",     limit: 255
-    t.string   "last_sign_in_ip",        limit: 255
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.boolean  "admin",                              default: false
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "admin", default: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
-
-  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   add_foreign_key "elevations", "pipelines"
   add_foreign_key "progressbars", "users"

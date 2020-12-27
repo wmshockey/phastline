@@ -3,6 +3,10 @@
 
 $(document).ready(() => {
 	
+	  if (document.getElementById("header")) {
+		  var header = document.getElementById("header").innerHTML;
+	  }
+	
 	  $('.copyright').on('mouseenter', event => {
 	    $(event.currentTarget).css({color: 'red'})
 	  });
@@ -20,7 +24,28 @@ $(document).ready(() => {
 	  })
   
 	  $('#runSim').click(function() {
-		  $("#simulation").removeClass("hidden")
+		  $("#simulation").removeClass("hidden");
+		  $("#simulation_status").text("Simulation started! 0");
+	/* Check every 1 second to see status of simulation. */
+		  id = document.getElementById("simulation_id").innerHTML;
+			setInterval(function() {	
+				$.ajax({
+					url: "/simulations/"+id+"/query",
+					dataType: 'json',
+					success: function(data) {
+						var status_msg = data.status;
+						$("#simulation_status").text(status_msg);
+						var msg_arr = status_msg.split(" ");
+						var pct = msg_arr[msg_arr.length-1]+"%";
+						progress_bar = document.getElementById("progressbar");
+						progress_bar.style.width = pct;
+						progress_bar.innerHTML = pct;			
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						alert('ajax error: ' + textStatus + ': ' + errorThrown);
+					}
+				});					
+			}, 1000);
 	  })
   
 	  $('#showResults').click(function() {
@@ -52,6 +77,7 @@ $(document).ready(() => {
   $('#estimate_steps').click(function() {
 	  calc_steps();
   });	  
+
 	  
   function calc_steps() {
 	  get_step_info();

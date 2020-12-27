@@ -13,8 +13,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: phastline_root
-  password: Hayabusa12
+  username: <%= ENV['PHASTLINE_DB_USERNAME']%>
+  password: <%= ENV['PHASTLINE_DB_PASSWORD']%>
   socket: /tmp/mysql.sock
 
 development:
@@ -50,5 +50,5 @@ test:
 production:
   <<: *default
   database: Phastline_prod
-  username: phastline_root
-  password: <%= ENV['PHASTLINE_DATABASE_PASSWORD'] %>
+  username: <%= ENV['PHASTLINE_DB_USERNAME']%>
+  password: <%= ENV['PHASTLINE_DB_PASSWORD'] %>
