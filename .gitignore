@@ -18,7 +18,7 @@ dump.rdb
 .DS_Store
 */.DS_Store
 .byebug_history
-Phastline_dev_dump.sql
+/Phastline*.sql
 <<<<<<< HEAD
 =======
 >>>>>>> d2da4c9139bda8bd777999c11aff39309c829ae8
