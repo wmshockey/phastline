@@ -19,7 +19,7 @@ gem 'tzinfo-data'
 # Use ActiveRecord import
 gem 'activerecord-import', '~> 0.15.0'
 # Use Sidekiq for Active Job Queue
-gem "sidekiq" 
+# gem "sidekiq" 
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

@@ -128,6 +128,6 @@ class ResultsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def result_params
-      params.require(:result).permit(:simulation_id, :simulation_name, :step, :timestamp, :kmp, :station_id, :stat, :flow, :pumped_volume, :upstream_batch, :downstream_batch, :hold, :suct, :head, :casep, :disc, :max_disc_pressure, :min_pressure_violation, :min_pressure_point, :max_pressure_violation, :max_pressure_point, :total_static_loss, :total_dynamic_loss)
+            params.require(:result).permit(:simulation_id, :simulation_name, :step, :timestamp, :step_time, :kmp, :station_id, :stat, :flow, :pumped_volume, :upstream_batch, :downstream_batch, :hold, :suct, :head, :casep, :disc, :max_disc_pressure, :min_pressure_violation, :min_pressure_point, :max_pressure_violation, :max_pressure_point, :total_static_loss, :total_dynamic_loss, :hhp, :linefill)
     end
 end

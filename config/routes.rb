@@ -55,7 +55,6 @@ Rails.application.routes.draw do
     resources :segments
     resources :stations do
       resources :units
-      resources :results
     end
     resources :elevations
     resources :temperatures

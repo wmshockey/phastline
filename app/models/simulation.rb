@@ -92,9 +92,9 @@ class Simulation < ApplicationRecord
             @flowar = calc_flowrates(flow, ratear)
             @headar = head_calc(@statar, @statcv, @flowar, @densar)
             @dlossar = dynamic_loss(@flowar, @segmar, @viscar, @densar, @draar)
-            steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
+            @steprecs = step_calc(@statar, @flowar, @btsqar, @suctar, @headar, @slossar, @dlossar, @maxpressar, @minpressar)
 #           Adjust the flowrate to converge on the capacity flow rate
-            new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, steprecs)
+            new_flow, viol, iterdone = adjust_flow(flow, prev_flow, prev_viol, iter, @steprecs)
             iterdone = true if flow == max_flowrate and viol <= 0
             if flow <= 0.0 and viol > 0 then
               self.errors.add(:base, "Flowrate iterations cannot converge in step #{$step}")
@@ -106,11 +106,11 @@ class Simulation < ApplicationRecord
 #         Shift batches into position for the next step, then save the step results
           stepdone, time_shift = step_shift_volumes(@statar, @btsqar, @flowar)
 #         Update the step records with the step duration time (time_shift)
-          steprecs.each {|r| r.step_time = time_shift}
+          @steprecs.each {|r| r.step_time = time_shift}
 #         Save the linefill in the results
-          steprecs.first.linefill = @lfill
+          @steprecs.first.linefill = @lfill
 #         Save step results in database table for user viewing
-          save_results(steprecs)
+          save_results
           percent_complete = percent_calc(@statar)
           self.update_attributes!(status: "step: #{$step}... percent complete: #{percent_complete}")
           $step = $step + 1
@@ -138,7 +138,7 @@ class Simulation < ApplicationRecord
       self.errors.add(:base, e.message)
       message_text = "Failed Simulation.  Please see error messages below."
       self.errors.each do |n, msg|
-        message_text = message_text + msg + "<br>"
+        message_text = message_text + msg
       end
       self.update_attributes!(status: message_text+"100")
 #     Now wait 2 seconds so that client side progressbar javascript routine can pick up and record the error messages.
@@ -995,7 +995,7 @@ class Simulation < ApplicationRecord
   def step_calc(statar, flowar, btsqar, suctar, headar, slossar, dlossar, maxpressar, minpressar)
     kmp = statar[0].kmp
     pres = suctar.get_y(kmp)
-    steprecs = Array.new
+    @steprecs = Array.new
     statar.each_with_index do |i, stn_ix|
       stat = i.name
       station_id = i.station_id
@@ -1082,11 +1082,11 @@ class Simulation < ApplicationRecord
         hhp = 0
       end
 #     Save step result record
-      steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, \
+      @steprecs << Steprec.new($step, $timestamp, 0, kmp, stat, station_id, flow, i.pumped_volume, \
                               upstream_batch_str, downstream_batch_str, hold, suct, head, casep, \
                               disc, mxdp, mnvl, mnpt, mxvl, mxpt, telos, tdlos, hhp, [])
     end
-    return steprecs
+    return @steprecs
   rescue Exception => e
     self.errors.add(:base, e.message)
   end
@@ -1158,10 +1158,10 @@ class Simulation < ApplicationRecord
     return summary_results
   end
 
-  def save_results(steprecs)
+  def save_results
     @results = Array.new
     max_step = 0
-    steprecs.each do |s|
+    @steprecs.each do |s|
         result = Result.new
         station = @pipeline.stations.find{|i| i.name == s.stat}
         result.simulation_id = self.id
@@ -1201,8 +1201,14 @@ class Simulation < ApplicationRecord
         end
         @results << result
     end
-    @results.each do |r|     
-      r.save
+    n = 0
+    while n<= @results.length-1
+      rec = @results[n]
+      if rec.save(validate: false) then
+      else
+        logger.error "Save of result record failed with message: #{rec.errors.full_messages} and pipeline = #{@pipeline.name}"
+      end
+      n=n+1
     end
   end
 
