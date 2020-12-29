@@ -2,6 +2,8 @@
 
 Phastline simulates the operation of a batched or single product liquid pipeline. By providing the application with a physical description of the pipeline such as length, diameter, elevation, station location, pumps etc. and the type of product to be shipped, the application will calculate and report the hydraulic gradients, pressures, flowrates, power and energy. It takes the products to be shipped in the form of a nomination, breaks the volumes into batches and simulates the movement of those batches through the pipeline, taking into account intermediate injections and deliveries at stations along the line. Batch injections will be scheduled out over the course of the simulation to evenly spread the volumes provided by each shipper.
 
+The publically available implementation of this application is available to anyone interested at www.phastware.com
+
 Technical details to get the application up and running:
 
 The Phastline application is basically a standard Ruby on Rails application with some minor javascript additions to the forms.  You should be able to deploy it by cloning the repository and setting the environment variables for your specific machine.  I run the development environment on an iMac OSX box and the server environment runs on a Linux Centos Version 7 box.
@@ -10,11 +12,13 @@ The Phastline application is basically a standard Ruby on Rails application with
 
 * Rails version is 5.2.4.2
 
+* MySQL version is 5.7.29
+
 * Configuration requires setting environment variables for your specific installations:
 PHASTLINE_DB_USERNAME, 
 PHASTLINE_DB_PASSWORD
 
-* You should be able to create an initial database by doing the following:
+* You should be able to create an initial MySQL database by doing the following:
 rake db:schema:dump
 rails generate migration create_database_structure
 
