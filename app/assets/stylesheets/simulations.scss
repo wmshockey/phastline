@@ -5,6 +5,8 @@
 body {
 	background: url('bg.jpg');
 	background-repeat: repeat no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
 } 
 
 .success {background-color: #4CAF50;} /* Green */

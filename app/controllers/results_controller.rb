@@ -20,16 +20,16 @@ class ResultsController < ApplicationController
   
   def station_detail
     @station_id = params[:station_id].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.station_id == @station_id}
+    @results = Result.where(["simulation_id = (?) and station_id = ?", @sim_id, @station_id])
   end
 
   def station_step_detail
     @station_id = params[:station_id].to_i
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.station_id == @station_id}
+    @results = Result.where(["simulation_id = (?) and station_id = ?", @sim_id, @station_id])
   end
 
   def station_curves
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
+    @results = Result.where(["simulation_id = (?) and step = ?", @sim_id, 1])
   end
 
   def step_flowrates
@@ -37,12 +37,12 @@ class ResultsController < ApplicationController
   end
 
   def batch_sequence
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
+    @results = Result.where(["simulation_id = (?) and step = ?", @sim_id, 1])
   end
 
   def batch_detail
     @batch = params[:batch]
-    @results = Result.select {|r| r.simulation_id == @sim_id and r.step == 1}
+    @results = Result.where(["simulation_id = (?) and step = ?", @sim_id, 1])
   end
   
   def power
@@ -116,7 +116,7 @@ class ResultsController < ApplicationController
       @sim_id = params[:id].to_i
       @simulation = Simulation.find(params[:id])
       @pipeline = Pipeline.find(@simulation.pipeline_id)
-      @results = Result.select {|r| r.simulation_id == @sim_id}
+      @results = Result.where(["simulation_id = (?)", @sim_id])
       if @results.empty?
         respond_to do |format|
           flash[:error] = "No simulation results available at this point, please run a simulation"
